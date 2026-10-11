@@ -1,0 +1,6629 @@
+{
+ "version": 1,
+ "name": "dark2",
+ "source": "aicars/dark2",
+ "sha256": {
+  "ngp": "74c8209603c2123f09c3d58f889a603f607202f24da73574861441395253f0c1",
+  "ptr": "616a9df78eb047d9b8fc524c073a5f54b39cf3f0c144b05d0ebab24942bc8d86",
+  "tex": "734359dc925bba387cdb31935a98d564beeb042cc5b0c45d7bd24e0cae5d58dd"
+ },
+ "coords": "ps2",
+ "counts": {
+  "meshes": 105,
+  "triangles": 15278,
+  "sprites": 0,
+  "beams": 0,
+  "textures": 14,
+  "instances": 25
+ },
+ "errors": [],
+ "scene": [
+  {
+   "mesh": "m006ef0",
+   "bone": "n00c360"
+  },
+  {
+   "mesh": "m00c410",
+   "bone": null
+  },
+  {
+   "mesh": "m00c800",
+   "bone": null
+  },
+  {
+   "mesh": "m01f5e0",
+   "bone": "n0255e0"
+  },
+  {
+   "mesh": "m025690",
+   "bone": null
+  },
+  {
+   "mesh": "m025810",
+   "bone": null
+  },
+  {
+   "mesh": "m0276a0",
+   "bone": null
+  },
+  {
+   "mesh": "m028a10",
+   "bone": null
+  },
+  {
+   "mesh": "m028f90",
+   "bone": null
+  },
+  {
+   "mesh": "m0334d0",
+   "bone": null
+  },
+  {
+   "mesh": "m0341a0",
+   "bone": null
+  },
+  {
+   "mesh": "m034a80",
+   "bone": null
+  },
+  {
+   "mesh": "m035380",
+   "bone": null
+  },
+  {
+   "mesh": "m0361d0",
+   "bone": "n036570"
+  },
+  {
+   "mesh": "m036620",
+   "bone": "n0369b0"
+  },
+  {
+   "mesh": "m036a60",
+   "bone": "n036dc0"
+  },
+  {
+   "mesh": "m036c10",
+   "bone": "n036dc0"
+  },
+  {
+   "mesh": "m036e70",
+   "bone": "n0371d0"
+  },
+  {
+   "mesh": "m037020",
+   "bone": "n0371d0"
+  },
+  {
+   "mesh": "m0372e0",
+   "bone": "n037680"
+  },
+  {
+   "mesh": "m037730",
+   "bone": "n037ad0"
+  },
+  {
+   "mesh": "m037b80",
+   "bone": "n037ee0"
+  },
+  {
+   "mesh": "m037d30",
+   "bone": "n037ee0"
+  },
+  {
+   "mesh": "m037f90",
+   "bone": "n0382f0"
+  },
+  {
+   "mesh": "m038140",
+   "bone": "n0382f0"
+  }
+ ],
+ "effects": {
+  "n000170": [],
+  "n03b1e0": [
+   {
+    "mesh": "m038440",
+    "bone": null
+   },
+   {
+    "mesh": "m038b20",
+    "bone": null
+   },
+   {
+    "mesh": "m039270",
+    "bone": null
+   },
+   {
+    "mesh": "m0398d0",
+    "bone": null
+   },
+   {
+    "mesh": "m039f40",
+    "bone": null
+   },
+   {
+    "mesh": "m03a830",
+    "bone": null
+   }
+  ],
+  "n03cfc0": [
+   {
+    "mesh": "m03cdc0",
+    "bone": null
+   }
+  ]
+ },
+ "objects": [
+  {
+   "node": "n03d0d0",
+   "inScene": true,
+   "instances": [
+    {
+     "mesh": "m006ef0",
+     "bone": "n00c360"
+    },
+    {
+     "mesh": "m00c410",
+     "bone": null
+    },
+    {
+     "mesh": "m00c800",
+     "bone": null
+    },
+    {
+     "mesh": "m01f5e0",
+     "bone": "n0255e0"
+    },
+    {
+     "mesh": "m025690",
+     "bone": null
+    },
+    {
+     "mesh": "m025810",
+     "bone": null
+    },
+    {
+     "mesh": "m0276a0",
+     "bone": null
+    },
+    {
+     "mesh": "m028a10",
+     "bone": null
+    },
+    {
+     "mesh": "m028f90",
+     "bone": null
+    },
+    {
+     "mesh": "m0334d0",
+     "bone": null
+    },
+    {
+     "mesh": "m0341a0",
+     "bone": null
+    },
+    {
+     "mesh": "m034a80",
+     "bone": null
+    },
+    {
+     "mesh": "m035380",
+     "bone": null
+    },
+    {
+     "mesh": "m0361d0",
+     "bone": "n036570"
+    },
+    {
+     "mesh": "m036620",
+     "bone": "n0369b0"
+    },
+    {
+     "mesh": "m036a60",
+     "bone": "n036dc0"
+    },
+    {
+     "mesh": "m036c10",
+     "bone": "n036dc0"
+    },
+    {
+     "mesh": "m036e70",
+     "bone": "n0371d0"
+    },
+    {
+     "mesh": "m037020",
+     "bone": "n0371d0"
+    },
+    {
+     "mesh": "m0372e0",
+     "bone": "n037680"
+    },
+    {
+     "mesh": "m037730",
+     "bone": "n037ad0"
+    },
+    {
+     "mesh": "m037b80",
+     "bone": "n037ee0"
+    },
+    {
+     "mesh": "m037d30",
+     "bone": "n037ee0"
+    },
+    {
+     "mesh": "m037f90",
+     "bone": "n0382f0"
+    },
+    {
+     "mesh": "m038140",
+     "bone": "n0382f0"
+    }
+   ]
+  }
+ ],
+ "bones": {
+  "n00c360": {
+   "parent": null,
+   "invBind": [
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    -0.073807,
+    -1.730625,
+    -5.441292,
+    1.0
+   ],
+   "bind": [
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    0.073807,
+    1.730625,
+    5.441292,
+    1.0
+   ]
+  },
+  "n0255e0": {
+   "parent": null,
+   "invBind": [
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    -0.410354,
+    -8.94012,
+    -121.847748,
+    1.0
+   ],
+   "bind": [
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    0.410354,
+    8.94012,
+    121.847748,
+    1.0
+   ]
+  },
+  "n036570": {
+   "parent": null,
+   "invBind": [
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    16.936869,
+    -8.934015,
+    -14.785517,
+    1.0
+   ],
+   "bind": [
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    -16.936869,
+    8.934015,
+    14.785517,
+    1.0
+   ]
+  },
+  "n0369b0": {
+   "parent": null,
+   "invBind": [
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    -16.746729,
+    -8.934015,
+    -14.785517,
+    1.0
+   ],
+   "bind": [
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    16.746729,
+    8.934015,
+    14.785517,
+    1.0
+   ]
+  },
+  "n036dc0": {
+   "parent": null,
+   "invBind": [
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    17.537189,
+    -9.521784,
+    -14.785518,
+    1.0
+   ],
+   "bind": [
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    -17.537189,
+    9.521784,
+    14.785518,
+    1.0
+   ]
+  },
+  "n0371d0": {
+   "parent": null,
+   "invBind": [
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    -17.347052,
+    -9.521784,
+    -14.785518,
+    1.0
+   ],
+   "bind": [
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    17.347052,
+    9.521784,
+    14.785518,
+    1.0
+   ]
+  },
+  "n037680": {
+   "parent": null,
+   "invBind": [
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    19.019594,
+    -22.949085,
+    -110.398613,
+    1.0
+   ],
+   "bind": [
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    -19.019594,
+    22.949085,
+    110.398613,
+    1.0
+   ]
+  },
+  "n037ad0": {
+   "parent": null,
+   "invBind": [
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    -19.866436,
+    -22.949085,
+    -109.84893,
+    1.0
+   ],
+   "bind": [
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    19.866436,
+    22.949085,
+    109.84893,
+    1.0
+   ]
+  },
+  "n037ee0": {
+   "parent": null,
+   "invBind": [
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    19.526794,
+    -9.893577,
+    -12.020994,
+    1.0
+   ],
+   "bind": [
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    -19.526794,
+    9.893577,
+    12.020994,
+    1.0
+   ]
+  },
+  "n0382f0": {
+   "parent": null,
+   "invBind": [
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    -19.359234,
+    -9.893577,
+    -11.471312,
+    1.0
+   ],
+   "bind": [
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    19.359234,
+    9.893577,
+    11.471312,
+    1.0
+   ]
+  }
+ },
+ "sceneUnknown": {},
+ "meshes": {
+  "m0001c0": {
+   "offset": 448,
+   "flags": 10027536,
+   "texture": "df250",
+   "texture2": null,
+   "textures": [
+    "df250"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m0001c0",
+   "sphere": [
+    0.0,
+    0.0,
+    97.37488,
+    33.06543
+   ],
+   "parts": [
+    {
+     "texture": "df250",
+     "attributes": {
+      "position": [
+       0,
+       240
+      ],
+      "normal": [
+       960,
+       240
+      ],
+      "uv": [
+       1920,
+       160
+      ],
+      "color": [
+       2560,
+       240
+      ],
+      "indices": [
+       3520,
+       144
+      ]
+     }
+    }
+   ]
+  },
+  "m000700": {
+   "offset": 1792,
+   "flags": 10027536,
+   "texture": "dca5c",
+   "texture2": null,
+   "textures": [
+    "dca5c"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m000700",
+   "sphere": [
+    0.0,
+    0.40182,
+    -1.515,
+    38.36256
+   ],
+   "parts": [
+    {
+     "texture": "dca5c",
+     "attributes": {
+      "position": [
+       4096,
+       828
+      ],
+      "normal": [
+       7408,
+       828
+      ],
+      "uv": [
+       10720,
+       552
+      ],
+      "color": [
+       12928,
+       828
+      ],
+      "indices": [
+       16240,
+       576
+      ]
+     }
+    }
+   ]
+  },
+  "m001440": {
+   "offset": 5184,
+   "flags": 10027536,
+   "texture": "dcb58",
+   "texture2": null,
+   "textures": [
+    "dcb58"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m001440",
+   "sphere": [
+    1.41656,
+    -1.53818,
+    73.48613,
+    54.45842
+   ],
+   "parts": [
+    {
+     "texture": "dcb58",
+     "attributes": {
+      "position": [
+       18544,
+       309
+      ],
+      "normal": [
+       19780,
+       309
+      ],
+      "uv": [
+       21016,
+       206
+      ],
+      "color": [
+       21840,
+       309
+      ],
+      "indices": [
+       23076,
+       201
+      ]
+     }
+    }
+   ]
+  },
+  "m001a60": {
+   "offset": 6752,
+   "flags": 14942736,
+   "texture": "dca5c",
+   "texture2": "dcc54",
+   "textures": [
+    "dca5c",
+    "dcc54",
+    "dcb58",
+    "dc7b4"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m001a60",
+   "sphere": [
+    9.57424,
+    1.12068,
+    69.89921,
+    88.93533
+   ],
+   "parts": [
+    {
+     "texture": "dca5c",
+     "attributes": {
+      "position": [
+       23880,
+       1518
+      ],
+      "normal": [
+       29952,
+       1518
+      ],
+      "uv": [
+       36024,
+       1012
+      ],
+      "color": [
+       40072,
+       1518
+      ],
+      "indices": [
+       46144,
+       888
+      ]
+     }
+    },
+    {
+     "texture": "dcc54",
+     "attributes": {
+      "position": [
+       49696,
+       1494
+      ],
+      "normal": [
+       55672,
+       1494
+      ],
+      "uv": [
+       61648,
+       996
+      ],
+      "color": [
+       65632,
+       1494
+      ],
+      "indices": [
+       71608,
+       1050
+      ]
+     }
+    },
+    {
+     "texture": "dcb58",
+     "attributes": {
+      "position": [
+       75808,
+       912
+      ],
+      "normal": [
+       79456,
+       912
+      ],
+      "uv": [
+       83104,
+       608
+      ],
+      "color": [
+       85536,
+       912
+      ],
+      "indices": [
+       89184,
+       564
+      ]
+     }
+    },
+    {
+     "texture": "dc7b4",
+     "attributes": {
+      "position": [
+       91440,
+       1440
+      ],
+      "normal": [
+       97200,
+       1440
+      ],
+      "uv": [
+       102960,
+       960
+      ],
+      "color": [
+       106800,
+       1440
+      ],
+      "indices": [
+       112560,
+       912
+      ]
+     }
+    }
+   ]
+  },
+  "m006b90": {
+   "offset": 27536,
+   "flags": 10027536,
+   "texture": "dcb58",
+   "texture2": null,
+   "textures": [
+    "dcb58"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m006b90",
+   "sphere": [
+    0.0,
+    0.04,
+    96.4903,
+    33.24026
+   ],
+   "parts": [
+    {
+     "texture": "dcb58",
+     "attributes": {
+      "position": [
+       116208,
+       66
+      ],
+      "normal": [
+       116472,
+       66
+      ],
+      "uv": [
+       116736,
+       44
+      ],
+      "color": [
+       116912,
+       66
+      ],
+      "indices": [
+       117176,
+       36
+      ]
+     }
+    }
+   ]
+  },
+  "m006ef0": {
+   "offset": 28400,
+   "flags": 1639184,
+   "texture": "dcc54",
+   "texture2": null,
+   "textures": [
+    "dcc54"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m006ef0",
+   "sphere": [
+    0.0084,
+    0.9681,
+    12.514,
+    11.07175
+   ],
+   "parts": [
+    {
+     "texture": "dcc54",
+     "attributes": {
+      "position": [
+       117320,
+       1554
+      ],
+      "normal": [
+       123536,
+       1554
+      ],
+      "uv": [
+       129752,
+       1036
+      ],
+      "color": [
+       133896,
+       1554
+      ],
+      "indices": [
+       140112,
+       1152
+      ]
+     }
+    }
+   ]
+  },
+  "m008810": {
+   "offset": 34832,
+   "flags": 1639184,
+   "texture": "dcc54",
+   "texture2": null,
+   "textures": [
+    "dcc54"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m008810",
+   "sphere": [
+    -1.32803,
+    3.1788,
+    12.10909,
+    10.87036
+   ],
+   "parts": [
+    {
+     "texture": "dcc54",
+     "attributes": {
+      "position": [
+       144720,
+       1758
+      ],
+      "normal": [
+       151752,
+       1758
+      ],
+      "uv": [
+       158784,
+       1172
+      ],
+      "color": [
+       163472,
+       1758
+      ],
+      "indices": [
+       170504,
+       1308
+      ]
+     }
+    }
+   ]
+  },
+  "m00a660": {
+   "offset": 42592,
+   "flags": 3277328,
+   "texture": "890e4",
+   "texture2": "dcc54",
+   "textures": [
+    "890e4",
+    "dcc54"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m00a660",
+   "sphere": [
+    1.13157,
+    0.51243,
+    11.58987,
+    10.47083
+   ],
+   "parts": [
+    {
+     "texture": "890e4",
+     "attributes": {
+      "position": [
+       175736,
+       150
+      ],
+      "normal": [
+       176336,
+       150
+      ],
+      "uv": [
+       176936,
+       100
+      ],
+      "color": [
+       177336,
+       150
+      ],
+      "indices": [
+       177936,
+       102
+      ]
+     }
+    },
+    {
+     "texture": "dcc54",
+     "attributes": {
+      "position": [
+       178344,
+       1380
+      ],
+      "normal": [
+       183864,
+       1380
+      ],
+      "uv": [
+       189384,
+       920
+      ],
+      "color": [
+       193064,
+       1380
+      ],
+      "indices": [
+       198584,
+       1020
+      ]
+     }
+    }
+   ]
+  },
+  "m00bf20": {
+   "offset": 48928,
+   "flags": 11665936,
+   "texture": "bcf7c",
+   "texture2": "b01d4",
+   "textures": [
+    "bcf7c",
+    "b01d4"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m00bf20",
+   "sphere": [
+    -1.90111,
+    3.53979,
+    11.25527,
+    7.60333
+   ],
+   "parts": [
+    {
+     "texture": "bcf7c",
+     "attributes": {
+      "position": [
+       202664,
+       60
+      ],
+      "normal": [
+       202904,
+       60
+      ],
+      "uv": [
+       203144,
+       40
+      ],
+      "color": [
+       203304,
+       60
+      ],
+      "indices": [
+       203544,
+       36
+      ]
+     }
+    },
+    {
+     "texture": "b01d4",
+     "attributes": {
+      "position": [
+       203688,
+       78
+      ],
+      "normal": [
+       204000,
+       78
+      ],
+      "uv": [
+       204312,
+       52
+      ],
+      "color": [
+       204520,
+       78
+      ],
+      "indices": [
+       204832,
+       48
+      ]
+     }
+    }
+   ]
+  },
+  "m00c410": {
+   "offset": 50192,
+   "flags": 3277328,
+   "texture": "dca5c",
+   "texture2": "dcb58",
+   "textures": [
+    "dca5c",
+    "dcb58"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m00c410",
+   "sphere": [
+    -0.00626,
+    -0.09465,
+    8.9357,
+    20.65433
+   ],
+   "parts": [
+    {
+     "texture": "dca5c",
+     "attributes": {
+      "position": [
+       205024,
+       96
+      ],
+      "normal": [
+       205408,
+       96
+      ],
+      "uv": [
+       205792,
+       64
+      ],
+      "color": [
+       206048,
+       96
+      ],
+      "indices": [
+       206432,
+       48
+      ]
+     }
+    },
+    {
+     "texture": "dcb58",
+     "attributes": {
+      "position": [
+       206624,
+       108
+      ],
+      "normal": [
+       207056,
+       108
+      ],
+      "uv": [
+       207488,
+       72
+      ],
+      "color": [
+       207776,
+       108
+      ],
+      "indices": [
+       208208,
+       60
+      ]
+     }
+    }
+   ]
+  },
+  "m00c800": {
+   "offset": 51200,
+   "flags": 3277328,
+   "texture": "dc7b4",
+   "texture2": "b01d4",
+   "textures": [
+    "dc7b4",
+    "b01d4"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m00c800",
+   "sphere": [
+    -0.0,
+    0.0,
+    0.25984,
+    23.74614
+   ],
+   "parts": [
+    {
+     "texture": "dc7b4",
+     "attributes": {
+      "position": [
+       208448,
+       5061
+      ],
+      "normal": [
+       228692,
+       5061
+      ],
+      "uv": [
+       248936,
+       3374
+      ],
+      "color": [
+       262432,
+       5061
+      ],
+      "indices": [
+       282676,
+       3363
+      ]
+     }
+    },
+    {
+     "texture": "b01d4",
+     "attributes": {
+      "position": [
+       296128,
+       492
+      ],
+      "normal": [
+       298096,
+       492
+      ],
+      "uv": [
+       300064,
+       328
+      ],
+      "color": [
+       301376,
+       492
+      ],
+      "indices": [
+       303344,
+       276
+      ]
+     }
+    }
+   ]
+  },
+  "m011bd0": {
+   "offset": 72656,
+   "flags": 1638928,
+   "texture": "dca5c",
+   "texture2": null,
+   "textures": [
+    "dca5c"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m011bd0",
+   "sphere": [
+    -5.0,
+    -7.03947,
+    1.4972,
+    6.24558
+   ],
+   "parts": [
+    {
+     "texture": "dca5c",
+     "attributes": {
+      "position": [
+       304448,
+       12
+      ],
+      "normal": [
+       304496,
+       12
+      ],
+      "uv": [
+       304544,
+       8
+      ],
+      "color": [
+       304576,
+       12
+      ],
+      "indices": [
+       304624,
+       6
+      ]
+     }
+    }
+   ]
+  },
+  "m011ce0": {
+   "offset": 72928,
+   "flags": 3277328,
+   "texture": "dca5c",
+   "texture2": "dcb58",
+   "textures": [
+    "dca5c",
+    "dcb58"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m011ce0",
+   "sphere": [
+    -0.00626,
+    -0.09465,
+    8.9357,
+    20.65433
+   ],
+   "parts": [
+    {
+     "texture": "dca5c",
+     "attributes": {
+      "position": [
+       304648,
+       96
+      ],
+      "normal": [
+       305032,
+       96
+      ],
+      "uv": [
+       305416,
+       64
+      ],
+      "color": [
+       305672,
+       96
+      ],
+      "indices": [
+       306056,
+       48
+      ]
+     }
+    },
+    {
+     "texture": "dcb58",
+     "attributes": {
+      "position": [
+       306248,
+       108
+      ],
+      "normal": [
+       306680,
+       108
+      ],
+      "uv": [
+       307112,
+       72
+      ],
+      "color": [
+       307400,
+       108
+      ],
+      "indices": [
+       307832,
+       60
+      ]
+     }
+    }
+   ]
+  },
+  "m0120d0": {
+   "offset": 73936,
+   "flags": 3277328,
+   "texture": "dc7b4",
+   "texture2": "b01d4",
+   "textures": [
+    "dc7b4",
+    "b01d4"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m0120d0",
+   "sphere": [
+    -0.0,
+    0.0,
+    0.25984,
+    23.74614
+   ],
+   "parts": [
+    {
+     "texture": "dc7b4",
+     "attributes": {
+      "position": [
+       308072,
+       4959
+      ],
+      "normal": [
+       327908,
+       4959
+      ],
+      "uv": [
+       347744,
+       3306
+      ],
+      "color": [
+       360968,
+       4959
+      ],
+      "indices": [
+       380804,
+       3315
+      ]
+     }
+    },
+    {
+     "texture": "b01d4",
+     "attributes": {
+      "position": [
+       394064,
+       498
+      ],
+      "normal": [
+       396056,
+       498
+      ],
+      "uv": [
+       398048,
+       332
+      ],
+      "color": [
+       399376,
+       498
+      ],
+      "indices": [
+       401368,
+       276
+      ]
+     }
+    }
+   ]
+  },
+  "m017920": {
+   "offset": 96544,
+   "flags": 10027536,
+   "texture": "dc7b4",
+   "texture2": null,
+   "textures": [
+    "dc7b4"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m017920",
+   "sphere": [
+    9.53482,
+    16.89445,
+    -2.28045,
+    3.06122
+   ],
+   "parts": [
+    {
+     "texture": "dc7b4",
+     "attributes": {
+      "position": [
+       402472,
+       75
+      ],
+      "normal": [
+       402772,
+       75
+      ],
+      "uv": [
+       403072,
+       50
+      ],
+      "color": [
+       403272,
+       75
+      ],
+      "indices": [
+       403572,
+       51
+      ]
+     }
+    }
+   ]
+  },
+  "m017b50": {
+   "offset": 97104,
+   "flags": 11665936,
+   "texture": "dc7b4",
+   "texture2": "b01d4",
+   "textures": [
+    "dc7b4",
+    "b01d4"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m017b50",
+   "sphere": [
+    5.0,
+    20.26086,
+    -3.20602,
+    4.00137
+   ],
+   "parts": [
+    {
+     "texture": "dc7b4",
+     "attributes": {
+      "position": [
+       403776,
+       96
+      ],
+      "normal": [
+       404160,
+       96
+      ],
+      "uv": [
+       404544,
+       64
+      ],
+      "color": [
+       404800,
+       96
+      ],
+      "indices": [
+       405184,
+       66
+      ]
+     }
+    },
+    {
+     "texture": "b01d4",
+     "attributes": {
+      "position": [
+       405448,
+       27
+      ],
+      "normal": [
+       405556,
+       27
+      ],
+      "uv": [
+       405664,
+       18
+      ],
+      "color": [
+       405736,
+       27
+      ],
+      "indices": [
+       405844,
+       15
+      ]
+     }
+    }
+   ]
+  },
+  "m017e50": {
+   "offset": 97872,
+   "flags": 10027536,
+   "texture": "dc7b4",
+   "texture2": null,
+   "textures": [
+    "dc7b4"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m017e50",
+   "sphere": [
+    -5.0,
+    -13.77565,
+    3.40587,
+    3.33233
+   ],
+   "parts": [
+    {
+     "texture": "dc7b4",
+     "attributes": {
+      "position": [
+       405904,
+       48
+      ],
+      "normal": [
+       406096,
+       48
+      ],
+      "uv": [
+       406288,
+       32
+      ],
+      "color": [
+       406416,
+       48
+      ],
+      "indices": [
+       406608,
+       30
+      ]
+     }
+    }
+   ]
+  },
+  "m018030": {
+   "offset": 98352,
+   "flags": 10027536,
+   "texture": "dc7b4",
+   "texture2": null,
+   "textures": [
+    "dc7b4"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m018030",
+   "sphere": [
+    -4.97685,
+    13.77566,
+    3.40588,
+    3.30994
+   ],
+   "parts": [
+    {
+     "texture": "dc7b4",
+     "attributes": {
+      "position": [
+       406728,
+       45
+      ],
+      "normal": [
+       406908,
+       45
+      ],
+      "uv": [
+       407088,
+       30
+      ],
+      "color": [
+       407208,
+       45
+      ],
+      "indices": [
+       407388,
+       27
+      ]
+     }
+    }
+   ]
+  },
+  "m018200": {
+   "offset": 98816,
+   "flags": 10027536,
+   "texture": "dc7b4",
+   "texture2": null,
+   "textures": [
+    "dc7b4"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m018200",
+   "sphere": [
+    9.53482,
+    -16.89447,
+    -2.28047,
+    3.0612
+   ],
+   "parts": [
+    {
+     "texture": "dc7b4",
+     "attributes": {
+      "position": [
+       407496,
+       75
+      ],
+      "normal": [
+       407796,
+       75
+      ],
+      "uv": [
+       408096,
+       50
+      ],
+      "color": [
+       408296,
+       75
+      ],
+      "indices": [
+       408596,
+       51
+      ]
+     }
+    }
+   ]
+  },
+  "m018500": {
+   "offset": 99584,
+   "flags": 4915728,
+   "texture": "dca5c",
+   "texture2": "dc7b4",
+   "textures": [
+    "dca5c",
+    "dc7b4",
+    "b01d4"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m018500",
+   "sphere": [
+    0.0,
+    -0.33845,
+    0.25984,
+    23.44707
+   ],
+   "parts": [
+    {
+     "texture": "dca5c",
+     "attributes": {
+      "position": [
+       408800,
+       69
+      ],
+      "normal": [
+       409076,
+       69
+      ],
+      "uv": [
+       409352,
+       46
+      ],
+      "color": [
+       409536,
+       69
+      ],
+      "indices": [
+       409812,
+       39
+      ]
+     }
+    },
+    {
+     "texture": "dc7b4",
+     "attributes": {
+      "position": [
+       409968,
+       4695
+      ],
+      "normal": [
+       428748,
+       4695
+      ],
+      "uv": [
+       447528,
+       3130
+      ],
+      "color": [
+       460048,
+       4695
+      ],
+      "indices": [
+       478828,
+       3135
+      ]
+     }
+    },
+    {
+     "texture": "b01d4",
+     "attributes": {
+      "position": [
+       491368,
+       426
+      ],
+      "normal": [
+       493072,
+       426
+      ],
+      "uv": [
+       494776,
+       284
+      ],
+      "color": [
+       495912,
+       426
+      ],
+      "indices": [
+       497616,
+       234
+      ]
+     }
+    }
+   ]
+  },
+  "m01d9e0": {
+   "offset": 121312,
+   "flags": 3277328,
+   "texture": "dca5c",
+   "texture2": "dcb58",
+   "textures": [
+    "dca5c",
+    "dcb58"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m01d9e0",
+   "sphere": [
+    -0.00626,
+    -0.09465,
+    8.9357,
+    20.65433
+   ],
+   "parts": [
+    {
+     "texture": "dca5c",
+     "attributes": {
+      "position": [
+       498552,
+       96
+      ],
+      "normal": [
+       498936,
+       96
+      ],
+      "uv": [
+       499320,
+       64
+      ],
+      "color": [
+       499576,
+       96
+      ],
+      "indices": [
+       499960,
+       48
+      ]
+     }
+    },
+    {
+     "texture": "dcb58",
+     "attributes": {
+      "position": [
+       500152,
+       108
+      ],
+      "normal": [
+       500584,
+       108
+      ],
+      "uv": [
+       501016,
+       72
+      ],
+      "color": [
+       501304,
+       108
+      ],
+      "indices": [
+       501736,
+       60
+      ]
+     }
+    }
+   ]
+  },
+  "m01de00": {
+   "offset": 122368,
+   "flags": 10027536,
+   "texture": "bcf7c",
+   "texture2": null,
+   "textures": [
+    "bcf7c"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m01de00",
+   "sphere": [
+    -4.93782,
+    16.48232,
+    -1.49093,
+    5.07475
+   ],
+   "parts": [
+    {
+     "texture": "bcf7c",
+     "attributes": {
+      "position": [
+       501976,
+       117
+      ],
+      "normal": [
+       502444,
+       117
+      ],
+      "uv": [
+       502912,
+       78
+      ],
+      "color": [
+       503224,
+       117
+      ],
+      "indices": [
+       503692,
+       81
+      ]
+     }
+    }
+   ]
+  },
+  "m01e100": {
+   "offset": 123136,
+   "flags": 10027536,
+   "texture": "bcf7c",
+   "texture2": null,
+   "textures": [
+    "bcf7c"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m01e100",
+   "sphere": [
+    -5.35241,
+    -7.01304,
+    3.41594,
+    5.01938
+   ],
+   "parts": [
+    {
+     "texture": "bcf7c",
+     "attributes": {
+      "position": [
+       504016,
+       108
+      ],
+      "normal": [
+       504448,
+       108
+      ],
+      "uv": [
+       504880,
+       72
+      ],
+      "color": [
+       505168,
+       108
+      ],
+      "indices": [
+       505600,
+       60
+      ]
+     }
+    }
+   ]
+  },
+  "m01e460": {
+   "offset": 124000,
+   "flags": 11665936,
+   "texture": "dc7b4",
+   "texture2": "b01d4",
+   "textures": [
+    "dc7b4",
+    "b01d4"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m01e460",
+   "sphere": [
+    -5.0,
+    20.26086,
+    -3.20602,
+    4.00137
+   ],
+   "parts": [
+    {
+     "texture": "dc7b4",
+     "attributes": {
+      "position": [
+       505840,
+       96
+      ],
+      "normal": [
+       506224,
+       96
+      ],
+      "uv": [
+       506608,
+       64
+      ],
+      "color": [
+       506864,
+       96
+      ],
+      "indices": [
+       507248,
+       66
+      ]
+     }
+    },
+    {
+     "texture": "b01d4",
+     "attributes": {
+      "position": [
+       507512,
+       27
+      ],
+      "normal": [
+       507620,
+       27
+      ],
+      "uv": [
+       507728,
+       18
+      ],
+      "color": [
+       507800,
+       27
+      ],
+      "indices": [
+       507908,
+       15
+      ]
+     }
+    }
+   ]
+  },
+  "m01e760": {
+   "offset": 124768,
+   "flags": 10027536,
+   "texture": "dc7b4",
+   "texture2": null,
+   "textures": [
+    "dc7b4"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m01e760",
+   "sphere": [
+    -9.53532,
+    16.84791,
+    -2.338,
+    3.07514
+   ],
+   "parts": [
+    {
+     "texture": "dc7b4",
+     "attributes": {
+      "position": [
+       507968,
+       78
+      ],
+      "normal": [
+       508280,
+       78
+      ],
+      "uv": [
+       508592,
+       52
+      ],
+      "color": [
+       508800,
+       78
+      ],
+      "indices": [
+       509112,
+       54
+      ]
+     }
+    }
+   ]
+  },
+  "m01e9a0": {
+   "offset": 125344,
+   "flags": 10027536,
+   "texture": "dc7b4",
+   "texture2": null,
+   "textures": [
+    "dc7b4"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m01e9a0",
+   "sphere": [
+    -4.18218,
+    17.55804,
+    -1.00596,
+    6.04586
+   ],
+   "parts": [
+    {
+     "texture": "dc7b4",
+     "attributes": {
+      "position": [
+       509328,
+       237
+      ],
+      "normal": [
+       510276,
+       237
+      ],
+      "uv": [
+       511224,
+       158
+      ],
+      "color": [
+       511856,
+       237
+      ],
+      "indices": [
+       512804,
+       159
+      ]
+     }
+    }
+   ]
+  },
+  "m01ee20": {
+   "offset": 126496,
+   "flags": 11665936,
+   "texture": "dc7b4",
+   "texture2": "b01d4",
+   "textures": [
+    "dc7b4",
+    "b01d4"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m01ee20",
+   "sphere": [
+    4.98355,
+    -20.26046,
+    -3.22229,
+    3.98725
+   ],
+   "parts": [
+    {
+     "texture": "dc7b4",
+     "attributes": {
+      "position": [
+       513440,
+       87
+      ],
+      "normal": [
+       513788,
+       87
+      ],
+      "uv": [
+       514136,
+       58
+      ],
+      "color": [
+       514368,
+       87
+      ],
+      "indices": [
+       514716,
+       57
+      ]
+     }
+    },
+    {
+     "texture": "b01d4",
+     "attributes": {
+      "position": [
+       514944,
+       27
+      ],
+      "normal": [
+       515052,
+       27
+      ],
+      "uv": [
+       515160,
+       18
+      ],
+      "color": [
+       515232,
+       27
+      ],
+      "indices": [
+       515340,
+       15
+      ]
+     }
+    }
+   ]
+  },
+  "m01f110": {
+   "offset": 127248,
+   "flags": 10027536,
+   "texture": "dc7b4",
+   "texture2": null,
+   "textures": [
+    "dc7b4"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m01f110",
+   "sphere": [
+    4.98628,
+    -20.13959,
+    -1.88642,
+    3.58313
+   ],
+   "parts": [
+    {
+     "texture": "dc7b4",
+     "attributes": {
+      "position": [
+       515400,
+       42
+      ],
+      "normal": [
+       515568,
+       42
+      ],
+      "uv": [
+       515736,
+       28
+      ],
+      "color": [
+       515848,
+       42
+      ],
+      "indices": [
+       516016,
+       24
+      ]
+     }
+    }
+   ]
+  },
+  "m01f2d0": {
+   "offset": 127696,
+   "flags": 10027536,
+   "texture": "dc7b4",
+   "texture2": null,
+   "textures": [
+    "dc7b4"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m01f2d0",
+   "sphere": [
+    -4.99733,
+    -7.09776,
+    4.06794,
+    5.82329
+   ],
+   "parts": [
+    {
+     "texture": "dc7b4",
+     "attributes": {
+      "position": [
+       516112,
+       36
+      ],
+      "normal": [
+       516256,
+       36
+      ],
+      "uv": [
+       516400,
+       24
+      ],
+      "color": [
+       516496,
+       36
+      ],
+      "indices": [
+       516640,
+       24
+      ]
+     }
+    }
+   ]
+  },
+  "m01f5e0": {
+   "offset": 128480,
+   "flags": 1639184,
+   "texture": "dcc54",
+   "texture2": null,
+   "textures": [
+    "dcc54"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m01f5e0",
+   "sphere": [
+    0.40109,
+    7.80194,
+    122.34608,
+    35.26963
+   ],
+   "parts": [
+    {
+     "texture": "dcc54",
+     "attributes": {
+      "position": [
+       516736,
+       1770
+      ],
+      "normal": [
+       523816,
+       1770
+      ],
+      "uv": [
+       530896,
+       1180
+      ],
+      "color": [
+       535616,
+       1770
+      ],
+      "indices": [
+       542696,
+       1320
+      ]
+     }
+    }
+   ]
+  },
+  "m021260": {
+   "offset": 135776,
+   "flags": 10027792,
+   "texture": "dcc54",
+   "texture2": null,
+   "textures": [
+    "dcc54"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m021260",
+   "sphere": [
+    0.72098,
+    10.98359,
+    121.81197,
+    34.20546
+   ],
+   "parts": [
+    {
+     "texture": "dcc54",
+     "attributes": {
+      "position": [
+       547976,
+       1776
+      ],
+      "normal": [
+       555080,
+       1776
+      ],
+      "uv": [
+       562184,
+       1184
+      ],
+      "color": [
+       566920,
+       1776
+      ],
+      "indices": [
+       574024,
+       1320
+      ]
+     }
+    }
+   ]
+  },
+  "m023030": {
+   "offset": 143408,
+   "flags": 3277584,
+   "texture": "dcc54",
+   "texture2": "dca5c",
+   "textures": [
+    "dcc54",
+    "dca5c"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m023030",
+   "sphere": [
+    0.77851,
+    7.54736,
+    123.12032,
+    34.67838
+   ],
+   "parts": [
+    {
+     "texture": "dcc54",
+     "attributes": {
+      "position": [
+       579304,
+       1764
+      ],
+      "normal": [
+       586360,
+       1764
+      ],
+      "uv": [
+       593416,
+       1176
+      ],
+      "color": [
+       598120,
+       1764
+      ],
+      "indices": [
+       605176,
+       1320
+      ]
+     }
+    },
+    {
+     "texture": "dca5c",
+     "attributes": {
+      "position": [
+       610456,
+       162
+      ],
+      "normal": [
+       611104,
+       162
+      ],
+      "uv": [
+       611752,
+       108
+      ],
+      "color": [
+       612184,
+       162
+      ],
+      "indices": [
+       612832,
+       120
+      ]
+     }
+    }
+   ]
+  },
+  "m025220": {
+   "offset": 152096,
+   "flags": 10027792,
+   "texture": "bcf7c",
+   "texture2": null,
+   "textures": [
+    "bcf7c"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m025220",
+   "sphere": [
+    0.9207,
+    8.24367,
+    141.8891,
+    17.61203
+   ],
+   "parts": [
+    {
+     "texture": "bcf7c",
+     "attributes": {
+      "position": [
+       613312,
+       54
+      ],
+      "normal": [
+       613528,
+       54
+      ],
+      "uv": [
+       613744,
+       36
+      ],
+      "color": [
+       613888,
+       54
+      ],
+      "indices": [
+       614104,
+       30
+      ]
+     }
+    }
+   ]
+  },
+  "m025690": {
+   "offset": 153232,
+   "flags": 1638928,
+   "texture": "dcb58",
+   "texture2": null,
+   "textures": [
+    "dcb58"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m025690",
+   "sphere": [
+    0.0,
+    0.0,
+    42.277,
+    22.84672
+   ],
+   "parts": [
+    {
+     "texture": "dcb58",
+     "attributes": {
+      "position": [
+       614224,
+       42
+      ],
+      "normal": [
+       614392,
+       42
+      ],
+      "uv": [
+       614560,
+       28
+      ],
+      "color": [
+       614672,
+       42
+      ],
+      "indices": [
+       614840,
+       24
+      ]
+     }
+    }
+   ]
+  },
+  "m025810": {
+   "offset": 153616,
+   "flags": 4915728,
+   "texture": "dca5c",
+   "texture2": "dcb58",
+   "textures": [
+    "dca5c",
+    "dcb58",
+    "dcc54"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m025810",
+   "sphere": [
+    10.43489,
+    -5.28387,
+    67.80537,
+    81.94896
+   ],
+   "parts": [
+    {
+     "texture": "dca5c",
+     "attributes": {
+      "position": [
+       614936,
+       708
+      ],
+      "normal": [
+       617768,
+       708
+      ],
+      "uv": [
+       620600,
+       472
+      ],
+      "color": [
+       622488,
+       708
+      ],
+      "indices": [
+       625320,
+       444
+      ]
+     }
+    },
+    {
+     "texture": "dcb58",
+     "attributes": {
+      "position": [
+       627096,
+       1134
+      ],
+      "normal": [
+       631632,
+       1134
+      ],
+      "uv": [
+       636168,
+       756
+      ],
+      "color": [
+       639192,
+       1134
+      ],
+      "indices": [
+       643728,
+       738
+      ]
+     }
+    },
+    {
+     "texture": "dcc54",
+     "attributes": {
+      "position": [
+       646680,
+       132
+      ],
+      "normal": [
+       647208,
+       132
+      ],
+      "uv": [
+       647736,
+       88
+      ],
+      "color": [
+       648088,
+       132
+      ],
+      "indices": [
+       648616,
+       72
+      ]
+     }
+    }
+   ]
+  },
+  "m0276a0": {
+   "offset": 161440,
+   "flags": 3277328,
+   "texture": "dcb58",
+   "texture2": "dcc54",
+   "textures": [
+    "dcb58",
+    "dcc54"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m0276a0",
+   "sphere": [
+    1.37107,
+    -1.75936,
+    73.3691,
+    54.63858
+   ],
+   "parts": [
+    {
+     "texture": "dcb58",
+     "attributes": {
+      "position": [
+       648904,
+       669
+      ],
+      "normal": [
+       651580,
+       669
+      ],
+      "uv": [
+       654256,
+       446
+      ],
+      "color": [
+       656040,
+       669
+      ],
+      "indices": [
+       658716,
+       453
+      ]
+     }
+    },
+    {
+     "texture": "dcc54",
+     "attributes": {
+      "position": [
+       660528,
+       651
+      ],
+      "normal": [
+       663132,
+       651
+      ],
+      "uv": [
+       665736,
+       434
+      ],
+      "color": [
+       667472,
+       651
+      ],
+      "indices": [
+       670076,
+       447
+      ]
+     }
+    }
+   ]
+  },
+  "m028a10": {
+   "offset": 166416,
+   "flags": 10027536,
+   "texture": "df250",
+   "texture2": null,
+   "textures": [
+    "df250"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m028a10",
+   "sphere": [
+    0.0,
+    0.1717,
+    97.68451,
+    33.13385
+   ],
+   "parts": [
+    {
+     "texture": "df250",
+     "attributes": {
+      "position": [
+       671864,
+       330
+      ],
+      "normal": [
+       673184,
+       330
+      ],
+      "uv": [
+       674504,
+       220
+      ],
+      "color": [
+       675384,
+       330
+      ],
+      "indices": [
+       676704,
+       210
+      ]
+     }
+    }
+   ]
+  },
+  "m028f90": {
+   "offset": 167824,
+   "flags": 11665936,
+   "texture": "ebdd4",
+   "texture2": "dcb58",
+   "textures": [
+    "ebdd4",
+    "dcb58"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m028f90",
+   "sphere": [
+    -0.0,
+    0.0,
+    100.19388,
+    46.81148
+   ],
+   "parts": [
+    {
+     "texture": "ebdd4",
+     "attributes": {
+      "position": [
+       677544,
+       300
+      ],
+      "normal": [
+       678744,
+       300
+      ],
+      "uv": [
+       679944,
+       200
+      ],
+      "color": [
+       680744,
+       300
+      ],
+      "indices": [
+       681944,
+       180
+      ]
+     }
+    },
+    {
+     "texture": "dcb58",
+     "attributes": {
+      "position": [
+       682664,
+       66
+      ],
+      "normal": [
+       682928,
+       66
+      ],
+      "uv": [
+       683192,
+       44
+      ],
+      "color": [
+       683368,
+       66
+      ],
+      "indices": [
+       683632,
+       36
+      ]
+     }
+    }
+   ]
+  },
+  "m029750": {
+   "offset": 169808,
+   "flags": 10027536,
+   "texture": "df250",
+   "texture2": null,
+   "textures": [
+    "df250"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m029750",
+   "sphere": [
+    0.0,
+    -0.15056,
+    97.69289,
+    33.16206
+   ],
+   "parts": [
+    {
+     "texture": "df250",
+     "attributes": {
+      "position": [
+       683776,
+       306
+      ],
+      "normal": [
+       685000,
+       306
+      ],
+      "uv": [
+       686224,
+       204
+      ],
+      "color": [
+       687040,
+       306
+      ],
+      "indices": [
+       688264,
+       186
+      ]
+     }
+    }
+   ]
+  },
+  "m029d10": {
+   "offset": 171280,
+   "flags": 1639184,
+   "texture": "dcb58",
+   "texture2": null,
+   "textures": [
+    "dcb58"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m029d10",
+   "sphere": [
+    0.0,
+    0.0,
+    42.277,
+    22.84672
+   ],
+   "parts": [
+    {
+     "texture": "dcb58",
+     "attributes": {
+      "position": [
+       689008,
+       48
+      ],
+      "normal": [
+       689200,
+       48
+      ],
+      "uv": [
+       689392,
+       32
+      ],
+      "color": [
+       689520,
+       48
+      ],
+      "indices": [
+       689712,
+       24
+      ]
+     }
+    }
+   ]
+  },
+  "m029f90": {
+   "offset": 171920,
+   "flags": 3277584,
+   "texture": "dcb58",
+   "texture2": "dcc54",
+   "textures": [
+    "dcb58",
+    "dcc54"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m029f90",
+   "sphere": [
+    1.09785,
+    -0.72564,
+    72.98446,
+    53.87833
+   ],
+   "parts": [
+    {
+     "texture": "dcb58",
+     "attributes": {
+      "position": [
+       689808,
+       570
+      ],
+      "normal": [
+       692088,
+       570
+      ],
+      "uv": [
+       694368,
+       380
+      ],
+      "color": [
+       695888,
+       570
+      ],
+      "indices": [
+       698168,
+       366
+      ]
+     }
+    },
+    {
+     "texture": "dcc54",
+     "attributes": {
+      "position": [
+       699632,
+       618
+      ],
+      "normal": [
+       702104,
+       618
+      ],
+      "uv": [
+       704576,
+       412
+      ],
+      "color": [
+       706224,
+       618
+      ],
+      "indices": [
+       708696,
+       420
+      ]
+     }
+    }
+   ]
+  },
+  "m02b620": {
+   "offset": 177696,
+   "flags": 4915984,
+   "texture": "dcb58",
+   "texture2": "dca5c",
+   "textures": [
+    "dcb58",
+    "dca5c",
+    "dcc54"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m02b620",
+   "sphere": [
+    12.15352,
+    7.79737,
+    61.04981,
+    76.38003
+   ],
+   "parts": [
+    {
+     "texture": "dcb58",
+     "attributes": {
+      "position": [
+       710376,
+       1182
+      ],
+      "normal": [
+       715104,
+       1182
+      ],
+      "uv": [
+       719832,
+       788
+      ],
+      "color": [
+       722984,
+       1182
+      ],
+      "indices": [
+       727712,
+       738
+      ]
+     }
+    },
+    {
+     "texture": "dca5c",
+     "attributes": {
+      "position": [
+       730664,
+       708
+      ],
+      "normal": [
+       733496,
+       708
+      ],
+      "uv": [
+       736328,
+       472
+      ],
+      "color": [
+       738216,
+       708
+      ],
+      "indices": [
+       741048,
+       414
+      ]
+     }
+    },
+    {
+     "texture": "dcc54",
+     "attributes": {
+      "position": [
+       742704,
+       132
+      ],
+      "normal": [
+       743232,
+       132
+      ],
+      "uv": [
+       743760,
+       88
+      ],
+      "color": [
+       744112,
+       132
+      ],
+      "indices": [
+       744640,
+       72
+      ]
+     }
+    }
+   ]
+  },
+  "m02dc80": {
+   "offset": 187520,
+   "flags": 10027536,
+   "texture": "dcb58",
+   "texture2": null,
+   "textures": [
+    "dcb58"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m02dc80",
+   "sphere": [
+    0.0,
+    0.03967,
+    95.60014,
+    33.3578
+   ],
+   "parts": [
+    {
+     "texture": "dcb58",
+     "attributes": {
+      "position": [
+       744928,
+       66
+      ],
+      "normal": [
+       745192,
+       66
+      ],
+      "uv": [
+       745456,
+       44
+      ],
+      "color": [
+       745632,
+       66
+      ],
+      "indices": [
+       745896,
+       36
+      ]
+     }
+    }
+   ]
+  },
+  "m02df20": {
+   "offset": 188192,
+   "flags": 10027536,
+   "texture": "ebdd4",
+   "texture2": null,
+   "textures": [
+    "ebdd4"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m02df20",
+   "sphere": [
+    0.08708,
+    0.01197,
+    101.6872,
+    46.56536
+   ],
+   "parts": [
+    {
+     "texture": "ebdd4",
+     "attributes": {
+      "position": [
+       746040,
+       300
+      ],
+      "normal": [
+       747240,
+       300
+      ],
+      "uv": [
+       748440,
+       200
+      ],
+      "color": [
+       749240,
+       300
+      ],
+      "indices": [
+       750440,
+       180
+      ]
+     }
+    }
+   ]
+  },
+  "m02e4d0": {
+   "offset": 189648,
+   "flags": 10027792,
+   "texture": "dca5c",
+   "texture2": null,
+   "textures": [
+    "dca5c"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m02e4d0",
+   "sphere": [
+    -24.1879,
+    -18.91098,
+    117.06551,
+    15.41003
+   ],
+   "parts": [
+    {
+     "texture": "dca5c",
+     "attributes": {
+      "position": [
+       751160,
+       72
+      ],
+      "normal": [
+       751448,
+       72
+      ],
+      "uv": [
+       751736,
+       48
+      ],
+      "color": [
+       751928,
+       72
+      ],
+      "indices": [
+       752216,
+       54
+      ]
+     }
+    }
+   ]
+  },
+  "m02e750": {
+   "offset": 190288,
+   "flags": 10027536,
+   "texture": "dca5c",
+   "texture2": null,
+   "textures": [
+    "dca5c"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m02e750",
+   "sphere": [
+    -12.50905,
+    0.18322,
+    61.23433,
+    11.14349
+   ],
+   "parts": [
+    {
+     "texture": "dca5c",
+     "attributes": {
+      "position": [
+       752432,
+       36
+      ],
+      "normal": [
+       752576,
+       36
+      ],
+      "uv": [
+       752720,
+       24
+      ],
+      "color": [
+       752816,
+       36
+      ],
+      "indices": [
+       752960,
+       24
+      ]
+     }
+    }
+   ]
+  },
+  "m02e8f0": {
+   "offset": 190704,
+   "flags": 3277328,
+   "texture": "dcb58",
+   "texture2": "dcc54",
+   "textures": [
+    "dcb58",
+    "dcc54"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m02e8f0",
+   "sphere": [
+    -32.93119,
+    -10.02441,
+    75.33481,
+    13.75355
+   ],
+   "parts": [
+    {
+     "texture": "dcb58",
+     "attributes": {
+      "position": [
+       753056,
+       129
+      ],
+      "normal": [
+       753572,
+       129
+      ],
+      "uv": [
+       754088,
+       86
+      ],
+      "color": [
+       754432,
+       129
+      ],
+      "indices": [
+       754948,
+       87
+      ]
+     }
+    },
+    {
+     "texture": "dcc54",
+     "attributes": {
+      "position": [
+       755296,
+       39
+      ],
+      "normal": [
+       755452,
+       39
+      ],
+      "uv": [
+       755608,
+       26
+      ],
+      "color": [
+       755712,
+       39
+      ],
+      "indices": [
+       755868,
+       27
+      ]
+     }
+    }
+   ]
+  },
+  "m02ed20": {
+   "offset": 191776,
+   "flags": 1638928,
+   "texture": "dcb58",
+   "texture2": null,
+   "textures": [
+    "dcb58"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m02ed20",
+   "sphere": [
+    1.80008,
+    0.61834,
+    42.277,
+    23.39305
+   ],
+   "parts": [
+    {
+     "texture": "dcb58",
+     "attributes": {
+      "position": [
+       755976,
+       90
+      ],
+      "normal": [
+       756336,
+       90
+      ],
+      "uv": [
+       756696,
+       60
+      ],
+      "color": [
+       756936,
+       90
+      ],
+      "indices": [
+       757296,
+       54
+      ]
+     }
+    }
+   ]
+  },
+  "m02efc0": {
+   "offset": 192448,
+   "flags": 3277328,
+   "texture": "dcb58",
+   "texture2": "dcc54",
+   "textures": [
+    "dcb58",
+    "dcc54"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m02efc0",
+   "sphere": [
+    -2.90581,
+    7.55741,
+    73.41188,
+    49.21531
+   ],
+   "parts": [
+    {
+     "texture": "dcb58",
+     "attributes": {
+      "position": [
+       757512,
+       399
+      ],
+      "normal": [
+       759108,
+       399
+      ],
+      "uv": [
+       760704,
+       266
+      ],
+      "color": [
+       761768,
+       399
+      ],
+      "indices": [
+       763364,
+       267
+      ]
+     }
+    },
+    {
+     "texture": "dcc54",
+     "attributes": {
+      "position": [
+       764432,
+       483
+      ],
+      "normal": [
+       766364,
+       483
+      ],
+      "uv": [
+       768296,
+       322
+      ],
+      "color": [
+       769584,
+       483
+      ],
+      "indices": [
+       771516,
+       327
+      ]
+     }
+    }
+   ]
+  },
+  "m02fcf0": {
+   "offset": 195824,
+   "flags": 4915728,
+   "texture": "dcb58",
+   "texture2": "dca5c",
+   "textures": [
+    "dcb58",
+    "dca5c",
+    "dcc54"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m02fcf0",
+   "sphere": [
+    -13.36373,
+    1.92524,
+    58.65843,
+    74.96984
+   ],
+   "parts": [
+    {
+     "texture": "dcb58",
+     "attributes": {
+      "position": [
+       772824,
+       1272
+      ],
+      "normal": [
+       777912,
+       1272
+      ],
+      "uv": [
+       783000,
+       848
+      ],
+      "color": [
+       786392,
+       1272
+      ],
+      "indices": [
+       791480,
+       828
+      ]
+     }
+    },
+    {
+     "texture": "dca5c",
+     "attributes": {
+      "position": [
+       794792,
+       558
+      ],
+      "normal": [
+       797024,
+       558
+      ],
+      "uv": [
+       799256,
+       372
+      ],
+      "color": [
+       800744,
+       558
+      ],
+      "indices": [
+       802976,
+       324
+      ]
+     }
+    },
+    {
+     "texture": "dcc54",
+     "attributes": {
+      "position": [
+       804272,
+       120
+      ],
+      "normal": [
+       804752,
+       120
+      ],
+      "uv": [
+       805232,
+       80
+      ],
+      "color": [
+       805552,
+       120
+      ],
+      "indices": [
+       806032,
+       72
+      ]
+     }
+    }
+   ]
+  },
+  "m031af0": {
+   "offset": 203504,
+   "flags": 10027536,
+   "texture": "df250",
+   "texture2": null,
+   "textures": [
+    "df250"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m031af0",
+   "sphere": [
+    -3.82664,
+    -0.08657,
+    97.42502,
+    33.19297
+   ],
+   "parts": [
+    {
+     "texture": "df250",
+     "attributes": {
+      "position": [
+       806320,
+       318
+      ],
+      "normal": [
+       807592,
+       318
+      ],
+      "uv": [
+       808864,
+       212
+      ],
+      "color": [
+       809712,
+       318
+      ],
+      "indices": [
+       810984,
+       192
+      ]
+     }
+    }
+   ]
+  },
+  "m032150": {
+   "offset": 205136,
+   "flags": 10027536,
+   "texture": "dcb58",
+   "texture2": null,
+   "textures": [
+    "dcb58"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m032150",
+   "sphere": [
+    -3.73131,
+    -0.04019,
+    95.63731,
+    33.35222
+   ],
+   "parts": [
+    {
+     "texture": "dcb58",
+     "attributes": {
+      "position": [
+       811752,
+       66
+      ],
+      "normal": [
+       812016,
+       66
+      ],
+      "uv": [
+       812280,
+       44
+      ],
+      "color": [
+       812456,
+       66
+      ],
+      "indices": [
+       812720,
+       36
+      ]
+     }
+    }
+   ]
+  },
+  "m0323f0": {
+   "offset": 205808,
+   "flags": 10027536,
+   "texture": "ebdd4",
+   "texture2": null,
+   "textures": [
+    "ebdd4"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m0323f0",
+   "sphere": [
+    -4.23626,
+    -0.04531,
+    101.47711,
+    46.56606
+   ],
+   "parts": [
+    {
+     "texture": "ebdd4",
+     "attributes": {
+      "position": [
+       812864,
+       288
+      ],
+      "normal": [
+       814016,
+       288
+      ],
+      "uv": [
+       815168,
+       192
+      ],
+      "color": [
+       815936,
+       288
+      ],
+      "indices": [
+       817088,
+       180
+      ]
+     }
+    }
+   ]
+  },
+  "m032980": {
+   "offset": 207232,
+   "flags": 10027792,
+   "texture": "dca5c",
+   "texture2": null,
+   "textures": [
+    "dca5c"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m032980",
+   "sphere": [
+    28.56884,
+    14.90049,
+    115.81702,
+    15.42305
+   ],
+   "parts": [
+    {
+     "texture": "dca5c",
+     "attributes": {
+      "position": [
+       817808,
+       156
+      ],
+      "normal": [
+       818432,
+       156
+      ],
+      "uv": [
+       819056,
+       104
+      ],
+      "color": [
+       819472,
+       156
+      ],
+      "indices": [
+       820096,
+       90
+      ]
+     }
+    }
+   ]
+  },
+  "m032d80": {
+   "offset": 208256,
+   "flags": 11665936,
+   "texture": "dcb58",
+   "texture2": "dcc54",
+   "textures": [
+    "dcb58",
+    "dcc54"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m032d80",
+   "sphere": [
+    13.46664,
+    -29.5071,
+    73.16983,
+    17.84862
+   ],
+   "parts": [
+    {
+     "texture": "dcb58",
+     "attributes": {
+      "position": [
+       820456,
+       33
+      ],
+      "normal": [
+       820588,
+       33
+      ],
+      "uv": [
+       820720,
+       22
+      ],
+      "color": [
+       820808,
+       33
+      ],
+      "indices": [
+       820940,
+       21
+      ]
+     }
+    },
+    {
+     "texture": "dcc54",
+     "attributes": {
+      "position": [
+       821024,
+       93
+      ],
+      "normal": [
+       821396,
+       93
+      ],
+      "uv": [
+       821768,
+       62
+      ],
+      "color": [
+       822016,
+       93
+      ],
+      "indices": [
+       822388,
+       69
+      ]
+     }
+    }
+   ]
+  },
+  "m033070": {
+   "offset": 209008,
+   "flags": 11665936,
+   "texture": "dcb58",
+   "texture2": "dcc54",
+   "textures": [
+    "dcb58",
+    "dcc54"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m033070",
+   "sphere": [
+    33.11244,
+    16.20768,
+    72.96732,
+    17.93777
+   ],
+   "parts": [
+    {
+     "texture": "dcb58",
+     "attributes": {
+      "position": [
+       822664,
+       120
+      ],
+      "normal": [
+       823144,
+       120
+      ],
+      "uv": [
+       823624,
+       80
+      ],
+      "color": [
+       823944,
+       120
+      ],
+      "indices": [
+       824424,
+       78
+      ]
+     }
+    },
+    {
+     "texture": "dcc54",
+     "attributes": {
+      "position": [
+       824736,
+       42
+      ],
+      "normal": [
+       824904,
+       42
+      ],
+      "uv": [
+       825072,
+       28
+      ],
+      "color": [
+       825184,
+       42
+      ],
+      "indices": [
+       825352,
+       24
+      ]
+     }
+    }
+   ]
+  },
+  "m0334d0": {
+   "offset": 210128,
+   "flags": 11665936,
+   "texture": "dcc54",
+   "texture2": "dca5c",
+   "textures": [
+    "dcc54",
+    "dca5c"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m0334d0",
+   "sphere": [
+    0.09148,
+    1.45397,
+    112.63303,
+    44.44345
+   ],
+   "parts": [
+    {
+     "texture": "dcc54",
+     "attributes": {
+      "position": [
+       825448,
+       798
+      ],
+      "normal": [
+       828640,
+       798
+      ],
+      "uv": [
+       831832,
+       532
+      ],
+      "color": [
+       833960,
+       798
+      ],
+      "indices": [
+       837152,
+       570
+      ]
+     }
+    },
+    {
+     "texture": "dca5c",
+     "attributes": {
+      "position": [
+       839432,
+       54
+      ],
+      "normal": [
+       839648,
+       54
+      ],
+      "uv": [
+       839864,
+       36
+      ],
+      "color": [
+       840008,
+       54
+      ],
+      "indices": [
+       840224,
+       36
+      ]
+     }
+    }
+   ]
+  },
+  "m0341a0": {
+   "offset": 213408,
+   "flags": 2149124608,
+   "texture": "dca5c",
+   "texture2": null,
+   "textures": [
+    "dca5c"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m0341a0",
+   "sphere": [
+    17.88559,
+    0.4057,
+    -1.515,
+    29.76961
+   ],
+   "parts": [
+    {
+     "texture": "dca5c",
+     "attributes": {
+      "position": [
+       840368,
+       546
+      ],
+      "normal": [
+       842552,
+       546
+      ],
+      "uv": [
+       844736,
+       364
+      ],
+      "color": [
+       846192,
+       546
+      ],
+      "indices": [
+       848376,
+       396
+      ]
+     }
+    }
+   ]
+  },
+  "m034a80": {
+   "offset": 215680,
+   "flags": 2149124608,
+   "texture": "dca5c",
+   "texture2": null,
+   "textures": [
+    "dca5c"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m034a80",
+   "sphere": [
+    -17.88559,
+    0.4057,
+    -1.515,
+    29.76961
+   ],
+   "parts": [
+    {
+     "texture": "dca5c",
+     "attributes": {
+      "position": [
+       849960,
+       558
+      ],
+      "normal": [
+       852192,
+       558
+      ],
+      "uv": [
+       854424,
+       372
+      ],
+      "color": [
+       855912,
+       558
+      ],
+      "indices": [
+       858144,
+       396
+      ]
+     }
+    }
+   ]
+  },
+  "m035380": {
+   "offset": 217984,
+   "flags": 1638928,
+   "texture": "dca5c",
+   "texture2": null,
+   "textures": [
+    "dca5c"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m035380",
+   "sphere": [
+    0.0,
+    0.39207,
+    -1.48051,
+    38.01618
+   ],
+   "parts": [
+    {
+     "texture": "dca5c",
+     "attributes": {
+      "position": [
+       859728,
+       912
+      ],
+      "normal": [
+       863376,
+       912
+      ],
+      "uv": [
+       867024,
+       608
+      ],
+      "color": [
+       869456,
+       912
+      ],
+      "indices": [
+       873104,
+       768
+      ]
+     }
+    }
+   ]
+  },
+  "m0361d0": {
+   "offset": 221648,
+   "flags": 10027536,
+   "texture": "dca5c",
+   "texture2": null,
+   "textures": [
+    "dca5c"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m0361d0",
+   "sphere": [
+    -16.93687,
+    0.67446,
+    14.78552,
+    10.20223
+   ],
+   "parts": [
+    {
+     "texture": "dca5c",
+     "attributes": {
+      "position": [
+       876176,
+       198
+      ],
+      "normal": [
+       876968,
+       198
+      ],
+      "uv": [
+       877760,
+       132
+      ],
+      "color": [
+       878288,
+       198
+      ],
+      "indices": [
+       879080,
+       108
+      ]
+     }
+    }
+   ]
+  },
+  "m036620": {
+   "offset": 222752,
+   "flags": 10027536,
+   "texture": "dca5c",
+   "texture2": null,
+   "textures": [
+    "dca5c"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m036620",
+   "sphere": [
+    16.74673,
+    0.67446,
+    14.78552,
+    10.20223
+   ],
+   "parts": [
+    {
+     "texture": "dca5c",
+     "attributes": {
+      "position": [
+       879512,
+       192
+      ],
+      "normal": [
+       880280,
+       192
+      ],
+      "uv": [
+       881048,
+       128
+      ],
+      "color": [
+       881560,
+       192
+      ],
+      "indices": [
+       882328,
+       108
+      ]
+     }
+    }
+   ]
+  },
+  "m036a60": {
+   "offset": 223840,
+   "flags": 10060304,
+   "texture": "8a480",
+   "texture2": null,
+   "textures": [
+    "8a480"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m036a60",
+   "sphere": [
+    -14.428,
+    16.23259,
+    16.91895,
+    12.81796
+   ],
+   "parts": [
+    {
+     "texture": "8a480",
+     "attributes": {
+      "position": [
+       882760,
+       15
+      ],
+      "normal": [
+       882820,
+       15
+      ],
+      "uv": [
+       882880,
+       10
+      ],
+      "color": [
+       882920,
+       15
+      ],
+      "indices": [
+       882980,
+       9
+      ]
+     }
+    }
+   ]
+  },
+  "m036c10": {
+   "offset": 224272,
+   "flags": 10060304,
+   "texture": "8a480",
+   "texture2": null,
+   "textures": [
+    "8a480"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m036c10",
+   "sphere": [
+    -19.91827,
+    21.39367,
+    14.98022,
+    13.09682
+   ],
+   "parts": [
+    {
+     "texture": "8a480",
+     "attributes": {
+      "position": [
+       883016,
+       15
+      ],
+      "normal": [
+       883076,
+       15
+      ],
+      "uv": [
+       883136,
+       10
+      ],
+      "color": [
+       883176,
+       15
+      ],
+      "indices": [
+       883236,
+       9
+      ]
+     }
+    }
+   ]
+  },
+  "m036e70": {
+   "offset": 224880,
+   "flags": 10060304,
+   "texture": "8a480",
+   "texture2": null,
+   "textures": [
+    "8a480"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m036e70",
+   "sphere": [
+    20.45624,
+    16.23259,
+    16.91895,
+    12.81796
+   ],
+   "parts": [
+    {
+     "texture": "8a480",
+     "attributes": {
+      "position": [
+       883272,
+       15
+      ],
+      "normal": [
+       883332,
+       15
+      ],
+      "uv": [
+       883392,
+       10
+      ],
+      "color": [
+       883432,
+       15
+      ],
+      "indices": [
+       883492,
+       9
+      ]
+     }
+    }
+   ]
+  },
+  "m037020": {
+   "offset": 225312,
+   "flags": 10060304,
+   "texture": "8a480",
+   "texture2": null,
+   "textures": [
+    "8a480"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m037020",
+   "sphere": [
+    14.96597,
+    21.39367,
+    14.98022,
+    13.09682
+   ],
+   "parts": [
+    {
+     "texture": "8a480",
+     "attributes": {
+      "position": [
+       883528,
+       15
+      ],
+      "normal": [
+       883588,
+       15
+      ],
+      "uv": [
+       883648,
+       10
+      ],
+      "color": [
+       883688,
+       15
+      ],
+      "indices": [
+       883748,
+       9
+      ]
+     }
+    }
+   ]
+  },
+  "m0372e0": {
+   "offset": 226016,
+   "flags": 10027536,
+   "texture": "dca5c",
+   "texture2": null,
+   "textures": [
+    "dca5c"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m0372e0",
+   "sphere": [
+    -19.01959,
+    22.94909,
+    110.39861,
+    8.6197
+   ],
+   "parts": [
+    {
+     "texture": "dca5c",
+     "attributes": {
+      "position": [
+       883784,
+       198
+      ],
+      "normal": [
+       884576,
+       198
+      ],
+      "uv": [
+       885368,
+       132
+      ],
+      "color": [
+       885896,
+       198
+      ],
+      "indices": [
+       886688,
+       108
+      ]
+     }
+    }
+   ]
+  },
+  "m037730": {
+   "offset": 227120,
+   "flags": 10027536,
+   "texture": "dca5c",
+   "texture2": null,
+   "textures": [
+    "dca5c"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m037730",
+   "sphere": [
+    19.86644,
+    22.94909,
+    109.84893,
+    8.6197
+   ],
+   "parts": [
+    {
+     "texture": "dca5c",
+     "attributes": {
+      "position": [
+       887120,
+       198
+      ],
+      "normal": [
+       887912,
+       198
+      ],
+      "uv": [
+       888704,
+       132
+      ],
+      "color": [
+       889232,
+       198
+      ],
+      "indices": [
+       890024,
+       108
+      ]
+     }
+    }
+   ]
+  },
+  "m037b80": {
+   "offset": 228224,
+   "flags": 10060304,
+   "texture": "8a480",
+   "texture2": null,
+   "textures": [
+    "8a480"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m037b80",
+   "sphere": [
+    -16.4176,
+    16.60438,
+    14.15442,
+    12.81796
+   ],
+   "parts": [
+    {
+     "texture": "8a480",
+     "attributes": {
+      "position": [
+       890456,
+       15
+      ],
+      "normal": [
+       890516,
+       15
+      ],
+      "uv": [
+       890576,
+       10
+      ],
+      "color": [
+       890616,
+       15
+      ],
+      "indices": [
+       890676,
+       9
+      ]
+     }
+    }
+   ]
+  },
+  "m037d30": {
+   "offset": 228656,
+   "flags": 10060304,
+   "texture": "8a480",
+   "texture2": null,
+   "textures": [
+    "8a480"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m037d30",
+   "sphere": [
+    -21.90787,
+    21.76546,
+    12.21569,
+    13.09682
+   ],
+   "parts": [
+    {
+     "texture": "8a480",
+     "attributes": {
+      "position": [
+       890712,
+       15
+      ],
+      "normal": [
+       890772,
+       15
+      ],
+      "uv": [
+       890832,
+       10
+      ],
+      "color": [
+       890872,
+       15
+      ],
+      "indices": [
+       890932,
+       9
+      ]
+     }
+    }
+   ]
+  },
+  "m037f90": {
+   "offset": 229264,
+   "flags": 10060304,
+   "texture": "8a480",
+   "texture2": null,
+   "textures": [
+    "8a480"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m037f90",
+   "sphere": [
+    22.46842,
+    16.60438,
+    13.60474,
+    12.81796
+   ],
+   "parts": [
+    {
+     "texture": "8a480",
+     "attributes": {
+      "position": [
+       890968,
+       15
+      ],
+      "normal": [
+       891028,
+       15
+      ],
+      "uv": [
+       891088,
+       10
+      ],
+      "color": [
+       891128,
+       15
+      ],
+      "indices": [
+       891188,
+       9
+      ]
+     }
+    }
+   ]
+  },
+  "m038140": {
+   "offset": 229696,
+   "flags": 10060304,
+   "texture": "8a480",
+   "texture2": null,
+   "textures": [
+    "8a480"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m038140",
+   "sphere": [
+    16.97816,
+    21.76546,
+    11.66601,
+    13.09682
+   ],
+   "parts": [
+    {
+     "texture": "8a480",
+     "attributes": {
+      "position": [
+       891224,
+       15
+      ],
+      "normal": [
+       891284,
+       15
+      ],
+      "uv": [
+       891344,
+       10
+      ],
+      "color": [
+       891384,
+       15
+      ],
+      "indices": [
+       891444,
+       9
+      ]
+     }
+    }
+   ]
+  },
+  "m038440": {
+   "offset": 230464,
+   "flags": 2157545984,
+   "texture": "6ec4c",
+   "texture2": null,
+   "textures": [
+    "6ec4c"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m038440",
+   "sphere": [
+    1.37119,
+    -1.7594,
+    73.48652,
+    54.61285
+   ],
+   "parts": [
+    {
+     "texture": "6ec4c",
+     "attributes": {
+      "position": [
+       891480,
+       321
+      ],
+      "normal": [
+       892764,
+       321
+      ],
+      "uv": [
+       894048,
+       214
+      ],
+      "color": [
+       894904,
+       321
+      ],
+      "indices": [
+       896188,
+       207
+      ]
+     }
+    }
+   ]
+  },
+  "m038b20": {
+   "offset": 232224,
+   "flags": 2157545984,
+   "texture": "6ec4c",
+   "texture2": null,
+   "textures": [
+    "6ec4c"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m038b20",
+   "sphere": [
+    1.37119,
+    -1.7594,
+    73.48652,
+    54.61285
+   ],
+   "parts": [
+    {
+     "texture": "6ec4c",
+     "attributes": {
+      "position": [
+       897016,
+       339
+      ],
+      "normal": [
+       898372,
+       339
+      ],
+      "uv": [
+       899728,
+       226
+      ],
+      "color": [
+       900632,
+       339
+      ],
+      "indices": [
+       901988,
+       219
+      ]
+     }
+    }
+   ]
+  },
+  "m039270": {
+   "offset": 234096,
+   "flags": 2157545984,
+   "texture": "6ec4c",
+   "texture2": null,
+   "textures": [
+    "6ec4c"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m039270",
+   "sphere": [
+    0.0,
+    6.70014,
+    125.80128,
+    45.95271
+   ],
+   "parts": [
+    {
+     "texture": "6ec4c",
+     "attributes": {
+      "position": [
+       902864,
+       366
+      ],
+      "normal": [
+       904328,
+       366
+      ],
+      "uv": [
+       905792,
+       244
+      ],
+      "color": [
+       906768,
+       366
+      ],
+      "indices": [
+       908232,
+       270
+      ]
+     }
+    }
+   ]
+  },
+  "m0398d0": {
+   "offset": 235728,
+   "flags": 2157545984,
+   "texture": "6ec4c",
+   "texture2": null,
+   "textures": [
+    "6ec4c"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m0398d0",
+   "sphere": [
+    0.0,
+    6.70014,
+    125.80128,
+    45.95271
+   ],
+   "parts": [
+    {
+     "texture": "6ec4c",
+     "attributes": {
+      "position": [
+       909312,
+       360
+      ],
+      "normal": [
+       910752,
+       360
+      ],
+      "uv": [
+       912192,
+       240
+      ],
+      "color": [
+       913152,
+       360
+      ],
+      "indices": [
+       914592,
+       270
+      ]
+     }
+    }
+   ]
+  },
+  "m039f40": {
+   "offset": 237376,
+   "flags": 2157545984,
+   "texture": "6ec4c",
+   "texture2": null,
+   "textures": [
+    "6ec4c"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m039f40",
+   "sphere": [
+    -0.0,
+    0.40182,
+    48.64351,
+    75.65105
+   ],
+   "parts": [
+    {
+     "texture": "6ec4c",
+     "attributes": {
+      "position": [
+       915672,
+       534
+      ],
+      "normal": [
+       917808,
+       534
+      ],
+      "uv": [
+       919944,
+       356
+      ],
+      "color": [
+       921368,
+       534
+      ],
+      "indices": [
+       923504,
+       408
+      ]
+     }
+    }
+   ]
+  },
+  "m03a830": {
+   "offset": 239664,
+   "flags": 2157545984,
+   "texture": "6ec4c",
+   "texture2": null,
+   "textures": [
+    "6ec4c"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m03a830",
+   "sphere": [
+    -0.0,
+    0.40182,
+    48.64351,
+    75.65105
+   ],
+   "parts": [
+    {
+     "texture": "6ec4c",
+     "attributes": {
+      "position": [
+       925136,
+       534
+      ],
+      "normal": [
+       927272,
+       534
+      ],
+      "uv": [
+       929408,
+       356
+      ],
+      "color": [
+       930832,
+       534
+      ],
+      "indices": [
+       932968,
+       408
+      ]
+     }
+    }
+   ]
+  },
+  "m03b200": {
+   "offset": 242176,
+   "flags": 10027538,
+   "texture": "6ea3c",
+   "texture2": null,
+   "textures": [
+    "6ea3c"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m03b200",
+   "sphere": [
+    -0.79667,
+    1.42088,
+    6.12822,
+    47.22704
+   ],
+   "parts": [
+    {
+     "texture": "6ea3c",
+     "attributes": {
+      "position": [
+       934600,
+       564
+      ],
+      "normal": [
+       936856,
+       564
+      ],
+      "uv": [
+       939112,
+       376
+      ],
+      "color": [
+       940616,
+       564
+      ],
+      "indices": [
+       942872,
+       378
+      ]
+     }
+    }
+   ]
+  },
+  "m03be90": {
+   "offset": 245392,
+   "flags": 2157545984,
+   "texture": "6ec4c",
+   "texture2": null,
+   "textures": [
+    "6ec4c"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m03be90",
+   "sphere": [
+    0.47415,
+    0.17927,
+    -0.31678,
+    10.38921
+   ],
+   "parts": [
+    {
+     "texture": "6ec4c",
+     "attributes": {
+      "position": [
+       944384,
+       264
+      ],
+      "normal": [
+       945440,
+       264
+      ],
+      "uv": [
+       946496,
+       176
+      ],
+      "color": [
+       947200,
+       264
+      ],
+      "indices": [
+       948256,
+       198
+      ]
+     }
+    }
+   ]
+  },
+  "m03c400": {
+   "offset": 246784,
+   "flags": 2157545984,
+   "texture": "6ec4c",
+   "texture2": null,
+   "textures": [
+    "6ec4c"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m03c400",
+   "sphere": [
+    0.18332,
+    -0.17313,
+    0.01698,
+    10.41071
+   ],
+   "parts": [
+    {
+     "texture": "6ec4c",
+     "attributes": {
+      "position": [
+       949048,
+       270
+      ],
+      "normal": [
+       950128,
+       270
+      ],
+      "uv": [
+       951208,
+       180
+      ],
+      "color": [
+       951928,
+       270
+      ],
+      "indices": [
+       953008,
+       204
+      ]
+     }
+    }
+   ]
+  },
+  "m03c9f0": {
+   "offset": 248304,
+   "flags": 2157543936,
+   "texture": "5a668",
+   "texture2": null,
+   "textures": [
+    "5a668"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m03c9f0",
+   "sphere": [
+    0.0,
+    2e-05,
+    -0.0,
+    78.88599
+   ],
+   "parts": [
+    {
+     "texture": "5a668",
+     "attributes": {
+      "position": [
+       953824,
+       72
+      ],
+      "normal": [
+       954112,
+       72
+      ],
+      "uv": [
+       954400,
+       48
+      ],
+      "color": [
+       954592,
+       72
+      ],
+      "indices": [
+       954880,
+       36
+      ]
+     }
+    }
+   ]
+  },
+  "m03cdc0": {
+   "offset": 249280,
+   "flags": 10027536,
+   "texture": "88de8",
+   "texture2": null,
+   "textures": [
+    "88de8"
+   ],
+   "scale": 0.001953125,
+   "packed": "fixed16",
+   "poolOwner": "m03cdc0",
+   "sphere": [
+    0.0,
+    0.0,
+    0.0,
+    50.32931
+   ],
+   "parts": [
+    {
+     "texture": "88de8",
+     "attributes": {
+      "position": [
+       955024,
+       12
+      ],
+      "normal": [
+       955072,
+       12
+      ],
+      "uv": [
+       955120,
+       8
+      ],
+      "color": [
+       955152,
+       12
+      ],
+      "indices": [
+       955200,
+       6
+      ]
+     }
+    }
+   ]
+  },
+  "m03d130": {
+   "offset": 250160,
+   "flags": 1638928,
+   "texture": "dcb58",
+   "texture2": null,
+   "textures": [
+    "dcb58"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m03d130",
+   "sphere": [
+    1.41,
+    0.61834,
+    42.277,
+    23.29112
+   ],
+   "parts": [
+    {
+     "texture": "dcb58",
+     "attributes": {
+      "position": [
+       955224,
+       84
+      ],
+      "normal": [
+       955560,
+       84
+      ],
+      "uv": [
+       955896,
+       56
+      ],
+      "color": [
+       956120,
+       84
+      ],
+      "indices": [
+       956456,
+       48
+      ]
+     }
+    }
+   ]
+  },
+  "m03d3c0": {
+   "offset": 250816,
+   "flags": 4915728,
+   "texture": "dca5c",
+   "texture2": "dc7b4",
+   "textures": [
+    "dca5c",
+    "dc7b4",
+    "b01d4"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m03d3c0",
+   "sphere": [
+    5.0,
+    -10.17113,
+    -0.01831,
+    12.14621
+   ],
+   "parts": [
+    {
+     "texture": "dca5c",
+     "attributes": {
+      "position": [
+       956648,
+       12
+      ],
+      "normal": [
+       956696,
+       12
+      ],
+      "uv": [
+       956744,
+       8
+      ],
+      "color": [
+       956776,
+       12
+      ],
+      "indices": [
+       956824,
+       6
+      ]
+     }
+    },
+    {
+     "texture": "dc7b4",
+     "attributes": {
+      "position": [
+       956848,
+       1188
+      ],
+      "normal": [
+       961600,
+       1188
+      ],
+      "uv": [
+       966352,
+       792
+      ],
+      "color": [
+       969520,
+       1188
+      ],
+      "indices": [
+       974272,
+       792
+      ]
+     }
+    },
+    {
+     "texture": "b01d4",
+     "attributes": {
+      "position": [
+       977440,
+       108
+      ],
+      "normal": [
+       977872,
+       108
+      ],
+      "uv": [
+       978304,
+       72
+      ],
+      "color": [
+       978592,
+       108
+      ],
+      "indices": [
+       979024,
+       60
+      ]
+     }
+    }
+   ]
+  },
+  "m03e8f0": {
+   "offset": 256240,
+   "flags": 3277328,
+   "texture": "dc7b4",
+   "texture2": "b01d4",
+   "textures": [
+    "dc7b4",
+    "b01d4"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m03e8f0",
+   "sphere": [
+    -5.0,
+    -10.41792,
+    0.38629,
+    12.50457
+   ],
+   "parts": [
+    {
+     "texture": "dc7b4",
+     "attributes": {
+      "position": [
+       979264,
+       1332
+      ],
+      "normal": [
+       984592,
+       1332
+      ],
+      "uv": [
+       989920,
+       888
+      ],
+      "color": [
+       993472,
+       1332
+      ],
+      "indices": [
+       998800,
+       888
+      ]
+     }
+    },
+    {
+     "texture": "b01d4",
+     "attributes": {
+      "position": [
+       1002352,
+       111
+      ],
+      "normal": [
+       1002796,
+       111
+      ],
+      "uv": [
+       1003240,
+       74
+      ],
+      "color": [
+       1003536,
+       111
+      ],
+      "indices": [
+       1003980,
+       63
+      ]
+     }
+    }
+   ]
+  },
+  "m03ff80": {
+   "offset": 262016,
+   "flags": 3277328,
+   "texture": "dc7b4",
+   "texture2": "b01d4",
+   "textures": [
+    "dc7b4",
+    "b01d4"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m03ff80",
+   "sphere": [
+    5.0,
+    10.07982,
+    0.38159,
+    12.2205
+   ],
+   "parts": [
+    {
+     "texture": "dc7b4",
+     "attributes": {
+      "position": [
+       1004232,
+       1248
+      ],
+      "normal": [
+       1009224,
+       1248
+      ],
+      "uv": [
+       1014216,
+       832
+      ],
+      "color": [
+       1017544,
+       1248
+      ],
+      "indices": [
+       1022536,
+       834
+      ]
+     }
+    },
+    {
+     "texture": "b01d4",
+     "attributes": {
+      "position": [
+       1025872,
+       138
+      ],
+      "normal": [
+       1026424,
+       138
+      ],
+      "uv": [
+       1026976,
+       92
+      ],
+      "color": [
+       1027344,
+       138
+      ],
+      "indices": [
+       1027896,
+       78
+      ]
+     }
+    }
+   ]
+  },
+  "m041570": {
+   "offset": 267632,
+   "flags": 4915728,
+   "texture": "dca5c",
+   "texture2": "dc7b4",
+   "textures": [
+    "dca5c",
+    "dc7b4",
+    "b01d4"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m041570",
+   "sphere": [
+    -4.98189,
+    7.71771,
+    0.06065,
+    10.20483
+   ],
+   "parts": [
+    {
+     "texture": "dca5c",
+     "attributes": {
+      "position": [
+       1028208,
+       45
+      ],
+      "normal": [
+       1028388,
+       45
+      ],
+      "uv": [
+       1028568,
+       30
+      ],
+      "color": [
+       1028688,
+       45
+      ],
+      "indices": [
+       1028868,
+       27
+      ]
+     }
+    },
+    {
+     "texture": "dc7b4",
+     "attributes": {
+      "position": [
+       1028976,
+       945
+      ],
+      "normal": [
+       1032756,
+       945
+      ],
+      "uv": [
+       1036536,
+       630
+      ],
+      "color": [
+       1039056,
+       945
+      ],
+      "indices": [
+       1042836,
+       621
+      ]
+     }
+    },
+    {
+     "texture": "b01d4",
+     "attributes": {
+      "position": [
+       1045320,
+       78
+      ],
+      "normal": [
+       1045632,
+       78
+      ],
+      "uv": [
+       1045944,
+       52
+      ],
+      "color": [
+       1046152,
+       78
+      ],
+      "indices": [
+       1046464,
+       42
+      ]
+     }
+    }
+   ]
+  },
+  "m0426d0": {
+   "offset": 272080,
+   "flags": 1638928,
+   "texture": "dcb58",
+   "texture2": null,
+   "textures": [
+    "dcb58"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m0426d0",
+   "sphere": [
+    0.0,
+    0.0,
+    30.45035,
+    36.29585
+   ],
+   "parts": [
+    {
+     "texture": "dcb58",
+     "attributes": {
+      "position": [
+       1046632,
+       900
+      ],
+      "normal": [
+       1050232,
+       900
+      ],
+      "uv": [
+       1053832,
+       600
+      ],
+      "color": [
+       1056232,
+       900
+      ],
+      "indices": [
+       1059832,
+       606
+      ]
+     }
+    }
+   ]
+  },
+  "m043470": {
+   "offset": 275568,
+   "flags": 1638928,
+   "texture": "dca5c",
+   "texture2": null,
+   "textures": [
+    "dca5c"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m043470",
+   "sphere": [
+    0.0,
+    0.40182,
+    -1.515,
+    38.36256
+   ],
+   "parts": [
+    {
+     "texture": "dca5c",
+     "attributes": {
+      "position": [
+       1062256,
+       1806
+      ],
+      "normal": [
+       1069480,
+       1806
+      ],
+      "uv": [
+       1076704,
+       1204
+      ],
+      "color": [
+       1081520,
+       1806
+      ],
+      "indices": [
+       1088744,
+       1308
+      ]
+     }
+    }
+   ]
+  },
+  "m044fd0": {
+   "offset": 282576,
+   "flags": 1638928,
+   "texture": "bcf7c",
+   "texture2": null,
+   "textures": [
+    "bcf7c"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m044fd0",
+   "sphere": [
+    -4.93782,
+    16.38448,
+    -1.47885,
+    5.13908
+   ],
+   "parts": [
+    {
+     "texture": "bcf7c",
+     "attributes": {
+      "position": [
+       1093976,
+       117
+      ],
+      "normal": [
+       1094444,
+       117
+      ],
+      "uv": [
+       1094912,
+       78
+      ],
+      "color": [
+       1095224,
+       117
+      ],
+      "indices": [
+       1095692,
+       81
+      ]
+     }
+    }
+   ]
+  },
+  "m0452b0": {
+   "offset": 283312,
+   "flags": 1638928,
+   "texture": "bcf7c",
+   "texture2": null,
+   "textures": [
+    "bcf7c"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m0452b0",
+   "sphere": [
+    -5.45612,
+    -7.62224,
+    2.75652,
+    3.4346
+   ],
+   "parts": [
+    {
+     "texture": "bcf7c",
+     "attributes": {
+      "position": [
+       1096016,
+       42
+      ],
+      "normal": [
+       1096184,
+       42
+      ],
+      "uv": [
+       1096352,
+       28
+      ],
+      "color": [
+       1096464,
+       42
+      ],
+      "indices": [
+       1096632,
+       24
+      ]
+     }
+    }
+   ]
+  },
+  "m045710": {
+   "offset": 284432,
+   "flags": 10027536,
+   "texture": "dca5c",
+   "texture2": null,
+   "textures": [
+    "dca5c"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m045710",
+   "sphere": [
+    -16.79054,
+    8.91597,
+    14.78552,
+    17.85936
+   ],
+   "parts": [
+    {
+     "texture": "dca5c",
+     "attributes": {
+      "position": [
+       1096728,
+       348
+      ],
+      "normal": [
+       1098120,
+       348
+      ],
+      "uv": [
+       1099512,
+       232
+      ],
+      "color": [
+       1100440,
+       348
+      ],
+      "indices": [
+       1101832,
+       216
+      ]
+     }
+    }
+   ]
+  },
+  "m045ce0": {
+   "offset": 285920,
+   "flags": 10027536,
+   "texture": "dca5c",
+   "texture2": null,
+   "textures": [
+    "dca5c"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m045ce0",
+   "sphere": [
+    16.6004,
+    8.91597,
+    14.78552,
+    17.85936
+   ],
+   "parts": [
+    {
+     "texture": "dca5c",
+     "attributes": {
+      "position": [
+       1102696,
+       342
+      ],
+      "normal": [
+       1104064,
+       342
+      ],
+      "uv": [
+       1105432,
+       228
+      ],
+      "color": [
+       1106344,
+       342
+      ],
+      "indices": [
+       1107712,
+       216
+      ]
+     }
+    }
+   ]
+  },
+  "m0462a0": {
+   "offset": 287392,
+   "flags": 10027536,
+   "texture": "dca5c",
+   "texture2": null,
+   "textures": [
+    "dca5c"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m0462a0",
+   "sphere": [
+    19.99007,
+    29.91221,
+    109.84893,
+    15.0891
+   ],
+   "parts": [
+    {
+     "texture": "dca5c",
+     "attributes": {
+      "position": [
+       1108576,
+       348
+      ],
+      "normal": [
+       1109968,
+       348
+      ],
+      "uv": [
+       1111360,
+       232
+      ],
+      "color": [
+       1112288,
+       348
+      ],
+      "indices": [
+       1113680,
+       216
+      ]
+     }
+    }
+   ]
+  },
+  "m046870": {
+   "offset": 288880,
+   "flags": 10027792,
+   "texture": "dcc54",
+   "texture2": null,
+   "textures": [
+    "dcc54"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m046870",
+   "sphere": [
+    -33.85122,
+    1.31338,
+    108.7,
+    13.75214
+   ],
+   "parts": [
+    {
+     "texture": "dcc54",
+     "attributes": {
+      "position": [
+       1114544,
+       204
+      ],
+      "normal": [
+       1115360,
+       204
+      ],
+      "uv": [
+       1116176,
+       136
+      ],
+      "color": [
+       1116720,
+       204
+      ],
+      "indices": [
+       1117536,
+       138
+      ]
+     }
+    }
+   ]
+  },
+  "m046c90": {
+   "offset": 289936,
+   "flags": 11665936,
+   "texture": "dcb58",
+   "texture2": "dcc54",
+   "textures": [
+    "dcb58",
+    "dcc54"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m046c90",
+   "sphere": [
+    27.16748,
+    -14.70828,
+    77.23634,
+    16.51521
+   ],
+   "parts": [
+    {
+     "texture": "dcb58",
+     "attributes": {
+      "position": [
+       1118088,
+       144
+      ],
+      "normal": [
+       1118664,
+       144
+      ],
+      "uv": [
+       1119240,
+       96
+      ],
+      "color": [
+       1119624,
+       144
+      ],
+      "indices": [
+       1120200,
+       96
+      ]
+     }
+    },
+    {
+     "texture": "dcc54",
+     "attributes": {
+      "position": [
+       1120584,
+       42
+      ],
+      "normal": [
+       1120752,
+       42
+      ],
+      "uv": [
+       1120920,
+       28
+      ],
+      "color": [
+       1121032,
+       42
+      ],
+      "indices": [
+       1121200,
+       30
+      ]
+     }
+    }
+   ]
+  },
+  "m047070": {
+   "offset": 290928,
+   "flags": 11665936,
+   "texture": "dcb58",
+   "texture2": "dcc54",
+   "textures": [
+    "dcb58",
+    "dcc54"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m047070",
+   "sphere": [
+    10.96752,
+    26.43527,
+    75.24154,
+    18.7176
+   ],
+   "parts": [
+    {
+     "texture": "dcb58",
+     "attributes": {
+      "position": [
+       1121320,
+       42
+      ],
+      "normal": [
+       1121488,
+       42
+      ],
+      "uv": [
+       1121656,
+       28
+      ],
+      "color": [
+       1121768,
+       42
+      ],
+      "indices": [
+       1121936,
+       30
+      ]
+     }
+    },
+    {
+     "texture": "dcc54",
+     "attributes": {
+      "position": [
+       1122056,
+       138
+      ],
+      "normal": [
+       1122608,
+       138
+      ],
+      "uv": [
+       1123160,
+       92
+      ],
+      "color": [
+       1123528,
+       138
+      ],
+      "indices": [
+       1124080,
+       96
+      ]
+     }
+    }
+   ]
+  },
+  "m047430": {
+   "offset": 291888,
+   "flags": 11665936,
+   "texture": "dcb58",
+   "texture2": "dcc54",
+   "textures": [
+    "dcb58",
+    "dcc54"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m047430",
+   "sphere": [
+    -30.15616,
+    13.62679,
+    69.72005,
+    16.7527
+   ],
+   "parts": [
+    {
+     "texture": "dcb58",
+     "attributes": {
+      "position": [
+       1124464,
+       123
+      ],
+      "normal": [
+       1124956,
+       123
+      ],
+      "uv": [
+       1125448,
+       82
+      ],
+      "color": [
+       1125776,
+       123
+      ],
+      "indices": [
+       1126268,
+       87
+      ]
+     }
+    },
+    {
+     "texture": "dcc54",
+     "attributes": {
+      "position": [
+       1126616,
+       39
+      ],
+      "normal": [
+       1126772,
+       39
+      ],
+      "uv": [
+       1126928,
+       26
+      ],
+      "color": [
+       1127032,
+       39
+      ],
+      "indices": [
+       1127188,
+       27
+      ]
+     }
+    }
+   ]
+  },
+  "m0477a0": {
+   "offset": 292768,
+   "flags": 11665936,
+   "texture": "dcb58",
+   "texture2": "dcc54",
+   "textures": [
+    "dcb58",
+    "dcc54"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m0477a0",
+   "sphere": [
+    -4.23626,
+    -0.04531,
+    101.47711,
+    46.56606
+   ],
+   "parts": [
+    {
+     "texture": "dcb58",
+     "attributes": {
+      "position": [
+       1127296,
+       252
+      ],
+      "normal": [
+       1128304,
+       252
+      ],
+      "uv": [
+       1129312,
+       168
+      ],
+      "color": [
+       1129984,
+       252
+      ],
+      "indices": [
+       1130992,
+       156
+      ]
+     }
+    },
+    {
+     "texture": "dcc54",
+     "attributes": {
+      "position": [
+       1131616,
+       120
+      ],
+      "normal": [
+       1132096,
+       120
+      ],
+      "uv": [
+       1132576,
+       80
+      ],
+      "color": [
+       1132896,
+       120
+      ],
+      "indices": [
+       1133376,
+       72
+      ]
+     }
+    }
+   ]
+  },
+  "m047dc0": {
+   "offset": 294336,
+   "flags": 10027536,
+   "texture": "dca5c",
+   "texture2": null,
+   "textures": [
+    "dca5c"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m047dc0",
+   "sphere": [
+    -1.49959,
+    0.01508,
+    71.34837,
+    30.17128
+   ],
+   "parts": [
+    {
+     "texture": "dca5c",
+     "attributes": {
+      "position": [
+       1133664,
+       126
+      ],
+      "normal": [
+       1134168,
+       126
+      ],
+      "uv": [
+       1134672,
+       84
+      ],
+      "color": [
+       1135008,
+       126
+      ],
+      "indices": [
+       1135512,
+       72
+      ]
+     }
+    }
+   ]
+  },
+  "m048090": {
+   "offset": 295056,
+   "flags": 11665936,
+   "texture": "dcb58",
+   "texture2": "dca5c",
+   "textures": [
+    "dcb58",
+    "dca5c"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m048090",
+   "sphere": [
+    -3.01358,
+    -0.03228,
+    88.57317,
+    34.84195
+   ],
+   "parts": [
+    {
+     "texture": "dcb58",
+     "attributes": {
+      "position": [
+       1135800,
+       126
+      ],
+      "normal": [
+       1136304,
+       126
+      ],
+      "uv": [
+       1136808,
+       84
+      ],
+      "color": [
+       1137144,
+       126
+      ],
+      "indices": [
+       1137648,
+       72
+      ]
+     }
+    },
+    {
+     "texture": "dca5c",
+     "attributes": {
+      "position": [
+       1137936,
+       24
+      ],
+      "normal": [
+       1138032,
+       24
+      ],
+      "uv": [
+       1138128,
+       16
+      ],
+      "color": [
+       1138192,
+       24
+      ],
+      "indices": [
+       1138288,
+       12
+      ]
+     }
+    }
+   ]
+  },
+  "m0483e0": {
+   "offset": 295904,
+   "flags": 10027536,
+   "texture": "dcc54",
+   "texture2": null,
+   "textures": [
+    "dcc54"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m0483e0",
+   "sphere": [
+    -1.60792,
+    9.03659,
+    8.54373,
+    2.95113
+   ],
+   "parts": [
+    {
+     "texture": "dcc54",
+     "attributes": {
+      "position": [
+       1138336,
+       234
+      ],
+      "normal": [
+       1139272,
+       234
+      ],
+      "uv": [
+       1140208,
+       156
+      ],
+      "color": [
+       1140832,
+       234
+      ],
+      "indices": [
+       1141768,
+       168
+      ]
+     }
+    }
+   ]
+  },
+  "m048810": {
+   "offset": 296976,
+   "flags": 13304336,
+   "texture": "dcc54",
+   "texture2": "dca5c",
+   "textures": [
+    "dcc54",
+    "dca5c",
+    "bcf7c"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m048810",
+   "sphere": [
+    0.85751,
+    8.03217,
+    125.61266,
+    35.43048
+   ],
+   "parts": [
+    {
+     "texture": "dcc54",
+     "attributes": {
+      "position": [
+       1142440,
+       1302
+      ],
+      "normal": [
+       1147648,
+       1302
+      ],
+      "uv": [
+       1152856,
+       868
+      ],
+      "color": [
+       1156328,
+       1302
+      ],
+      "indices": [
+       1161536,
+       966
+      ]
+     }
+    },
+    {
+     "texture": "dca5c",
+     "attributes": {
+      "position": [
+       1165400,
+       162
+      ],
+      "normal": [
+       1166048,
+       162
+      ],
+      "uv": [
+       1166696,
+       108
+      ],
+      "color": [
+       1167128,
+       162
+      ],
+      "indices": [
+       1167776,
+       120
+      ]
+     }
+    },
+    {
+     "texture": "bcf7c",
+     "attributes": {
+      "position": [
+       1168256,
+       54
+      ],
+      "normal": [
+       1168472,
+       54
+      ],
+      "uv": [
+       1168688,
+       36
+      ],
+      "color": [
+       1168832,
+       54
+      ],
+      "indices": [
+       1169048,
+       30
+      ]
+     }
+    }
+   ]
+  },
+  "m049f30": {
+   "offset": 302896,
+   "flags": 11665936,
+   "texture": "dcc54",
+   "texture2": "890e4",
+   "textures": [
+    "dcc54",
+    "890e4"
+   ],
+   "scale": 0.00390625,
+   "packed": "fixed16",
+   "poolOwner": "m049f30",
+   "sphere": [
+    -0.86656,
+    2.65005,
+    11.62824,
+    9.76478
+   ],
+   "parts": [
+    {
+     "texture": "dcc54",
+     "attributes": {
+      "position": [
+       1169168,
+       636
+      ],
+      "normal": [
+       1171712,
+       636
+      ],
+      "uv": [
+       1174256,
+       424
+      ],
+      "color": [
+       1175952,
+       636
+      ],
+      "indices": [
+       1178496,
+       456
+      ]
+     }
+    },
+    {
+     "texture": "890e4",
+     "attributes": {
+      "position": [
+       1180320,
+       150
+      ],
+      "normal": [
+       1180920,
+       150
+      ],
+      "uv": [
+       1181520,
+       100
+      ],
+      "color": [
+       1181920,
+       150
+      ],
+      "indices": [
+       1182520,
+       102
+      ]
+     }
+    }
+   ]
+  }
+ },
+ "textures": {
+  "b01d4": {
+   "url": "textures/4aa4b38f62612a07c875.png",
+   "width": 128,
+   "height": 128,
+   "bpp": 8,
+   "alpha": "opaque"
+  },
+  "890e4": {
+   "url": "textures/c2ee051c6af2da93068e.png",
+   "width": 128,
+   "height": 128,
+   "bpp": 4,
+   "alpha": "blend"
+  },
+  "8a480": {
+   "url": "textures/533e799f99b96656e80c.png",
+   "width": 64,
+   "height": 64,
+   "bpp": 4,
+   "alpha": "blend"
+  },
+  "88de8": {
+   "url": "textures/562619917f3637d4089c.png",
+   "width": 128,
+   "height": 64,
+   "bpp": 8,
+   "alpha": "blend"
+  },
+  "df250": {
+   "url": "textures/2ac00b9a021cb69d9f8f.png",
+   "width": 64,
+   "height": 64,
+   "bpp": 4,
+   "alpha": "opaque"
+  },
+  "dca5c": {
+   "url": "textures/faf86f8a1848e8c5578b.png",
+   "width": 128,
+   "height": 128,
+   "bpp": 8,
+   "alpha": "opaque"
+  },
+  "dcb58": {
+   "url": "textures/91d5c57c7ebe36389c08.png",
+   "width": 128,
+   "height": 128,
+   "bpp": 8,
+   "alpha": "blend"
+  },
+  "dcc54": {
+   "url": "textures/d1097c39337c1b2f3265.png",
+   "width": 128,
+   "height": 128,
+   "bpp": 8,
+   "alpha": "opaque"
+  },
+  "ebdd4": {
+   "url": "textures/5732d510c05f79492137.png",
+   "width": 64,
+   "height": 64,
+   "bpp": 8,
+   "alpha": "blend"
+  },
+  "bcf7c": {
+   "url": "textures/bff7b6864de18b6058cd.png",
+   "width": 64,
+   "height": 64,
+   "bpp": 4,
+   "alpha": "blend"
+  },
+  "dc7b4": {
+   "url": "textures/6294c38d552695ca0877.png",
+   "width": 128,
+   "height": 128,
+   "bpp": 8,
+   "alpha": "opaque"
+  },
+  "6ea3c": {
+   "url": "textures/467ee679232dfe33df9b.png",
+   "width": 128,
+   "height": 128,
+   "bpp": 8,
+   "alpha": "opaque"
+  },
+  "6ec4c": {
+   "url": "textures/f664efdcc62c599f39c5.png",
+   "width": 128,
+   "height": 128,
+   "bpp": 8,
+   "alpha": "blend"
+  },
+  "5a668": {
+   "url": "textures/996eced7820cbc9b7782.png",
+   "width": 64,
+   "height": 64,
+   "bpp": 4,
+   "alpha": "blend"
+  }
+ }
+}

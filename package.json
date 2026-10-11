@@ -1,0 +1,24 @@
+{
+  "name": "twisted-metal-web",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Reconstrução não oficial de Twisted Metal: Head-On (PS2) para o navegador",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "extract": "python tools/extract.py",
+    "convert": "python tools/convert_model.py",
+    "index": "python tools/build_index.py",
+    "test:py": "python -m unittest discover -s tools -p \"test_*.py\""
+  },
+  "dependencies": {
+    "three": "0.186.1"
+  },
+  "devDependencies": {
+    "@types/three": "0.186.0",
+    "playwright-core": "1.63.0",
+    "typescript": "7.0.2",
+    "vite": "8.3.1"
+  }
+}

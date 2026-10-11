@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Twisted Metal Web — visualizador</title>
+    <style>
+      html, body { margin: 0; height: 100%; overflow: hidden; background: #111; font: 12px/1.4 system-ui, sans-serif; color: #ddd; }
+      canvas { display: block; }
+      #status { position: fixed; top: 8px; left: 8px; background: #000a; padding: 4px 8px; border-radius: 4px; }
+      #panel { position: fixed; top: 40px; left: 8px; bottom: 8px; overflow: auto; background: #000a; padding: 6px 8px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 11px; }
+      #panel label { display: block; white-space: nowrap; cursor: pointer; }
+      #picker { position: fixed; top: 8px; right: 8px; font-size: 13px; padding: 4px; }
+      #help { position: fixed; bottom: 8px; right: 8px; background: #000a; padding: 4px 8px; border-radius: 4px; }
+    </style>
+  </head>
+  <body>
+    <div id="status">carregando…</div>
+    <div id="panel"></div>
+    <div id="help">arrastar: girar · roda: zoom · WASD/QE: voar · Shift: rápido</div>
+    <script type="module" src="/src/viewer.ts"></script>
+  </body>
+</html>

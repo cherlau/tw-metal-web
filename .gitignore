@@ -1,0 +1,18 @@
+# Dados originais do jogo: nunca no git (SPEC §17)
+*.iso
+*.bdd
+*.pss
+*.vag
+*.vpk
+*.bnk
+*.xfx
+source/
+artifacts/
+blender/
+references/
+
+# Python / Node
+__pycache__/
+*.pyc
+node_modules/
+dist/
