@@ -117,3 +117,34 @@ class PublishedLevelTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+@unittest.skipUnless((ROOT / "source" / "disc" / "scus_976.21").exists(), "ELF ausente")
+class NativeRulesTests(unittest.TestCase):
+    """Tabela de física dos veículos do ELF (docs/NATIVE.md)."""
+
+    def test_vehicle_table(self):
+        sys.path.insert(0, str(ROOT / "tools" / "native"))
+        import export_rules
+        from elf import Elf
+
+        v = export_rules.vehicles(Elf())
+        self.assertEqual(len(v), 36)
+        self.assertEqual(v["axel"]["name"], "HO_Axel")
+        self.assertEqual(v["sweet"]["name"], "Sweet Tooth")
+        self.assertEqual(v["cop"]["name"], "Cop Car")
+        self.assertEqual(v["roadkill" if "roadkill" in v else "rkill"]["wheels"][0], [3.0, 7.0, -1.8])
+        # frente = +Y: as duas primeiras rodas na frente
+        for car in v.values():
+            self.assertGreater(car["wheels"][0][1], car["wheels"][2][1], car["name"])
+
+
+    def test_gravity_constants(self):
+        """FUN_00176548: força = massa × escala × -32.2; escalas em gp-0x756c / gp-0x7568 (docs/NATIVE.md)."""
+        sys.path.insert(0, str(ROOT / "tools" / "native"))
+        from elf import Elf
+
+        e = Elf()
+        self.assertEqual(e.gp, 0x2FA5F0)
+        self.assertEqual(e.f32(e.gp - 0x756C), 2.0)
+        self.assertEqual(e.f32(e.gp - 0x7568), 4.0)

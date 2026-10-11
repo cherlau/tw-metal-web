@@ -1,0 +1,310 @@
+{
+ "tracks": {
+  "bonus1": {
+   "url": "music/bonus1.m4a",
+   "duration": 127.593,
+   "bytes": 2142861
+  },
+  "calypso": {
+   "url": "music/calypso.m4a",
+   "duration": 263.534,
+   "bytes": 4304330
+  },
+  "colelec": {
+   "url": "music/colelec.m4a",
+   "duration": 323.454,
+   "bytes": 5372099
+  },
+  "coliseum": {
+   "url": "music/coliseum.m4a",
+   "duration": 65.828,
+   "bytes": 1082134
+  },
+  "colorch": {
+   "url": "music/colorch.m4a",
+   "duration": 199.111,
+   "bytes": 3283288
+  },
+  "darkt1": {
+   "url": "music/darkt1.m4a",
+   "duration": 24.381,
+   "bytes": 405188
+  },
+  "darkt2": {
+   "url": "music/darkt2.m4a",
+   "duration": 25.193,
+   "bytes": 413225
+  },
+  "dmtch2": {
+   "url": "music/dmtch2.m4a",
+   "duration": 228.829,
+   "bytes": 3834017
+  },
+  "dproof": {
+   "url": "music/dproof.m4a",
+   "duration": 239.801,
+   "bytes": 3927477
+  },
+  "dthmat1": {
+   "url": "music/dthmat1.m4a",
+   "duration": 348.476,
+   "bytes": 5888218
+  },
+  "eddybos2": {
+   "url": "music/eddybos2.m4a",
+   "duration": 16.254,
+   "bytes": 267238
+  },
+  "eddyboss": {
+   "url": "music/eddyboss.m4a",
+   "duration": 21.13,
+   "bytes": 354135
+  },
+  "egyorch": {
+   "url": "music/egyorch.m4a",
+   "duration": 203.174,
+   "bytes": 3372502
+  },
+  "egyrock": {
+   "url": "music/egyrock.m4a",
+   "duration": 176.355,
+   "bytes": 2931125
+  },
+  "grceorch": {
+   "url": "music/grceorch.m4a",
+   "duration": 212.114,
+   "bytes": 3524263
+  },
+  "grcerock": {
+   "url": "music/grcerock.m4a",
+   "duration": 212.927,
+   "bytes": 3536067
+  },
+  "jnkyrdam": {
+   "url": "music/jnkyrdam.m4a",
+   "duration": 335.247,
+   "bytes": 5464554
+  },
+  "jnkyrdex": {
+   "url": "music/jnkyrdex.m4a",
+   "duration": 346.501,
+   "bytes": 5728931
+  },
+  "laelec": {
+   "url": "music/laelec.m4a",
+   "duration": 286.07,
+   "bytes": 4833819
+  },
+  "larock": {
+   "url": "music/larock.m4a",
+   "duration": 258.438,
+   "bytes": 4331127
+  },
+  "monelec": {
+   "url": "music/monelec.m4a",
+   "duration": 258.438,
+   "bytes": 4307928
+  },
+  "monrock": {
+   "url": "music/monrock.m4a",
+   "duration": 182.044,
+   "bytes": 3031707
+  },
+  "prisnex": {
+   "url": "music/prisnex.m4a",
+   "duration": 353.609,
+   "bytes": 5923584
+  },
+  "prsnbatl": {
+   "url": "music/prsnbatl.m4a",
+   "duration": 358.348,
+   "bytes": 6126015
+  },
+  "prsorch": {
+   "url": "music/prsorch.m4a",
+   "duration": 192.609,
+   "bytes": 3163295
+  },
+  "prsrock": {
+   "url": "music/prsrock.m4a",
+   "duration": 198.298,
+   "bytes": 3275019
+  },
+  "roofbatl": {
+   "url": "music/roofbatl.m4a",
+   "duration": 348.278,
+   "bytes": 5919710
+  },
+  "rsqelec": {
+   "url": "music/rsqelec.m4a",
+   "duration": 320.203,
+   "bytes": 5390080
+  },
+  "rsqorch": {
+   "url": "music/rsqorch.m4a",
+   "duration": 195.86,
+   "bytes": 3228857
+  },
+  "rsqrock": {
+   "url": "music/rsqrock.m4a",
+   "duration": 188.546,
+   "bytes": 3088451
+  },
+  "stdmelec": {
+   "url": "music/stdmelec.m4a",
+   "duration": 240.558,
+   "bytes": 4039159
+  },
+  "stdmrock": {
+   "url": "music/stdmrock.m4a",
+   "duration": 206.425,
+   "bytes": 3382005
+  },
+  "tm_high": {
+   "url": "music/tm_high.m4a",
+   "duration": 70.704,
+   "bytes": 1152304
+  },
+  "tranorch": {
+   "url": "music/tranorch.m4a",
+   "duration": 188.546,
+   "bytes": 3073744
+  },
+  "tranrock": {
+   "url": "music/tranrock.m4a",
+   "duration": 215.365,
+   "bytes": 3547976
+  },
+  "trftelec": {
+   "url": "music/trftelec.m4a",
+   "duration": 310.451,
+   "bytes": 5299990
+  },
+  "trftrock": {
+   "url": "music/trftrock.m4a",
+   "duration": 179.606,
+   "bytes": 2953402
+  },
+  "tstrelec": {
+   "url": "music/tstrelec.m4a",
+   "duration": 335.644,
+   "bytes": 5602753
+  },
+  "tstrrock": {
+   "url": "music/tstrrock.m4a",
+   "duration": 180.419,
+   "bytes": 3014658
+  },
+  "hoshell": {
+   "url": "music/hoshell.m4a",
+   "duration": 48.0,
+   "bytes": 780627
+  },
+  "hcshell": {
+   "url": "music/hcshell.m4a",
+   "duration": 48.0,
+   "bytes": 791620
+  }
+ },
+ "levels": {
+  "coliseum": [
+   "colelec",
+   "colorch"
+  ],
+  "egypt": [
+   "egyorch",
+   "egyrock"
+  ],
+  "fway": [
+   "laelec",
+   "larock"
+  ],
+  "paris": [
+   "prsorch",
+   "prsrock"
+  ],
+  "russia": [
+   "rsqelec",
+   "rsqorch",
+   "rsqrock"
+  ],
+  "greece": [
+   "grceorch",
+   "grcerock"
+  ],
+  "monaco": [
+   "monelec",
+   "monrock"
+  ],
+  "castle": [
+   "tranorch",
+   "tranrock"
+  ],
+  "fwayboss": [
+   "laelec",
+   "larock"
+  ],
+  "tokyo": [
+   "tstrelec",
+   "tstrrock"
+  ],
+  "rooftops": [
+   "trftelec",
+   "trftrock"
+  ],
+  "colisdm": [
+   "tm_high"
+  ],
+  "greecedm": [
+   "tm_high"
+  ],
+  "parisdm": [
+   "tm_high"
+  ],
+  "tokyodm": [
+   "tm_high"
+  ],
+  "egyptdm": [
+   "tm_high"
+  ],
+  "arena": [
+   "stdmelec",
+   "stdmrock"
+  ],
+  "castledm": [
+   "tranorch",
+   "tranrock"
+  ],
+  "hc_gd": [
+   "roofbatl"
+  ],
+  "hc_nd": [
+   "prisnex"
+  ],
+  "hc_sc": [
+   "dthmat1"
+  ],
+  "hc_st": [
+   "dmtch2"
+  ],
+  "hc_su": [
+   "tm_high"
+  ],
+  "asylum": [
+   "prsnbatl",
+   "prisnex"
+  ],
+  "impound": [
+   "jnkyrdam",
+   "jnkyrdex"
+  ],
+  "tokyob": [
+   "tstrelec",
+   "tstrrock"
+  ]
+ },
+ "menu": [
+  "hoshell",
+  "hcshell"
+ ]
+}

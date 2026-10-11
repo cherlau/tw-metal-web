@@ -1,0 +1,6 @@
+# Atualização do jogador (FUN_001025f0) e suas 4 etapas
+at:12aa60 le_controle
+at:1026e0 etapa1
+at:102f50 etapa2
+at:102a88 etapa3
+at:1032b8 etapa4

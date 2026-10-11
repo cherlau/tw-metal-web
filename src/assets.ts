@@ -58,6 +58,8 @@ export interface ModelDoc {
   bones: Record<string, BoneDef>;
   effects: Record<string, InstanceDef[]>;
   objects?: { node: string; inScene: boolean; instances: InstanceDef[] }[];
+  /** Listas de pontos das arenas (coordenadas do PS2): spt, pkp, pts, gps. */
+  points?: Record<string, { pos: [number, number, number]; raw: string[] }[]>;
   sceneUnknown: Record<string, string[]>;
   meshes: Record<string, MeshDef>;
   textures: Record<string, TextureDef>;

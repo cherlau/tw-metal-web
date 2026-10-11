@@ -95,6 +95,19 @@ Escolha do host (confirmar no ELF): texturas de gelo `88a28`/`b5a20` tratadas co
 ### Coordenadas ✅
 **Z para cima** (ondas de choque planas em XY; caminhão do Sweet Tooth alongado em Y), metros. Conversão para o Three: rotação de -90° em X, `(x, y, z) → (x, z, -y)`, sem espelho — confirmado pelo texto "A-12" legível no capô da viatura. Regra única em `src/coords.ts`.
 
+## Listas de pontos das arenas (`SPT`, `PKP`, `PTS`, `GPS`) 🟡 — `convert_model.read_points`
+`u32 versão` (data: `0x12282000` em SPT/PKP, `0x07162003` em PTS/GPS) · `3× u32 n` (iguais) · `n` registros com `vec3 f32` (coordenadas do PS2) no início.
+| Seção | Registro | Uso conhecido |
+|---|---|---|
+| `PTS` | 32 B | nós do caminho da IA (em superfície dirigível — usados como spawn provisório) |
+| `PKP` | 64 B | pickups (armas, vida) — tipo nos words seguintes (🟡) |
+| `SPT` | 64 B | 🟡 **não** são spawns de chão (testado: caíam no vazio) — talvez holofotes/câmeras |
+| `GPS` | 80 B | grupos de pontos (bounds + índices) |
+Os words após o `vec3` são exportados crus (`raw`) para decodificação futura.
+
+## Orientação dos veículos ✅
+A frente dos modelos de carro é **+Y no PS2** (grade e faróis da viatura, lanternas atrás). No Three: `VEHICLE_TO_THREE = rotY(π) · PS2_TO_THREE` (frente = +Z), em `src/coords.ts`.
+
 ## Outros
 | Formato | Status |
 |---|---|

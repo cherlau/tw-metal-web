@@ -1,0 +1,4 @@
+# Alvos: regras de veículo (física, carga de carro, armas).
+refsrange:2ba900:2bd8b0 tabela_fisica_veiculos
+str:^Weapons\sBay\sFull armas_baia_cheia
+str:^Loading\sCar carpager_loadcar

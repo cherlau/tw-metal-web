@@ -1,0 +1,3 @@
+# Passo de física: quem percorre a lista de corpos ativos (DAT_002f4284) e o pool (DAT_002f427c)
+2f4284 lista_corpos_ativos
+2f427c pool_corpos

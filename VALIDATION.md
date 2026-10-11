@@ -56,3 +56,49 @@
 - Prefabs dos níveis (objetos fora da cena) exportados mas não instanciados (posições virão do jogo/ELF ou dos `.PTS/.PKP`).
 - Grade de setores `0x0C`: só a lista de nós é usada; as células não foram decodificadas.
 - Tamanho: níveis somam 435 MB (float32 sem compressão) — otimizar antes do deploy (M13).
+
+## 2026-10-11 — M4: colisão + dirigir
+
+| Item | Resultado |
+|---|---|
+| Física | `src/physics/vehicle.ts` puro (sem DOM/Three); 6 testes sintéticos (assentar, vel. máxima, freio/ré, direção, parede, não girar parado) |
+| Colisão | BVH (three-mesh-bvh 0.9.15) sobre os triângulos da pose base sem aditivos: 137 k (Arena), 159 k (Rússia), 260 k (Paris) triângulos, 108–261 ms para montar |
+| Assets reais em Node | `tests/world.test.ts`: Arena e Tokyo DM, 12 spawns cada — assenta e dirige 6 s sem cair do mundo |
+| QA assistido (input scriptado, `tools/web/drive.mjs`) | Tokyo DM (Axel, viatura), Arena (Axel), Rússia (Sweet Tooth), Paris (Twister): acelera, vira, para em parede, 4 rodas no chão |
+| Orientação | frente dos carros = +Y no PS2 (grade/faróis vistos de frente na 1ª tentativa); `VEHICLE_TO_THREE` |
+| Testes | TS 8/8 · Python 36/36 |
+
+**Escolhas do host (provisórias, a substituir pela Fase 4/Ghidra):** todas as constantes de `VEHICLE_RULES` (gravidade 64 u/s², vel. máx. 150 u/s ≈ 100 mph assumindo unidade = pé), modelo arcade (sem rigid body), spawns nos nós PTS, colisão pelos triângulos de render (a grade 0x0C original não foi decodificada).
+
+**Não verificado:** sensação de direção contra o jogo original (requer comparação humana); fps em GPU real (o headless usa SwiftShader, 12–20 fps).
+
+## 2026-10-11 (tarde) — Verificação pós-travamento + início da Fase 4
+
+**Integridade após o travamento do PC:** extração (787 arquivos, 0 reescritos pelo hash), assets (100 modelos + 2.893 PNGs, `tools/verify_assets.py`), código (tsc, TS 8/8, Python), documentos e memória — **nada perdido**. Jogo no Chrome real (RTX 3050): 85 fps na Arena.
+
+**Fase 4 (RE):** Ghidra 12.1.3 + EE Reloaded v2.1.37 instalados (downloads conferidos por SHA-256); ELF analisado em headless. Primeiro achado: **tabela de física dos veículos** em `0x2ba990` (36 × `0x150`), lida por `FUN_00140d60`. Rodas da tabela batem com os modelos em 31/36 carros e substituem a estimativa por bounding box (`rules/vehicles.json`). Teste `NativeRulesTests`. Detalhes: `docs/NATIVE.md`.
+
+## 2026-10-11 (noite) — Combate: armas, pickups e bots
+
+| Item | Resultado |
+|---|---|
+| Nativo usado | ids/nomes dos pickups (tabela `0x2c3a00` = word 8 do `PKP`), regra de escolha de alvo (`FUN_00102f50`), unidades pés/mph, gravidade |
+| Regras puras | `src/game/weapons.ts` + `src/game/match.ts`; testes TS **19/19** (alvo nativo, míssil reto/teleguiado, ricochete, dano em área, pickups, munição, morte/renascimento, bots se movem e atiram, carros não se atravessam) |
+| QA headless (`tools/web/match-qa.mjs`, `bot-trace.mjs`) | bots andam (até 164 pés/s com turbo), pegam pickups (Remote, Napalm, Ricochet), causam dano |
+| Chrome real (RTX 3050) | 85 fps com 5 carros na Arena; 4 Homing disparados pelo jogador derrubaram a viatura de 100 → 61 (4×10) |
+| Bugs achados e corrigidos | bots presos (detecção de "atolado" sem memória de tempo); bots atirando através de paredes (sem linha de visão); carros se atravessando (sem colisão carro×carro) |
+
+**Escolhas do host:** ver `docs/NATIVE.md` (dano/velocidade/munição, vida, turbo, IA, mapeamento visual dos objetos do GLOBALS). **Não verificado:** sensação de combate contra o original.
+
+## 2026-10-11 (noite) — Música e efeitos
+
+| Item | Resultado |
+|---|---|
+| Música (`tools/convert_audio.py`) | 41 faixas VAG/VPK → AAC 128k (136 MB); pares mono L/R do menu unidos em estéreo; índice por arena |
+| Efeitos (`tools/convert_sfx.py`) | 24 bancos 989snd (global + 23 carros) → 469 sons AAC 96k (4,9 MB) com os nomes originais |
+| Runtime (`src/audio.ts`) | WebAudio: barramentos master/música/efeitos, efeitos 3D com ouvinte na câmera, motor de 3 laços por carro + sirene da viatura; liga no 1º gesto, **M** silencia |
+| QA headless (`tools/web/audio-qa.mjs`) | Arena (5 carros): contexto `running`, 5 motores, `stdmrock` tocando 30 s, 33× `W_MGUN`, `W_RICO_LNCH`, `P_WEAPON`, `V_MAJOR_COLL`; Rússia: `rsqelec`; **0 falhas** de carregamento de áudio |
+| Bug achado e corrigido | se o gesto chegasse antes do índice da música, ela nunca começava |
+| Testes | TS 19/19 |
+
+**Não verificado:** escuta humana (mixagem, volume, se o som do motor lembra o original); áudio no Safari/iOS. Escolhas do host listadas em `docs/NATIVE.md` (Áudio).

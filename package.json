@@ -10,14 +10,18 @@
     "extract": "python tools/extract.py",
     "convert": "python tools/convert_model.py",
     "index": "python tools/build_index.py",
-    "test:py": "python -m unittest discover -s tools -p \"test_*.py\""
+    "test:py": "python -m unittest discover -s tools -p \"test_*.py\"",
+    "test": "node --import tsx --test tests/*.test.ts"
   },
   "dependencies": {
-    "three": "0.186.1"
+    "three": "0.186.1",
+    "three-mesh-bvh": "0.9.15"
   },
   "devDependencies": {
+    "@types/node": "24.19.0",
     "@types/three": "0.186.0",
     "playwright-core": "1.63.0",
+    "tsx": "4.23.15",
     "typescript": "7.0.2",
     "vite": "8.3.1"
   }

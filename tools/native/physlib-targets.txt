@@ -1,0 +1,1 @@
+range:250000:253800 lib_fisica

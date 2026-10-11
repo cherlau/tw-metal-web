@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import io
+import struct
 import json
 import sys
 from pathlib import Path
@@ -36,6 +37,24 @@ CODE_FX_TEXTURES = {
     0x88A28: "freeze",  # cristais de gelo (casca do congelamento)
     0xB5A20: "freeze",  # espinhos de gelo
 }
+
+
+# Listas de pontos das arenas: u32 versão (data), 3× u32 n, n registros; vec3 f32 no início de cada registro.
+POINT_LISTS = {"spt": 64, "pkp": 64, "pts": 32, "gps": 80}
+
+
+def read_points(path: Path, stride: int) -> list[dict]:
+    d = path.read_bytes()
+    _ver, n, n2, n3 = struct.unpack_from("<4I", d, 0)
+    if not (n == n2 == n3) or 16 + n * stride != len(d):
+        raise ValueError(f"{path.name}: lista de pontos inconsistente (n={n}, {len(d)} bytes, stride {stride})")
+    out = []
+    for i in range(n):
+        p = 16 + i * stride
+        pos = struct.unpack_from("<3f", d, p)
+        raw = struct.unpack_from(f"<{(stride - 12) // 4}I", d, p + 12)
+        out.append({"pos": [round(v, 4) for v in pos], "raw": [f"{w:x}" for w in raw]})  # raw: 🟡 a decodificar
+    return out
 
 
 class BinWriter:
@@ -191,6 +210,12 @@ def convert(name: str, folder: str) -> dict:
         } | {
             f"code:{kind}": [{"mesh": f"m{i.mesh:06x}", "bone": f"n{i.bone:06x}" if i.bone >= 0 else None} for i in insts]
             for kind, insts in scene_rep.code_effects.items()
+        },
+        # Pontos da arena (spawn, pickups, caminhos da IA…), coordenadas do PS2.
+        "points": {
+            kind: read_points(f, stride)
+            for kind, stride in POINT_LISTS.items()
+            for f in sorted(base.glob(f"*.{kind}"))[:1]
         },
         # Objetos do nível (cabeçalho +0x10): os que não aparecem na cena são pré-fabricados
         # (centrados na origem) instanciados pelo jogo em runtime.

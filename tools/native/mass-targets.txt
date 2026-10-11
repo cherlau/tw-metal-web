@@ -1,0 +1,10 @@
+# Leitores de carro+0x848 (massa/2?)
+at:12e3a4 le_0x848_12e3a4
+at:140e28 le_0x848_140e28
+at:16bd08 le_0x848_16bd08
+at:17d444 le_0x848_17d444
+at:17d59c le_0x848_17d59c
+at:1b2850 le_0x848_1b2850
+at:1b7dfc le_0x848_1b7dfc
+at:1c29fc le_0x848_1c29fc
+at:1e5c7c le_0x848_1e5c7c

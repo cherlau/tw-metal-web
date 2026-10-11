@@ -1,0 +1,2 @@
+at:1ca284 escreve_0x858_a
+at:1cb114 escreve_0x858_b

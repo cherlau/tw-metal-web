@@ -1,0 +1,19 @@
+# Usos da constante mph->pés/s (1.4666667)
+at:10ce24 mph_10ce24
+at:116c10 mph_116c10
+at:1177f4 mph_1177f4
+at:133988 mph_133988
+at:14cb74 mph_14cb74
+at:16bcec mph_16bcec
+at:17aabc mph_17aabc
+at:18a900 mph_18a900
+at:18aa58 mph_18aa58
+at:193974 mph_193974
+at:1b2834 mph_1b2834
+at:1b286c mph_1b286c
+at:1b7ddc mph_1b7ddc
+at:1bfb78 mph_1bfb78
+at:1bfc60 mph_1bfc60
+at:1d03dc mph_1d03dc
+at:1d07d0 mph_1d07d0
+at:1ff314 mph_1ff314

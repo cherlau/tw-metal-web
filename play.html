@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Twisted Metal Web</title>
+    <style>
+      html, body { margin: 0; height: 100%; overflow: hidden; background: #111; font: 13px/1.4 system-ui, sans-serif; color: #eee; }
+      #game canvas { display: block; }
+      #hud { position: fixed; top: 8px; left: 8px; background: #000a; padding: 6px 10px; border-radius: 6px; min-width: 320px; }
+      #hud .bars { display: flex; gap: 8px; margin-bottom: 4px; }
+      #hud .bar { position: relative; flex: 1; height: 16px; background: #333; border-radius: 3px; overflow: hidden; }
+      #hud .bar i { position: absolute; inset: 0 auto 0 0; display: block; }
+      #hud .bar.hp i { background: linear-gradient(90deg, #c22, #4c4); }
+      #hud .bar.turbo i { background: #29f; }
+      #hud .bar b { position: relative; font-size: 11px; padding-left: 4px; }
+      #hud .sel { color: #ff4; font-weight: bold; text-decoration: underline; }
+      #hud .small { font-size: 11px; opacity: .8; }
+      #hud .toast { color: #ffd34d; font-weight: bold; }
+      #hud .dead { color: #f55; font-size: 20px; font-weight: bold; }
+      #help { position: fixed; bottom: 8px; left: 8px; background: #000a; padding: 4px 8px; border-radius: 4px; }
+      #loading { position: fixed; inset: 0; display: grid; place-items: center; font-size: 18px; background: #111; }
+      #loading[hidden] { display: none; }
+    </style>
+  </head>
+  <body>
+    <div id="game"></div>
+    <div id="hud"></div>
+    <div id="help">W/↑ acelerar · S/↓ freio/ré · A/D virar · Espaço freio de mão · <b>J</b> metralhadora · <b>K</b> arma especial · <b>L</b> trocar arma · <b>Shift</b> turbo · R renascer · C câmera · M som · gamepad: RT/LT, RB tiro, B especial, Y troca, LB turbo</div>
+    <div id="loading">carregando…</div>
+    <script type="module" src="/src/game.ts"></script>
+  </body>
+</html>

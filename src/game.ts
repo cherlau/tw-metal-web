@@ -1,0 +1,433 @@
+// Deathmatch numa arena. Uso: play.html?lvl=arena&car=axel&bots=3
+import * as THREE from 'three';
+import { assetURL, loadModel, type ModelDoc } from './assets';
+import { AudioEngine } from './audio';
+import { LevelCollision } from './collision';
+import { PS2_TO_THREE, VEHICLE_TO_THREE } from './coords';
+import { Input } from './input';
+import { Match, MATCH_RULES, type CarActions, type MatchEvent } from './game/match';
+import { PICKUP_RULES, pickupEffect, WEAPON_RULES, type WeaponId } from './game/weapons';
+import { basisOf, speedOf, type VehicleShape, type VehicleState } from './physics/vehicle';
+import { v3, type V3 } from './physics/vec';
+import { buildBatched, isAdditive } from './render';
+
+const params = new URLSearchParams(location.search);
+const levelName = params.get('lvl') ?? 'arena';
+const carName = params.get('car') ?? 'axel';
+const botCount = Math.max(0, Math.min(7, Number(params.get('bots') ?? 3)));
+const BOT_POOL = ['cop', 'sweet', 'twist', 'spectre', 'thump', 'grass', 'crim', 'wart', 'hamr', 'rkill'];
+
+const STEP = 1 / 60; // tick fixo (SPEC §9.2)
+const abort = new AbortController();
+addEventListener('pagehide', () => abort.abort());
+
+// ---------------------------------------------------------------- renderer
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+document.getElementById('game')!.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x1a1d24);
+const camera = new THREE.PerspectiveCamera(60, 1, 0.5, 20000);
+const hud = document.getElementById('hud')!;
+const loading = document.getElementById('loading')!;
+
+function resize() {
+  renderer.setSize(innerWidth, innerHeight);
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+}
+addEventListener('resize', resize, { signal: abort.signal });
+resize();
+
+const ps2 = (p: number[]): V3 => {
+  const v = new THREE.Vector3(p[0], p[1], p[2]).applyMatrix4(PS2_TO_THREE);
+  return v3(v.x, v.y, v.z);
+};
+
+// ---------------------------------------------------------------- carga
+async function loadLevel() {
+  loading.textContent = `carregando arena ${levelName}…`;
+  const { doc, bin } = await loadModel(`lvl/${levelName}`);
+  const { group, drawCalls } = await buildBatched(doc, bin, doc.scene);
+  group.matrixAutoUpdate = false;
+  group.matrix.copy(PS2_TO_THREE);
+  scene.add(group);
+  loading.textContent = 'montando colisão…';
+  await new Promise((r) => setTimeout(r));
+  const t0 = performance.now();
+  const collision = new LevelCollision(doc, bin, PS2_TO_THREE);
+  console.info(`[colisão] ${collision.triangleCount} triângulos, BVH em ${Math.round(performance.now() - t0)} ms`);
+  return { doc, collision, drawCalls };
+}
+
+/** Regras recuperadas do executável (tools/native/export_rules.py). */
+async function loadVehicleRules(): Promise<Record<string, { wheels: number[][] }>> {
+  const r = await fetch(assetURL('rules/vehicles.json'));
+  return r.ok ? (await r.json()).vehicles : {};
+}
+
+const carCache = new Map<string, Promise<{ template: THREE.Group; shape: VehicleShape }>>();
+function loadCarModel(name: string, rules: Record<string, { wheels: number[][] }>) {
+  let p = carCache.get(name);
+  if (!p) {
+    p = (async () => {
+      const { doc, bin } = await loadModel(`cars/${name}`);
+      const { group } = await buildBatched(doc, bin, doc.scene);
+      group.matrixAutoUpdate = false;
+      group.matrix.copy(VEHICLE_TO_THREE);
+      const template = new THREE.Group();
+      template.add(group);
+      const shape = shapeOf(doc, bin);
+      // Rodas da tabela nativa (coords do PS2, frente +Y) -> espaço do carro no Three: (x, y, z) -> (-x, z, y).
+      const w = rules[name]?.wheels;
+      if (w?.length === 4) shape.wheels = w.map(([x, y, z]) => v3(-x, z, y));
+      return { template, shape };
+    })();
+    carCache.set(name, p);
+  }
+  return p;
+}
+
+/** Caixa do carro (espaço Three, origem do modelo) sem malhas aditivas (fachos de luz etc.). */
+function shapeOf(doc: ModelDoc, bin: ArrayBuffer): VehicleShape {
+  const box = new THREE.Box3();
+  const p = new THREE.Vector3();
+  for (const { mesh } of doc.scene) {
+    const def = doc.meshes[mesh];
+    if (isAdditive(def)) continue;
+    for (const part of def.parts ?? []) {
+      const [o, n] = part.attributes.position;
+      const a = new Float32Array(bin, o, n);
+      for (let i = 0; i < n; i += 3) box.expandByPoint(p.set(a[i], a[i + 1], a[i + 2]).applyMatrix4(VEHICLE_TO_THREE));
+    }
+  }
+  return { halfWidth: Math.max(-box.min.x, box.max.x), halfLength: Math.max(-box.min.z, box.max.z), bottom: box.min.y, top: box.max.y };
+}
+
+/**
+ * Objetos do GLOBALS.BDD usados como peças de jogo (prefabs centrados na origem).
+ * ⚠️ ESCOLHA DO HOST: o índice → significado foi identificado visualmente (docs/NATIVE.md).
+ */
+const GLOBAL_OBJECTS = { weaponPickup: 20, healthPickup: 17, turboPickup: 15, missile: 16, fireball: 36, burst: 29 } as const;
+
+async function loadGlobals() {
+  const { doc, bin } = await loadModel('globals/globals');
+  const out: Record<keyof typeof GLOBAL_OBJECTS, THREE.Group> = {} as never;
+  for (const [key, index] of Object.entries(GLOBAL_OBJECTS) as [keyof typeof GLOBAL_OBJECTS, number][]) {
+    const { group } = await buildBatched(doc, bin, doc.objects?.[index]?.instances ?? []);
+    group.matrixAutoUpdate = false;
+    group.matrix.copy(PS2_TO_THREE);
+    // Normaliza o tamanho (raio ~1) — a escala original vem do jogo, aqui escolhemos no uso.
+    const holder = new THREE.Group();
+    holder.add(group);
+    const sphere = new THREE.Box3().setFromObject(holder).getBoundingSphere(new THREE.Sphere());
+    group.matrix.premultiply(new THREE.Matrix4().makeTranslation(-sphere.center.x, -sphere.center.y, -sphere.center.z));
+    holder.scale.setScalar(1 / Math.max(sphere.radius, 1e-3));
+    out[key] = holder;
+  }
+  return out;
+}
+
+function spawnPoints(doc: ModelDoc, collision: LevelCollision): V3[] {
+  // Nós do caminho da IA (PTS — superfície dirigível). ⚠️ Spawns reais do DM moram no ELF.
+  const pts = doc.points ?? {};
+  const raw = (pts.pts?.length ? pts.pts : pts.pkp ?? []).map((p) => ps2(p.pos));
+  if (!raw.length) {
+    const c = collision.bounds.getCenter(new THREE.Vector3());
+    raw.push(v3(c.x, collision.bounds.max.y, c.z));
+  }
+  return raw;
+}
+
+function placeOnGround(p: V3, shape: VehicleShape, collision: LevelCollision): V3 {
+  const hit = collision.raycast(v3(p.x, p.y + 40, p.z), v3(0, -1, 0), 400);
+  const groundY = hit ? p.y + 40 - hit.distance : p.y;
+  return v3(p.x, groundY - shape.bottom + 2, p.z);
+}
+
+// ---------------------------------------------------------------- efeitos visuais
+interface Fx {
+  obj: THREE.Object3D;
+  age: number;
+  life: number;
+  grow: number;
+}
+
+// ---------------------------------------------------------------- jogo
+async function main() {
+  const rules = await loadVehicleRules();
+  const bots = BOT_POOL.filter((n) => n !== carName).slice(0, botCount);
+  const [{ doc: lvl, collision, drawCalls }, globals, ...cars] = await Promise.all([
+    loadLevel(),
+    loadGlobals(),
+    loadCarModel(carName, rules),
+    ...bots.map((b) => loadCarModel(b, rules)),
+  ]);
+  const spawns = spawnPoints(lvl, collision);
+  const match = new Match(collision, spawns, (p, s) => placeOnGround(p, s, collision));
+  const player = match.addCar('Você', carName, cars[0].shape, false);
+  bots.forEach((b, i) => match.addCar(b, b, cars[i + 1].shape, true));
+  match.addPickups((lvl.points?.pkp ?? []).map((p) => ({ id: parseInt(p.raw[8], 16), pos: ps2(p.pos) })));
+
+  // Modelos dos carros (um por carro da partida).
+  const models = match.cars.map((c, i) => {
+    const m = (i === 0 ? cars[0] : cars[i]).template.clone();
+    scene.add(m);
+    return m;
+  });
+  // Pickups: ícone girando por cima do ponto do PKP.
+  const pickupObjs = match.pickups.map((p) => {
+    const eff = pickupEffect(p.id);
+    const src = eff.kind === 'health' ? globals.healthPickup : eff.kind === 'turbo' ? globals.turboPickup : globals.weaponPickup;
+    const o = src.clone();
+    o.scale.multiplyScalar(4);
+    o.position.set(p.pos.x, p.pos.y + 5, p.pos.z);
+    scene.add(o);
+    return o;
+  });
+  // Projéteis: pool de mísseis.
+  const missiles: THREE.Object3D[] = [];
+  const missileFor = (i: number) => {
+    while (missiles.length <= i) {
+      const m = globals.missile.clone();
+      m.scale.multiplyScalar(2.5);
+      scene.add(m);
+      missiles.push(m);
+    }
+    return missiles[i];
+  };
+  // Traçantes da metralhadora.
+  const tracerGeo = new THREE.BufferGeometry();
+  const tracerPos = new Float32Array(64 * 6);
+  tracerGeo.setAttribute('position', new THREE.BufferAttribute(tracerPos, 3));
+  const tracers = new THREE.LineSegments(tracerGeo, new THREE.LineBasicMaterial({ color: 0xffdd66 }));
+  tracers.frustumCulled = false;
+  scene.add(tracers);
+  let tracerList: { from: V3; to: V3; age: number }[] = [];
+  const fx: Fx[] = [];
+  const explode = (pos: V3, big: boolean) => {
+    for (const [src, life, grow] of [[globals.fireball, 0.6, big ? 30 : 14], [globals.burst, 0.35, big ? 40 : 18]] as const) {
+      const o = src.clone();
+      o.position.set(pos.x, pos.y, pos.z);
+      o.scale.setScalar(1);
+      scene.add(o);
+      fx.push({ obj: o, age: 0, life, grow });
+    }
+  };
+
+  const input = new Input(abort.signal);
+  const audio = new AudioEngine(levelName, abort.signal);
+  // Nomes dos sons do GLOBAL.BNK (nativos) para cada evento.
+  const LAUNCH: Record<WeaponId, string> = {
+    machinegun: 'W_MGUN', fire: 'W_FIREMISS_LNCH', homing: 'W_HOMMISS_LNCH', swarmer: 'W_SWARM_LNCH',
+    napalm: 'W_NAP_LAUNCH', ricochet: 'W_RICO_LNCH', power: 'W_PWRMISS_LNCH', remote: 'W_REMOTE_DROP',
+  };
+  const EXPLO: Record<WeaponId, string> = {
+    machinegun: 'W_EXPLO_SML', fire: 'W_EXPLO_MED', homing: 'W_EXPLO_MED', swarmer: 'W_EXPLO_SML',
+    napalm: 'W_EXPLO_LRG', ricochet: 'W_EXPLO_MED', power: 'W_EXPLO_LRG', remote: 'W_EXPLO_LRG',
+  };
+  let lastGunSound = 0;
+  const toasts: { text: string; t: number }[] = [];
+  const toast = (text: string) => toasts.push({ text, t: 2.5 });
+  const handle = (e: MatchEvent) => {
+    if (e.kind === 'shot') {
+      tracerList.push({ from: e.from, to: e.to, age: 0 });
+      // Metralhadora: um som a cada ~3 tiros por carro para não saturar.
+      if (performance.now() - lastGunSound > 90 || e.car === player.id) {
+        audio.play('global', 'W_MGUN', { pos: e.from, volume: e.car === player.id ? 0.7 : 0.5 });
+        lastGunSound = performance.now();
+      }
+    } else if (e.kind === 'launch') audio.play('global', LAUNCH[e.weapon], { pos: e.pos });
+    else if (e.kind === 'impact') audio.play('global', e.speed > 60 ? 'V_MAJOR_COLL' : 'V_CRASH', { pos: e.pos, volume: Math.min(1, e.speed / 60) });
+    else if (e.kind === 'explosion') {
+      explode(e.pos, e.weapon === 'power' || e.weapon === 'napalm' || e.weapon === 'remote');
+      audio.play('global', EXPLO[e.weapon], { pos: e.pos });
+    } else if (e.kind === 'pickup') {
+      const eff = pickupEffect(e.pickupId);
+      audio.play('global', eff.kind === 'health' ? 'P_PARTIALHEALTH' : eff.kind === 'turbo' ? 'P_TURBO' : 'P_WEAPON', { pos: match.center(match.cars[e.car]) });
+      if (e.car === player.id) toast(e.name);
+    } else if (e.kind === 'killed') {
+      audio.play('global', 'W_EXPLO_HUGE1', { pos: e.pos });
+      if (e.victim === player.id) audio.play('global', 'W_PLAYER_DEATH');
+      const v = match.cars[e.victim];
+      const k = e.killer !== null ? match.cars[e.killer] : null;
+      toast(k && k !== v ? `${k.name} destruiu ${v.name}` : `${v.name} foi destruído`);
+    }
+  };
+
+  // Câmera.
+  const shape = player.shape;
+  const cams = [
+    { dist: Math.max(18, shape.halfLength * 3.2), height: Math.max(7, shape.top * 1.8) },
+    { dist: Math.max(35, shape.halfLength * 5.5), height: Math.max(14, shape.top * 3.5) },
+  ];
+  let camIndex = 0;
+  const camPos = new THREE.Vector3();
+  const camLook = new THREE.Vector3();
+  let camInit = false;
+
+  loading.hidden = true;
+  renderer.compile(scene, camera);
+
+  let acc = 0;
+  let last = performance.now();
+  let fpsT = 0;
+  let fpsN = 0;
+  let fps = 0;
+  const basisM = new THREE.Matrix4();
+  const lerp = (a: V3, b: V3, t: number) => v3(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t, a.z + (b.z - a.z) * t);
+  let prevStates: VehicleState[] = match.cars.map((c) => structuredClone(c.state));
+  const killY = collision.bounds.min.y - 300;
+  let pendingSpecial = false;
+  let turboWas = false;
+  let pendingNext = false;
+
+  renderer.setAnimationLoop((now) => {
+    const dt = Math.min((now - last) / 1000, 0.08); // evita espiral da morte
+    last = now;
+    fpsT += dt;
+    fpsN++;
+    if (fpsT > 0.5) {
+      fps = Math.round(fpsN / fpsT);
+      fpsT = fpsN = 0;
+    }
+    if (input.consume('reset') && player.deadFor === 0) match.respawn(player);
+    if (input.consume('camera')) camIndex = (camIndex + 1) % cams.length;
+    const a = input.actions();
+    pendingSpecial ||= a.fireSpecial;
+    pendingNext ||= a.nextWeapon;
+
+    acc += dt;
+    while (acc >= STEP) {
+      prevStates = match.cars.map((c) => structuredClone(c.state));
+      const act: CarActions = { ...a, fireSpecial: pendingSpecial, nextWeapon: pendingNext };
+      pendingSpecial = pendingNext = false;
+      match.step(STEP, new Map([[player.id, act]]));
+      for (const c of match.cars) if (c.deadFor === 0 && c.state.pos.y < killY) match.respawn(c);
+      for (const e of match.drain()) handle(e);
+      acc -= STEP;
+    }
+    const alpha = acc / STEP;
+
+    // Carros (pose interpolada).
+    match.cars.forEach((c, i) => {
+      const m = models[i];
+      m.visible = c.deadFor === 0;
+      if (!m.visible) return;
+      const prev = prevStates[i] ?? c.state;
+      const pos = lerp(prev.pos, c.state.pos, alpha);
+      const b = basisOf({ ...c.state, yaw: prev.yaw + (c.state.yaw - prev.yaw) * alpha, up: lerp(prev.up, c.state.up, alpha) });
+      basisM.makeBasis(new THREE.Vector3(b.x.x, b.x.y, b.x.z), new THREE.Vector3(b.y.x, b.y.y, b.y.z), new THREE.Vector3(b.z.x, b.z.y, b.z.z));
+      m.position.set(pos.x, pos.y, pos.z);
+      m.quaternion.setFromRotationMatrix(basisM);
+    });
+    // Pickups: giram e flutuam; somem enquanto renascem.
+    const t = now / 1000;
+    match.pickups.forEach((p, i) => {
+      const o = pickupObjs[i];
+      o.visible = p.respawnIn === 0;
+      o.rotation.y = t * 1.5;
+      o.position.y = p.pos.y + 5 + Math.sin(t * 2 + i) * 0.8;
+    });
+    // Projéteis.
+    match.projectiles.forEach((p, i) => {
+      const m = missileFor(i);
+      m.visible = true;
+      m.position.set(p.pos.x, p.pos.y, p.pos.z);
+      m.lookAt(p.pos.x + p.vel.x, p.pos.y + p.vel.y, p.pos.z + p.vel.z);
+    });
+    for (let i = match.projectiles.length; i < missiles.length; i++) missiles[i].visible = false;
+    // Traçantes (70 ms).
+    tracerList = tracerList.filter((tr) => (tr.age += dt) < 0.07).slice(-64);
+    tracerPos.fill(0);
+    tracerList.forEach((tr, i) => tracerPos.set([tr.from.x, tr.from.y, tr.from.z, tr.to.x, tr.to.y, tr.to.z], i * 6));
+    tracerGeo.attributes.position.needsUpdate = true;
+    tracerGeo.setDrawRange(0, tracerList.length * 2);
+    // Explosões: crescem e somem.
+    for (let i = fx.length - 1; i >= 0; i--) {
+      const f = fx[i];
+      f.age += dt;
+      if (f.age >= f.life) {
+        scene.remove(f.obj);
+        fx.splice(i, 1);
+        continue;
+      }
+      f.obj.scale.setScalar(1 + f.grow * (f.age / f.life));
+    }
+
+    // Câmera de perseguição (segue os destroços quando o jogador morre).
+    const ps = player.state;
+    const c = cams[camIndex];
+    const fwd = new THREE.Vector3(Math.sin(ps.yaw), 0, Math.cos(ps.yaw));
+    const target = new THREE.Vector3(ps.pos.x, ps.pos.y + shape.top * 0.6, ps.pos.z);
+    let desired = target.clone().addScaledVector(fwd, -c.dist).add(new THREE.Vector3(0, c.height + (player.deadFor > 0 ? 25 : 0), 0));
+    const toCam = desired.clone().sub(target);
+    const dist = toCam.length();
+    const hit = collision.raycast(target, { x: toCam.x / dist, y: toCam.y / dist, z: toCam.z / dist }, dist);
+    if (hit) desired = target.clone().addScaledVector(toCam.normalize(), Math.max(4, hit.distance - 2));
+    const k = 1 - Math.exp(-dt * 8);
+    if (!camInit) {
+      camPos.copy(desired);
+      camLook.copy(target);
+      camInit = true;
+    }
+    camPos.lerp(desired, k);
+    camLook.lerp(target.clone().addScaledVector(fwd, c.dist * 0.4), k);
+    camera.position.copy(camPos);
+    camera.lookAt(camLook);
+
+    // Áudio: ouvinte na câmera; motores do jogador e dos bots.
+    const camDir = new THREE.Vector3();
+    camera.getWorldDirection(camDir);
+    audio.listener(camera.position, camDir);
+    for (const c of match.cars) {
+      const sp = speedOf(c.state) / 150;
+      audio.engine(c.id, c.model, sp, c.id === player.id ? a.throttle : 0.7, match.center(c), c.deadFor === 0);
+    }
+    if (a.turbo && a.throttle > 0 && player.turbo > 1 && !turboWas) audio.play('global', 'V_TURBO_LAUNCH', { volume: 0.8 });
+    turboWas = a.turbo && a.throttle > 0;
+
+    renderer.render(scene, camera);
+    renderHud(fps, drawCalls, collision.triangleCount, dt);
+  });
+
+  function renderHud(fps: number, drawCalls: number, tri: number, dt: number) {
+    for (const tt of toasts) tt.t -= dt;
+    while (toasts.length && toasts[0].t <= 0) toasts.shift();
+    const hp = Math.round((player.health / MATCH_RULES.maxHealth) * 100);
+    const turbo = Math.round((player.turbo / MATCH_RULES.turboMax) * 100);
+    const weapons = (Object.entries(player.ammo) as [WeaponId, number][])
+      .filter(([, n]) => n > 0)
+      .map(([w, n]) => `<span class="${w === player.selected ? 'sel' : ''}">${WEAPON_RULES[w].name} ×${n}</span>`)
+      .join(' ');
+    const board = [...match.cars].sort((x, y) => y.kills - x.kills).map((c) => `${c.name} ${c.kills}/${c.deaths}`).join(' · ');
+    hud.innerHTML = `
+      <div class="bars"><div class="bar hp"><i style="width:${hp}%"></i><b>VIDA ${hp}</b></div>
+      <div class="bar turbo"><i style="width:${turbo}%"></i><b>TURBO</b></div></div>
+      <div>${Math.round(speedOf(player.state) * 0.6818)} mph · ${weapons || 'sem armas especiais (pegue os ícones)'}</div>
+      <div class="small">${board}</div>
+      ${player.deadFor > 0 ? `<div class="dead">DESTRUÍDO — renascendo…</div>` : ''}
+      ${!audio.started ? `<div class="small">🔇 aperte qualquer tecla para ligar o som</div>` : audio.isMuted ? `<div class="small">🔇 mudo (M)</div>` : ''}
+      ${toasts.map((tt) => `<div class="toast">${tt.text}</div>`).join('')}
+      <div class="small">${levelName} · ${fps} fps · ${drawCalls} draw calls · ${tri} tri de colisão · pickups ${match.pickups.length} (renascem em ${PICKUP_RULES.respawn}s)</div>`;
+  }
+
+  // Ganchos para QA (tools/web).
+  (window as any).__game = {
+    audio,
+    state: () => player.state,
+    setState: (s: VehicleState) => (player.state = s),
+    match,
+    spawns,
+    collision,
+    THREE,
+  };
+  (window as any).__ready = true;
+}
+
+main().catch((e) => {
+  loading.hidden = false;
+  loading.textContent = `Falha: ${e}`;
+  console.error(e);
+});

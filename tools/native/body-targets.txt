@@ -1,0 +1,6 @@
+# Alvos: corpo rígido do veículo (massa, atrito, amortecimento, integração).
+at:175900 corpo_aloca
+at:175ad0 corpo_inicializa
+at:140d60 carro_cria_corpo
+at:1409e8 carro_id
+at:12a2a8 carro_do_jogador_pos_corpo

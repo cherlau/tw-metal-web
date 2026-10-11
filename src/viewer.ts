@@ -1,8 +1,8 @@
 // Visualizador de modelos convertidos (M2). Uso: /?car=axel
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { buildGeometry, loadModel, loadTexture, type MeshDef, type ModelDoc } from './assets';
+import { loadModel, type ModelDoc } from './assets';
+import { buildBatched, buildMeshObject } from './render';
 import { PS2_TO_THREE } from './coords';
 
 const params = new URLSearchParams(location.search);
@@ -63,91 +63,40 @@ async function main() {
 const sceneMode = params.get('scene') ?? 'on';
 // ?fx=1 mostra também os slots de efeito (escudo, gelo, fogo, turbo…)
 const showFx = params.get('fx') === '1';
+// ?obj=N mostra só o objeto N da lista de objetos (níveis/globals: pickups, projéteis, efeitos…)
+const objIndex = params.get('obj');
 
-const materials = new Map<string, THREE.Material>();
+const renderOpts = { unlit, vertexColors };
 
-async function materialFor(doc: ModelDoc, def: MeshDef, texture: string | null): Promise<{ key: string; material: THREE.Material }> {
-  const texDef = texture ? doc.textures[texture] : undefined;
-  const additive = (def.flags & 0x8000) !== 0;
-  const key = `${texture}|${additive}|${texDef?.alpha}`;
-  let material = materials.get(key);
-  if (!material) {
-    const map = texDef ? await loadTexture(texDef) : null;
-    material = new (unlit ? THREE.MeshBasicMaterial : THREE.MeshLambertMaterial)({
-      map,
-      vertexColors,
-      side: THREE.DoubleSide,
-      alphaTest: !additive && texDef?.alpha === 'cutout' ? 0.5 : 0,
-      transparent: additive || texDef?.alpha === 'blend',
-      blending: additive ? THREE.AdditiveBlending : THREE.NormalBlending,
-      depthWrite: !additive && texDef?.alpha !== 'blend',
-    });
-    materials.set(key, material);
-  }
-  return { key, material };
-}
-
-/** Junta todas as instâncias com o mesmo material numa malha só (SPEC §9.4: batching estático). */
-async function buildBatched(doc: ModelDoc, bin: ArrayBuffer, keys: string[]) {
-  const buckets = new Map<string, { material: THREE.Material; geos: THREE.BufferGeometry[] }>();
-  for (const key of keys) {
-    const def = doc.meshes[key];
-    if (def.sphere[3] > maxRadius || (only && !only.test(key)) || (hide && hide.test(key))) continue;
-    for (const part of def.parts ?? []) {
-      const { key: mk, material } = await materialFor(doc, def, part.texture);
-      if (!buckets.has(mk)) buckets.set(mk, { material, geos: [] });
-      buckets.get(mk)!.geos.push(buildGeometry(part, bin));
-    }
-  }
-  let tris = 0;
-  for (const { material, geos } of buckets.values()) {
-    const merged = mergeGeometries(geos, false);
-    if (!merged) throw new Error('mergeGeometries falhou');
-    tris += merged.index!.count / 3;
-    root.add(new THREE.Mesh(merged, material));
-  }
-  status.textContent += ` · ${buckets.size} draw calls · ${tris} tri visíveis`;
-}
-
-async function makeMeshObject(doc: ModelDoc, bin: ArrayBuffer, key: string): Promise<THREE.Group> {
-  const def = doc.meshes[key];
-  const group = new THREE.Group();
-  group.name = key;
-  const texDef = def.texture ? doc.textures[def.texture] : undefined;
-  const map = texDef ? await loadTexture(texDef) : null;
-  for (const part of def.parts ?? []) {
-    const { material } = await materialFor(doc, def, part.texture);
-    const mesh = new THREE.Mesh(buildGeometry(part, bin), material);
-    mesh.userData.material = material;
-    group.add(mesh);
-  }
-  for (const s of def.sprites ?? []) {
-    const sprite = new THREE.Sprite(
-      new THREE.SpriteMaterial({ map, color: new THREE.Color(s.color[0], s.color[1], s.color[2]), blending: THREE.AdditiveBlending, depthWrite: false }),
-    );
-    sprite.position.set(...s.center);
-    sprite.scale.setScalar(s.size);
-    group.add(sprite);
-  }
-  return group;
+async function buildBatchedView(doc: ModelDoc, keys: string[], bin: ArrayBuffer) {
+  const { group, drawCalls, triangles } = await buildBatched(
+    doc,
+    bin,
+    keys.map((mesh) => ({ mesh, bone: null })),
+    { ...renderOpts, filter: (key, def) => def.sphere[3] <= maxRadius && (!only || only.test(key)) && !(hide && hide.test(key)) },
+  );
+  root.add(...group.children);
+  status.textContent += ` · ${drawCalls} draw calls · ${triangles} tri visíveis`;
 }
 
 async function build(doc: ModelDoc, bin: ArrayBuffer) {
   // ?batch=0 desliga o batching (uma malha por instância, com nome — para depuração/raycast)
   if (levelName && params.get('batch') !== '0') {
     panel.hidden = true;
-    await buildBatched(doc, bin, doc.scene.map((i) => i.mesh));
+    await buildBatchedView(doc, doc.scene.map((i) => i.mesh), bin);
     frame();
     return;
   }
   const list = document.createElement('div');
   const entries: { key: string; bone?: string | null }[] =
-    sceneMode === 'off'
+    objIndex !== null
+      ? (doc.objects?.[Number(objIndex)]?.instances ?? []).map((i) => ({ key: i.mesh, bone: i.bone }))
+      : sceneMode === 'off'
       ? Object.keys(doc.meshes).map((key) => ({ key }))
       : [...doc.scene, ...(showFx ? Object.values(doc.effects).flat() : [])].map((i) => ({ key: i.mesh, bone: i.bone }));
   for (const [n, { key, bone }] of entries.entries()) {
     const def = doc.meshes[key];
-    const group = await makeMeshObject(doc, bin, key);
+    const group = await buildMeshObject(doc, bin, key, renderOpts);
     group.visible = (!only || only.test(key)) && !(hide && hide.test(key)) && def.sphere[3] <= maxRadius;
     root.add(group);
 
@@ -162,6 +111,7 @@ async function build(doc: ModelDoc, bin: ArrayBuffer) {
     list.append(row);
   }
   panel.append(list);
+  if (objIndex !== null) frame();
 }
 
 /** Enquadra a câmera no conteúdo (níveis são muito maiores que carros). */
@@ -238,6 +188,12 @@ fetch(`${import.meta.env.BASE_URL}assets/index.json`)
     }
     select.onchange = () => (location.search = `?${select.value}`);
     document.body.append(select);
+    // Atalho para dirigir: arena atual (ou a Arena) com o carro atual (ou o Axel).
+    const play = document.createElement('a');
+    play.id = 'play';
+    play.textContent = '▶ jogar';
+    play.href = `play.html?lvl=${levelName ?? 'arena'}&car=${levelName ? 'axel' : carName}`;
+    document.body.append(play);
   });
 
 addEventListener('resize', resize);
