@@ -1,0 +1,2 @@
+str:^P_WEAPON$ pickup_weapon
+str:^P_TURBO$ pickup_turbo

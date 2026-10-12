@@ -1,8 +1,10 @@
 // Visualizador de modelos convertidos (M2). Uso: /?car=axel
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { loadModel, type ModelDoc } from './assets';
+import { loadModel, type InstanceDef, type ModelDoc } from './assets';
 import { buildBatched, buildMeshObject } from './render';
+import { buildLevelLights, buildSky } from './levelfx';
+import { buildCarRest, visibleBox } from './rig';
 import { PS2_TO_THREE } from './coords';
 
 const params = new URLSearchParams(location.search);
@@ -68,11 +70,11 @@ const objIndex = params.get('obj');
 
 const renderOpts = { unlit, vertexColors };
 
-async function buildBatchedView(doc: ModelDoc, keys: string[], bin: ArrayBuffer) {
+async function buildBatchedView(doc: ModelDoc, instances: InstanceDef[], bin: ArrayBuffer) {
   const { group, drawCalls, triangles } = await buildBatched(
     doc,
     bin,
-    keys.map((mesh) => ({ mesh, bone: null })),
+    instances, // mantém o deslocamento dos objetos posicionados (nós 0x03/0x1F)
     { ...renderOpts, filter: (key, def) => def.sphere[3] <= maxRadius && (!only || only.test(key)) && !(hide && hide.test(key)) },
   );
   root.add(...group.children);
@@ -83,7 +85,23 @@ async function build(doc: ModelDoc, bin: ArrayBuffer) {
   // ?batch=0 desliga o batching (uma malha por instância, com nome — para depuração/raycast)
   if (levelName && params.get('batch') !== '0') {
     panel.hidden = true;
-    await buildBatchedView(doc, doc.scene.map((i) => i.mesh), bin);
+    await buildBatchedView(doc, doc.scene, bin);
+    if (params.get('lights') !== '0') root.add(await buildLevelLights(doc, doc.scene));
+    const sky = params.get('sky') !== '0' ? await buildSky(doc, bin, PS2_TO_THREE, buildBatched) : null;
+    if (sky) {
+      scene.add(sky.group);
+      skyUpdate = sky.update;
+    }
+    frame();
+    return;
+  }
+  // Carro com esqueleto: pose de repouso do jogo (?rig=0 mostra as malhas cruas, por malha)
+  if (!levelName && (doc as ModelDoc & { rig?: unknown }).rig && params.get('rig') !== '0' && objIndex === null && sceneMode !== 'off' && !showFx) {
+    const g = await buildCarRest(doc, bin);
+    // a raiz do visualizador já aplica PS2_TO_THREE: tira a conversão própria do carro
+    (g.children[0] as THREE.Object3D).matrix.identity();
+    root.add(g);
+    panel.hidden = true;
     frame();
     return;
   }
@@ -97,7 +115,20 @@ async function build(doc: ModelDoc, bin: ArrayBuffer) {
   for (const [n, { key, bone }] of entries.entries()) {
     const def = doc.meshes[key];
     const group = await buildMeshObject(doc, bin, key, renderOpts);
+    // ?front=1 desenha só a face de fora (como o jogo faz com os ícones de pickup)
+    if (params.get('front') === '1')
+      group.traverse((o) => {
+        const m = o as THREE.Mesh;
+        if (m.isMesh) (m.material = (m.material as THREE.Material).clone()).side = THREE.FrontSide;
+      });
     group.visible = (!only || only.test(key)) && !(hide && hide.test(key)) && def.sphere[3] <= maxRadius;
+    // ?pose=alt aplica a 2ª matriz do osso (+0x60) sobre a inversa (+0x20): p' = bind · invBind · p.
+    // Hipótese: em ossos "incoerentes" ela é a pose alternativa (porta aberta, arma exposta).
+    if (params.get('pose') === 'alt' && bone && doc.bones[bone]?.bind) {
+      const b = doc.bones[bone];
+      const m = new THREE.Matrix4().fromArray(b.bind!).multiply(new THREE.Matrix4().fromArray(b.invBind));
+      group.applyMatrix4(m);
+    }
     root.add(group);
 
     const row = document.createElement('label');
@@ -116,11 +147,11 @@ async function build(doc: ModelDoc, bin: ArrayBuffer) {
 
 /** Enquadra a câmera no conteúdo (níveis são muito maiores que carros). */
 function frame() {
-  const box = new THREE.Box3().setFromObject(root);
+  const box = visibleBox(root); // ignora peças escondidas (armas recolhidas)
   const size = box.getSize(new THREE.Vector3()).length();
   const center = box.getCenter(new THREE.Vector3());
   controls.target.copy(center);
-  camera.position.copy(center).add(new THREE.Vector3(0.35, 0.45, 0.6).multiplyScalar(size * 0.6));
+  camera.position.copy(center).add(new THREE.Vector3(0.35, 0.45, 0.6).normalize().multiplyScalar(size * 1.1));
   camera.near = size / 5000;
   camera.far = size * 4;
   camera.updateProjectionMatrix();
@@ -198,9 +229,11 @@ fetch(`${import.meta.env.BASE_URL}assets/index.json`)
 
 addEventListener('resize', resize);
 resize();
+let skyUpdate: ((camera: THREE.Camera) => void) | null = null;
 renderer.setAnimationLoop(() => {
   fly();
   controls.update();
+  skyUpdate?.(camera);
   renderer.render(scene, camera);
 });
 

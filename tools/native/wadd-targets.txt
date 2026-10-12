@@ -1,0 +1,3 @@
+str:No\savailable\sweapon\sslot weapon_add
+str:Weapons\sBay\sFull weapon_bay_full
+str:Unable\sto\sactivate\sCS\sfor\sweapon weapon_cs

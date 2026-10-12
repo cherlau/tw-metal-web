@@ -1,0 +1,12 @@
+# Quem toca os clipes do carro por categoria (FUN_002110d8 = índice do clipe; FUN_00211098 = define o clipe da instância)
+at:1270e4 car_clips_init
+at:1fa328 car_clips_b
+at:117efc clip_2_3
+at:101780 clip_play_a
+at:1152d8 clip_play_b
+at:10dd2c clip_c
+at:211098 anim_set_clip
+at:2a0668 clip_handle
+at:212290 anim_x
+at:211348 anim_y
+at:210dc0 anim_z

@@ -9,7 +9,9 @@ import { Match, MATCH_RULES, type CarActions, type MatchEvent } from './game/mat
 import { PICKUP_RULES, pickupEffect, WEAPON_RULES, type WeaponId } from './game/weapons';
 import { basisOf, speedOf, type VehicleShape, type VehicleState } from './physics/vehicle';
 import { v3, type V3 } from './physics/vec';
-import { buildBatched, isAdditive } from './render';
+import { buildBatched, isAdditive, solidBox } from './render';
+import { buildLevelLights, buildSky } from './levelfx';
+import { CarRig, type RigDoc } from './rig';
 
 const params = new URLSearchParams(location.search);
 const levelName = params.get('lvl') ?? 'arena';
@@ -20,6 +22,8 @@ const BOT_POOL = ['cop', 'sweet', 'twist', 'spectre', 'thump', 'grass', 'crim', 
 const STEP = 1 / 60; // tick fixo (SPEC §9.2)
 const abort = new AbortController();
 addEventListener('pagehide', () => abort.abort());
+// Esc: volta ao menu.
+addEventListener('keydown', (e) => e.code === 'Escape' && location.assign('play.html'), { signal: abort.signal });
 
 // ---------------------------------------------------------------- renderer
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -46,13 +50,21 @@ const ps2 = (p: number[]): V3 => {
 };
 
 // ---------------------------------------------------------------- carga
+let skyUpdate: ((camera: THREE.Camera) => void) | null = null; // céu segue a câmera
+
 async function loadLevel() {
   loading.textContent = `carregando arena ${levelName}…`;
   const { doc, bin } = await loadModel(`lvl/${levelName}`);
   const { group, drawCalls } = await buildBatched(doc, bin, doc.scene);
+  group.add(await buildLevelLights(doc, doc.scene)); // sprites e fachos de luz
   group.matrixAutoUpdate = false;
   group.matrix.copy(PS2_TO_THREE);
   scene.add(group);
+  const sky = await buildSky(doc, bin, PS2_TO_THREE, buildBatched);
+  if (sky) {
+    scene.add(sky.group);
+    skyUpdate = sky.update;
+  }
   loading.textContent = 'montando colisão…';
   await new Promise((r) => setTimeout(r));
   const t0 = performance.now();
@@ -67,22 +79,53 @@ async function loadVehicleRules(): Promise<Record<string, { wheels: number[][] }
   return r.ok ? (await r.json()).vehicles : {};
 }
 
-const carCache = new Map<string, Promise<{ template: THREE.Group; shape: VehicleShape }>>();
+type CarAsset = { template: THREE.Group; shape: VehicleShape; mounts: Record<string, number[]>; doc: ModelDoc; bin: ArrayBuffer };
+const carCache = new Map<string, Promise<CarAsset>>();
 function loadCarModel(name: string, rules: Record<string, { wheels: number[][] }>) {
   let p = carCache.get(name);
   if (!p) {
     p = (async () => {
       const { doc, bin } = await loadModel(`cars/${name}`);
-      const { group } = await buildBatched(doc, bin, doc.scene);
-      group.matrixAutoUpdate = false;
-      group.matrix.copy(VEHICLE_TO_THREE);
       const template = new THREE.Group();
-      template.add(group);
-      const shape = shapeOf(doc, bin);
+      // Com esqueleto (rig), a carroceria é montada por carro (CarRig) — canais independentes.
+      if (!(doc as ModelDoc & { rig?: RigDoc }).rig) {
+        const { group } = await buildBatched(doc, bin, doc.scene);
+        group.matrixAutoUpdate = false;
+        group.matrix.copy(VEHICLE_TO_THREE);
+        template.add(group);
+      }
+      // Clarão do tiro (efeito ligado pelo código do jogo; conversor: effects['code:muzzle']).
+      const muzzleDefs = doc.effects?.['code:muzzle'] ?? [];
+      if (muzzleDefs.length) {
+        const { group: muzzle } = await buildBatched(doc, bin, muzzleDefs);
+        muzzle.name = 'muzzle';
+        muzzle.matrixAutoUpdate = false;
+        muzzle.matrix.copy(VEHICLE_TO_THREE);
+        muzzle.visible = false;
+        template.add(muzzle);
+      }
+      let shape = shapeOf(doc, bin);
+      const rigDoc = (doc as ModelDoc & { rig?: RigDoc }).rig;
+      if (rigDoc) {
+        // Caixa pela pose de repouso do esqueleto (rodas no lugar), sem malhas aditivas.
+        const rest = await CarRig.build(doc as ModelDoc & { rig: RigDoc }, bin, doc.scene.filter((i) => !isAdditive(doc.meshes[i.mesh])));
+        for (const cl of rest.clipsWithRole('susp')) rest.time.set(cl.category, 0.5);
+        for (const cl of rest.clipsWithRole('steer')) rest.time.set(cl.category, 0.5);
+        rest.update();
+        rest.group.updateMatrixWorld(true);
+        const box = new THREE.Box3();
+        rest.group.traverse((o) => {
+          let shown = true;
+          o.traverseAncestors((a) => (shown &&= a.visible));
+          if ((o as THREE.Mesh).isMesh && shown) box.expandByObject(o);
+        });
+        if (!box.isEmpty())
+          shape = { ...shape, halfWidth: Math.max(-box.min.x, box.max.x), halfLength: Math.max(-box.min.z, box.max.z), bottom: box.min.y, top: box.max.y };
+      }
       // Rodas da tabela nativa (coords do PS2, frente +Y) -> espaço do carro no Three: (x, y, z) -> (-x, z, y).
       const w = rules[name]?.wheels;
       if (w?.length === 4) shape.wheels = w.map(([x, y, z]) => v3(-x, z, y));
-      return { template, shape };
+      return { template, shape, mounts: (doc as ModelDoc & { mounts?: Record<string, number[]> }).mounts ?? {}, doc, bin };
     })();
     carCache.set(name, p);
   }
@@ -91,17 +134,7 @@ function loadCarModel(name: string, rules: Record<string, { wheels: number[][] }
 
 /** Caixa do carro (espaço Three, origem do modelo) sem malhas aditivas (fachos de luz etc.). */
 function shapeOf(doc: ModelDoc, bin: ArrayBuffer): VehicleShape {
-  const box = new THREE.Box3();
-  const p = new THREE.Vector3();
-  for (const { mesh } of doc.scene) {
-    const def = doc.meshes[mesh];
-    if (isAdditive(def)) continue;
-    for (const part of def.parts ?? []) {
-      const [o, n] = part.attributes.position;
-      const a = new Float32Array(bin, o, n);
-      for (let i = 0; i < n; i += 3) box.expandByPoint(p.set(a[i], a[i + 1], a[i + 2]).applyMatrix4(VEHICLE_TO_THREE));
-    }
-  }
+  const box = solidBox(doc, bin, VEHICLE_TO_THREE);
   return { halfWidth: Math.max(-box.min.x, box.max.x), halfLength: Math.max(-box.min.z, box.max.z), bottom: box.min.y, top: box.max.y };
 }
 
@@ -109,24 +142,136 @@ function shapeOf(doc: ModelDoc, bin: ArrayBuffer): VehicleShape {
  * Objetos do GLOBALS.BDD usados como peças de jogo (prefabs centrados na origem).
  * ⚠️ ESCOLHA DO HOST: o índice → significado foi identificado visualmente (docs/NATIVE.md).
  */
-const GLOBAL_OBJECTS = { weaponPickup: 20, healthPickup: 17, turboPickup: 15, missile: 16, fireball: 36, burst: 29 } as const;
+const GLOBAL_OBJECTS = { missile: 16, fireball: 36, burst: 29 } as const;
+
+/**
+ * Pickup (id do PKP / tabela 0x2c3a00) -> objeto do GLOBALS com o modelo 3D da arma + cor da aura.
+ * ⚠️ ESCOLHA DO HOST: modelos identificados visualmente (16 míssil laranja, 19 roxo, 21 prateado com
+ * brilho vermelho, 22 dinamite com antena, 23 arco, 24 três foguetes, 25 tanques…); cores da aura pela
+ * cor do próprio modelo. 20 (placa amarela) = Environment Attack e armas sem modelo próprio.
+ */
+const PICKUP_MODELS: Record<number, { obj: number; aura: number }> = {
+  0: { obj: 20, aura: 0xffd040 }, // Machine Gun
+  1: { obj: 16, aura: 0xff7a1a }, // Fire Missile
+  2: { obj: 19, aura: 0xc040ff }, // Homing
+  3: { obj: 24, aura: 0xffc020 }, // Swarmer
+  4: { obj: 25, aura: 0xff5010 }, // Napalm
+  5: { obj: 23, aura: 0x60e0ff }, // Ricochet
+  6: { obj: 21, aura: 0xff2020 }, // Power Missile
+  7: { obj: 15, aura: 0x40a0ff }, // Turbo
+  8: { obj: 18, aura: 0x40ff60 }, // Health 30%
+  9: { obj: 20, aura: 0xffd040 }, // Environment Attack
+  10: { obj: 26, aura: 0x40ff40 }, // Upgrade
+  11: { obj: 22, aura: 0xff8040 }, // Remote Bomb
+  12: { obj: 17, aura: 0x40ff60 }, // Full Health
+  14: { obj: 20, aura: 0xffd040 }, // Mega Gun
+};
+
+/** Brilho radial para a aura dos pickups (textura gerada; o PS2 usa um sprite aditivo). */
+let auraTexture: THREE.Texture | null = null;
+function auraSprite(color: number): THREE.Sprite {
+  if (!auraTexture) {
+    const c = document.createElement('canvas');
+    c.width = c.height = 64;
+    const g = c.getContext('2d')!;
+    const grd = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+    grd.addColorStop(0, 'rgba(255,255,255,0.9)');
+    grd.addColorStop(0.35, 'rgba(255,255,255,0.45)');
+    grd.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = grd;
+    g.fillRect(0, 0, 64, 64);
+    auraTexture = new THREE.CanvasTexture(c);
+  }
+  const sp = new THREE.Sprite(
+    new THREE.SpriteMaterial({ map: auraTexture, color, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true }),
+  );
+  sp.scale.setScalar(3.2); // no espaço normalizado do ícone (raio 1)
+  return sp;
+}
+
+async function loadGlobalObject(doc: ModelDoc, bin: ArrayBuffer, index: number): Promise<THREE.Group> {
+  const { group } = await buildBatched(doc, bin, doc.objects?.[index]?.instances ?? []);
+  // Ícones são anéis de painéis semitransparentes: o PS2 desenha só a face de fora. Com os dois lados,
+  // o painel de trás aparecia através do da frente (ícone "duplicado").
+  group.traverse((o) => {
+    const mesh = o as THREE.Mesh;
+    if (!mesh.isMesh) return;
+    const mat = (mesh.material as THREE.Material).clone();
+    mat.side = THREE.FrontSide;
+    mesh.material = mat;
+  });
+  group.matrixAutoUpdate = false;
+  group.matrix.copy(PS2_TO_THREE);
+  // Normaliza o tamanho (raio ~1) — a escala original vem do jogo, aqui escolhemos no uso.
+  const holder = new THREE.Group();
+  holder.add(group);
+  const sphere = new THREE.Box3().setFromObject(holder).getBoundingSphere(new THREE.Sphere());
+  group.matrix.premultiply(new THREE.Matrix4().makeTranslation(-sphere.center.x, -sphere.center.y, -sphere.center.z));
+  holder.scale.setScalar(1 / Math.max(sphere.radius, 1e-3));
+  return holder;
+}
+
+/** Arma -> slot de montagem no carro (= id do pickup; registros 0x00F8 do .ngp). Remote: sem slot 11 nos
+ *  carros Head-On -> 15 (traseira baixa). ⚠️ ESCOLHA DO HOST para o fallback. */
+const WEAPON_SLOT: Record<WeaponId, number[]> = {
+  machinegun: [],
+  fire: [1],
+  homing: [2],
+  swarmer: [3],
+  napalm: [4],
+  ricochet: [5],
+  power: [6],
+  remote: [11, 15],
+};
+const WEAPON_PICKUP: Record<WeaponId, number> = {
+  machinegun: 0, fire: 1, homing: 2, swarmer: 3, napalm: 4, ricochet: 5, power: 6, remote: 11,
+};
+
+/**
+ * Modelo da arma para montar no carro, em coordenadas do PS2 (o grupo de montagem aplica
+ * VEHICLE_TO_THREE): centrado, eixo mais longo alinhado à frente do carro (+Y) e tamanho fixo.
+ * ⚠️ ESCOLHA DO HOST: orientação e tamanho (o jogo monta pelo código).
+ */
+async function loadMountModel(doc: ModelDoc, bin: ArrayBuffer, index: number): Promise<THREE.Group> {
+  const { group } = await buildBatched(doc, bin, doc.objects?.[index]?.instances ?? []);
+  group.traverse((o) => {
+    const mesh = o as THREE.Mesh;
+    if (mesh.isMesh) (mesh.material = (mesh.material as THREE.Material).clone()).side = THREE.FrontSide;
+  });
+  const box = new THREE.Box3().setFromObject(group);
+  const size = box.getSize(new THREE.Vector3());
+  const center = box.getCenter(new THREE.Vector3());
+  group.position.sub(center);
+  const holder = new THREE.Group();
+  holder.add(group);
+  // eixo longo -> +Y (frente do carro no PS2)
+  if (size.z >= size.x && size.z >= size.y) holder.rotation.x = -Math.PI / 2;
+  else if (size.x >= size.y && size.x >= size.z) holder.rotation.z = Math.PI / 2;
+  holder.scale.setScalar(2.8 / Math.max(size.x, size.y, size.z, 1e-3));
+  const out = new THREE.Group();
+  out.add(holder);
+  return out;
+}
 
 async function loadGlobals() {
   const { doc, bin } = await loadModel('globals/globals');
   const out: Record<keyof typeof GLOBAL_OBJECTS, THREE.Group> = {} as never;
   for (const [key, index] of Object.entries(GLOBAL_OBJECTS) as [keyof typeof GLOBAL_OBJECTS, number][]) {
-    const { group } = await buildBatched(doc, bin, doc.objects?.[index]?.instances ?? []);
-    group.matrixAutoUpdate = false;
-    group.matrix.copy(PS2_TO_THREE);
-    // Normaliza o tamanho (raio ~1) — a escala original vem do jogo, aqui escolhemos no uso.
-    const holder = new THREE.Group();
-    holder.add(group);
-    const sphere = new THREE.Box3().setFromObject(holder).getBoundingSphere(new THREE.Sphere());
-    group.matrix.premultiply(new THREE.Matrix4().makeTranslation(-sphere.center.x, -sphere.center.y, -sphere.center.z));
-    holder.scale.setScalar(1 / Math.max(sphere.radius, 1e-3));
-    out[key] = holder;
+    out[key] = await loadGlobalObject(doc, bin, index);
   }
-  return out;
+  const pickups = new Map<number, THREE.Group>();
+  for (const [id, { obj, aura }] of Object.entries(PICKUP_MODELS)) {
+    const icon = await loadGlobalObject(doc, bin, obj);
+    const holder = new THREE.Group();
+    holder.add(icon, auraSprite(aura));
+    pickups.set(Number(id), holder);
+  }
+  const mounts = new Map<WeaponId, THREE.Group>();
+  for (const [w, id] of Object.entries(WEAPON_PICKUP) as [WeaponId, number][]) {
+    const obj = PICKUP_MODELS[id]?.obj;
+    if (obj !== undefined && obj !== 20) mounts.set(w, await loadMountModel(doc, bin, obj));
+  }
+  return { ...out, pickups, mounts };
 }
 
 function spawnPoints(doc: ModelDoc, collision: LevelCollision): V3[] {
@@ -176,10 +321,50 @@ async function main() {
     scene.add(m);
     return m;
   });
+  // Esqueleto por carro (rodas, suspensão, esterço, lançadores e armas pelos clipes do jogo).
+  const rigs = await Promise.all(
+    match.cars.map(async (c, i) => {
+      const asset = i === 0 ? cars[0] : cars[i];
+      const doc = asset.doc as ModelDoc & { rig?: RigDoc };
+      if (!doc.rig) return null;
+      const r = await CarRig.build(doc as ModelDoc & { rig: RigDoc }, asset.bin, doc.scene);
+      models[i].add(r.group);
+      return r;
+    }),
+  );
+  const muzzles = models.map((m) => m.getObjectByName('muzzle') ?? null);
+  const wheelPhase = match.cars.map(() => 0);
+  const lastYaw = match.cars.map((c) => c.state.yaw);
+  // Suportes de arma (FUN_00148978): clipe que abre quando a arma é selecionada e fecha (ao contrário) quando
+  // outra é escolhida; só um suporte se move por vez. Estado: 0 fechado, 1 aberto/abrindo, 2 fechando.
+  const mountsOf = rigs.map((r) =>
+    (r?.clipsWithRole('weapon') ?? []).map((clip) => ({ clip, weapons: clip.weapons ?? [], state: 0, t: 0 })),
+  );
+  // Armas montadas no carro (visíveis enquanto houver munição), nos pontos 0x00F8 do modelo.
+  const mounted = match.cars.map((c, i) => {
+    const info = i === 0 ? cars[0] : cars[i];
+    const frame = new THREE.Group();
+    frame.matrixAutoUpdate = false;
+    frame.matrix.copy(VEHICLE_TO_THREE);
+    models[i].add(frame);
+    const map = new Map<WeaponId, THREE.Object3D>();
+    for (const [w, src] of globals.mounts) {
+      const slot = WEAPON_SLOT[w].find((k) => info.mounts[String(k)]);
+      if (slot === undefined) continue;
+      if (mountsOf[i].some((m) => m.weapons.includes(w))) continue; // o suporte do próprio carro representa a arma
+      const o = src.clone();
+      const [x, y, z] = info.mounts[String(slot)];
+      o.position.set(x, y, z);
+      o.visible = false;
+      frame.add(o);
+      map.set(w, o);
+    }
+    return map;
+  });
+  const muzzleUntil = match.cars.map(() => 0);
   // Pickups: ícone girando por cima do ponto do PKP.
   const pickupObjs = match.pickups.map((p) => {
-    const eff = pickupEffect(p.id);
-    const src = eff.kind === 'health' ? globals.healthPickup : eff.kind === 'turbo' ? globals.turboPickup : globals.weaponPickup;
+    const src = globals.pickups.get(p.id) ?? globals.pickups.get(9)!;
     const o = src.clone();
     o.scale.multiplyScalar(4);
     o.position.set(p.pos.x, p.pos.y + 5, p.pos.z);
@@ -233,12 +418,15 @@ async function main() {
   const handle = (e: MatchEvent) => {
     if (e.kind === 'shot') {
       tracerList.push({ from: e.from, to: e.to, age: 0 });
+      muzzleUntil[e.car] = performance.now() + 60;
       // Metralhadora: um som a cada ~3 tiros por carro para não saturar.
       if (performance.now() - lastGunSound > 90 || e.car === player.id) {
         audio.play('global', 'W_MGUN', { pos: e.from, volume: e.car === player.id ? 0.7 : 0.5 });
         lastGunSound = performance.now();
       }
-    } else if (e.kind === 'launch') audio.play('global', LAUNCH[e.weapon], { pos: e.pos });
+    } else if (e.kind === 'launch') {
+      audio.play('global', LAUNCH[e.weapon], { pos: e.pos });
+    }
     else if (e.kind === 'impact') audio.play('global', e.speed > 60 ? 'V_MAJOR_COLL' : 'V_CRASH', { pos: e.pos, volume: Math.min(1, e.speed / 60) });
     else if (e.kind === 'explosion') {
       explode(e.pos, e.weapon === 'power' || e.weapon === 'napalm' || e.weapon === 'remote');
@@ -321,6 +509,40 @@ async function main() {
       basisM.makeBasis(new THREE.Vector3(b.x.x, b.x.y, b.x.z), new THREE.Vector3(b.y.x, b.y.y, b.y.z), new THREE.Vector3(b.z.x, b.z.y, b.z.z));
       m.position.set(pos.x, pos.y, pos.z);
       m.quaternion.setFromRotationMatrix(basisM);
+      for (const [w, o] of mounted[i]) o.visible = (c.ammo[w] ?? 0) > 0;
+      const r = rigs[i];
+      if (r) {
+        // Rodas: giro pela distância percorrida (raio ~2 pés ⚠️), esterço pela taxa de giro, suspensão no meio.
+        const spd = Math.hypot(c.state.vel.x, c.state.vel.z) * Math.sign(c.state.vel.x * Math.sin(c.state.yaw) + c.state.vel.z * Math.cos(c.state.yaw) || 1);
+        wheelPhase[i] = (((wheelPhase[i] + (spd * dt) / (2 * Math.PI * 2)) % 1) + 1) % 1;
+        let dyaw = c.state.yaw - lastYaw[i];
+        dyaw = Math.atan2(Math.sin(dyaw), Math.cos(dyaw));
+        lastYaw[i] = c.state.yaw;
+        const steer = Math.max(-1, Math.min(1, -dyaw / Math.max(dt, 1e-3) / 1.6));
+        for (const cl of r.clipsWithRole('spin')) r.time.set(cl.category, wheelPhase[i]);
+        for (const cl of r.clipsWithRole('steer')) r.time.set(cl.category, 0.5 + 0.5 * steer);
+        for (const cl of r.clipsWithRole('susp')) r.time.set(cl.category, 0.5);
+        r.setDirect(wheelPhase[i], steer);
+        // Suportes de arma (FUN_0014a168 → FUN_00148978): abre o da arma selecionada (com munição) só quando
+        // nenhum suporte está aberto ou fechando; fecha os demais. Clipe a mountSpeed × 60 quadros/s.
+        const sel = c.selected && (c.ammo[c.selected] ?? 0) > 0 ? c.selected : null;
+        const mounts = mountsOf[i];
+        const busy = mounts.some((mt) => mt.state !== 0);
+        const speed = (r.rig.mountSpeed ?? 1) * 60;
+        for (const mt of mounts) {
+          const mine = sel !== null && mt.weapons.includes(sel);
+          if (mine && mt.state === 0 && !busy) mt.state = 1;
+          else if (!mine && mt.state === 1) mt.state = 2;
+          const len = Math.max(mt.clip.duration - (mt.clip.start ?? 0), 1);
+          if (mt.state === 1) mt.t = Math.min(1, mt.t + (dt * speed) / len);
+          else if (mt.state === 2) {
+            mt.t = Math.max(0, mt.t - (dt * speed) / len);
+            if (mt.t <= 0) mt.state = 0;
+          }
+          r.time.set(mt.clip.category, mt.t);
+        }
+        r.update();
+      }
     });
     // Pickups: giram e flutuam; somem enquanto renascem.
     const t = now / 1000;
@@ -356,6 +578,9 @@ async function main() {
       f.obj.scale.setScalar(1 + f.grow * (f.age / f.life));
     }
 
+    const nowMs = performance.now();
+    muzzles.forEach((mz, i) => mz && (mz.visible = nowMs < muzzleUntil[i] && match.cars[i].deadFor === 0));
+
     // Câmera de perseguição (segue os destroços quando o jogador morre).
     const ps = player.state;
     const c = cams[camIndex];
@@ -376,6 +601,13 @@ async function main() {
     camLook.lerp(target.clone().addScaledVector(fwd, c.dist * 0.4), k);
     camera.position.copy(camPos);
     camera.lookAt(camLook);
+    // QA: câmera fixa relativa ao carro do jogador (window.__camOverride = { pos: [x,y,z], look: [x,y,z] }, no espaço do carro)
+    const ov = (window as any).__camOverride as { pos: number[]; look: number[] } | undefined;
+    if (ov) {
+      const m0 = models[0];
+      camera.position.set(ov.pos[0], ov.pos[1], ov.pos[2]).applyMatrix4(m0.matrixWorld);
+      camera.lookAt(new THREE.Vector3(ov.look[0], ov.look[1], ov.look[2]).applyMatrix4(m0.matrixWorld));
+    }
 
     // Áudio: ouvinte na câmera; motores do jogador e dos bots.
     const camDir = new THREE.Vector3();
@@ -388,6 +620,7 @@ async function main() {
     if (a.turbo && a.throttle > 0 && player.turbo > 1 && !turboWas) audio.play('global', 'V_TURBO_LAUNCH', { volume: 0.8 });
     turboWas = a.turbo && a.throttle > 0;
 
+    skyUpdate?.(camera);
     renderer.render(scene, camera);
     renderHud(fps, drawCalls, collision.triangleCount, dt);
   });
@@ -414,8 +647,14 @@ async function main() {
   }
 
   // Ganchos para QA (tools/web).
+  (window as any).__doorsDebug = () => ({
+    mounts: mountsOf.map((ms) => ms.map((m) => ({ category: m.clip.category, weapons: m.weapons, state: m.state, t: +m.t.toFixed(2) }))),
+    now: performance.now() / 1000,
+    ammo: match.cars[0].ammo,
+  });
   (window as any).__game = {
     audio,
+    pickupObjs,
     state: () => player.state,
     setState: (s: VehicleState) => (player.state = s),
     match,

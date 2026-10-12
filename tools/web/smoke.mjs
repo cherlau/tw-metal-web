@@ -2,7 +2,7 @@
 import { chromium } from 'playwright-core';
 const b = await chromium.launch({ channel: 'msedge', headless: true, args: ['--enable-unsafe-swiftshader','--use-angle=swiftshader'] });
 const p = await b.newPage({ viewport: { width: 1280, height: 800 } });
-await p.goto('http://localhost:5199/?lvl=russia');
+await p.goto('http://localhost:5199/?lvl=parisdm');
 await p.waitForFunction(() => window.__ready === true, null, { timeout: 180000 });
 const before = await p.evaluate(() => window.__viewer.camera.position.toArray().map((v) => v.toFixed(0)));
 await p.mouse.click(640, 400);

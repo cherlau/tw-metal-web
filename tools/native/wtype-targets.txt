@@ -1,0 +1,4 @@
+str:Invalid\sweapon\stype weapon_factory
+str:Tried\sto\skill\snon-active weapon_kill
+2ba698 weapon_short_names
+at:14ac68 weapon_by_type

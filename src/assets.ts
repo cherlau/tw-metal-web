@@ -20,12 +20,15 @@ export interface MeshDef {
   flags: number;
   texture: string | null;
   texture2: string | null;
+  textures?: string[];
   scale: number;
   packed: string;
   poolOwner: string | null;
   sphere: [number, number, number, number];
   parts?: PartDef[]; // uma por slot de textura
   sprites?: SpriteDef[];
+  /** Estado do GS herdado do grupo (pacote A+D): ALPHA_1 [A, B, C, D, FIX] e gravação de z. */
+  gs?: { alpha?: [number, number, number, number, number]; zwrite?: boolean };
 }
 
 export interface TextureDef {
@@ -39,6 +42,8 @@ export interface TextureDef {
 export interface InstanceDef {
   mesh: string;
   bone: string | null;
+  /** Translação do objeto (nós 0x03 dos níveis), coordenadas do PS2. */
+  offset?: [number, number, number];
 }
 
 export interface BoneDef {
@@ -105,6 +110,8 @@ export function buildGeometry(part: PartDef, bin: ArrayBuffer): THREE.BufferGeom
   const g = new THREE.BufferGeometry();
   for (const [key, [offset, count]] of Object.entries(part.attributes)) {
     if (key === 'indices') g.setIndex(new THREE.BufferAttribute(new Uint32Array(bin, offset, count), 1));
+    // colorA: cor com alfa (malhas com estado do GS; o alfa controla a mistura).
+    else if (key === 'colorA') g.setAttribute('color', new THREE.BufferAttribute(new Float32Array(bin, offset, count), 4));
     else g.setAttribute(key, new THREE.BufferAttribute(new Float32Array(bin, offset, count), key === 'uv' ? 2 : 3));
   }
   g.computeBoundingSphere();

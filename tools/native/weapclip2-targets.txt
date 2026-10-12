@@ -1,0 +1,4 @@
+at:127f9c car_anim_frame
+at:11de00 car_anim_create
+at:2121dc inst_sample_a
+at:212264 inst_sample_b

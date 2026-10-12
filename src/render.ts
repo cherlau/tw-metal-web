@@ -14,12 +14,25 @@ const materialCache = new Map<string, THREE.Material>();
 /** flags do cabeçalho de malha, bit 15: translúcida/aditiva (fogo, fumaça, brilho) — 🟡 hipótese. */
 export const isAdditive = (def: MeshDef) => (def.flags & 0x8000) !== 0;
 
+/**
+ * Mistura do GS: Cv = (A - B) * C + D, com A/B/D ∈ {Cs, Cd, 0} e C ∈ {As, Ad, FIX}.
+ * Suportadas: (Cs - Cd) * As + Cd = normal; (Cs - 0) * As + Cd = aditiva. Outras: normal (🟡).
+ */
+function gsBlending(alpha: [number, number, number, number, number] | undefined): THREE.Blending | null {
+  if (!alpha) return null;
+  const [a, b, , d] = alpha;
+  if (a === 0 && b === 1 && d === 1) return THREE.NormalBlending;
+  if (a === 0 && b === 2 && d === 1) return THREE.AdditiveBlending;
+  return THREE.NormalBlending;
+}
+
 export async function materialFor(doc: ModelDoc, def: MeshDef, texture: string | null, opt: RenderOptions = {}) {
   const unlit = opt.unlit ?? true;
   const vertexColors = opt.vertexColors ?? true;
   const texDef = texture ? doc.textures[texture] : undefined;
   const additive = isAdditive(def);
-  const key = `${doc.source}|${texture}|${additive}|${texDef?.alpha}|${unlit}|${vertexColors}`;
+  const gsBlend = gsBlending(def.gs?.alpha);
+  const key = `${doc.source}|${texture}|${additive}|${texDef?.alpha}|${unlit}|${vertexColors}|${def.gs?.alpha?.join(',')}|${def.gs?.zwrite}`;
   let material = materialCache.get(key);
   if (!material) {
     const map = texDef ? await loadTexture(texDef) : null;
@@ -28,10 +41,16 @@ export async function materialFor(doc: ModelDoc, def: MeshDef, texture: string |
       vertexColors,
       side: THREE.DoubleSide,
       alphaTest: !additive && texDef?.alpha === 'cutout' ? 0.5 : 0,
-      transparent: additive || texDef?.alpha === 'blend',
-      blending: additive ? THREE.AdditiveBlending : THREE.NormalBlending,
-      depthWrite: !additive && texDef?.alpha !== 'blend',
+      transparent: additive || gsBlend !== null || texDef?.alpha === 'blend',
+      blending: additive ? THREE.AdditiveBlending : (gsBlend ?? THREE.NormalBlending),
+      depthWrite: def.gs?.zwrite ?? (!additive && texDef?.alpha !== 'blend'),
     });
+    // Camadas sobrepostas (reflexo) ficam exatamente sobre a pintura: empurra para a frente no z.
+    if (def.gs && !additive) {
+      material.polygonOffset = true;
+      material.polygonOffsetFactor = -1;
+      material.polygonOffsetUnits = -1;
+    }
     materialCache.set(key, material);
   }
   return { key, material };
@@ -48,13 +67,15 @@ export async function buildBatched(
   opt: RenderOptions & { filter?: (key: string, def: MeshDef) => boolean } = {},
 ): Promise<{ group: THREE.Group; drawCalls: number; triangles: number }> {
   const buckets = new Map<string, { material: THREE.Material; geos: THREE.BufferGeometry[] }>();
-  for (const { mesh: key } of instances) {
+  for (const { mesh: key, offset } of instances) {
     const def = doc.meshes[key];
     if (opt.filter && !opt.filter(key, def)) continue;
     for (const part of def.parts ?? []) {
       const { key: mk, material } = await materialFor(doc, def, part.texture, opt);
       if (!buckets.has(mk)) buckets.set(mk, { material, geos: [] });
-      buckets.get(mk)!.geos.push(buildGeometry(part, bin));
+      const g = buildGeometry(part, bin);
+      // Objeto posicionado (nó 0x03): a mesma malha pode aparecer em vários lugares -> cópia transladada.
+      buckets.get(mk)!.geos.push(offset ? g.clone().translate(offset[0], offset[1], offset[2]) : g);
     }
   }
   const group = new THREE.Group();
@@ -90,4 +111,20 @@ export async function buildMeshObject(doc: ModelDoc, bin: ArrayBuffer, key: stri
     group.add(sprite);
   }
   return group;
+}
+
+/** Caixa das malhas sólidas da cena (sem aditivas: fachos, fogo), com `matrix` aplicada. */
+export function solidBox(doc: ModelDoc, bin: ArrayBuffer, matrix: THREE.Matrix4): THREE.Box3 {
+  const box = new THREE.Box3();
+  const p = new THREE.Vector3();
+  for (const { mesh } of doc.scene) {
+    const def = doc.meshes[mesh];
+    if (isAdditive(def)) continue;
+    for (const part of def.parts ?? []) {
+      const [o, n] = part.attributes.position;
+      const a = new Float32Array(bin, o, n);
+      for (let i = 0; i < n; i += 3) box.expandByPoint(p.set(a[i], a[i + 1], a[i + 2]).applyMatrix4(matrix));
+    }
+  }
+  return box;
 }

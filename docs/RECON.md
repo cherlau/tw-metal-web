@@ -168,7 +168,7 @@ Detalhes em `docs/FORMATS.md`; log em `VALIDATION.md`.
 Todas as 26 arenas convertidas e visualizáveis (`/?lvl=<nome>`), 0 erros, 57–219 draw calls, câmera livre. Detalhes em `VALIDATION.md` e `docs/FORMATS.md`.
 
 ## 12. M4 — Colisão + dirigir ✅ (2026-10-11)
-`play.html?lvl=<arena>&car=<carro>` — física arcade provisória, BVH, câmera de perseguição, teclado + gamepad. Detalhes em `VALIDATION.md`.
+`play.html` sem parâmetros abre o **menu** (carro com prévia 3D, arena, nº de bots; catálogo em `src/catalog.ts`); `play.html?lvl=<arena>&car=<carro>&bots=N` vai direto para a partida (Esc volta ao menu) — física arcade provisória, BVH, câmera de perseguição, teclado + gamepad. Detalhes em `VALIDATION.md`.
 
 ## 13. Próximo marco (M5/M6 — regras reais e armas)
 Recuperar do ELF (Ghidra + Emotion Engine Reloaded) as constantes de física/dano e a tabela de armas; animar rodas/ossos com as trilhas `0x0B`.

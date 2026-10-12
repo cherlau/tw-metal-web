@@ -103,8 +103,9 @@ class RealLevelTests(unittest.TestCase):
 @unittest.skipUnless((ASSETS / "lvl" / "arena.json").exists(), "níveis não convertidos")
 class PublishedLevelTests(unittest.TestCase):
     def test_levels_clean(self):
+        # Publicadas só as 7 arenas de deathmatch (pedido do usuário, 2026-10-11).
         docs = sorted((ASSETS / "lvl").glob("*.json"))
-        self.assertEqual(len(docs), 26)
+        self.assertEqual([p.stem for p in docs], ["arena", "castledm", "colisdm", "egyptdm", "greecedm", "parisdm", "tokyodm"])
         for p in docs:
             doc = json.loads(p.read_text("utf-8"))
             self.assertEqual(doc["errors"], [], p.name)

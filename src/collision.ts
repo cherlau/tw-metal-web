@@ -25,7 +25,7 @@ export class LevelCollision implements CollisionWorld {
 
   constructor(doc: ModelDoc, bin: ArrayBuffer, toWorld: THREE.Matrix4) {
     const geos: THREE.BufferGeometry[] = [];
-    for (const { mesh } of doc.scene) {
+    for (const { mesh, offset } of doc.scene) {
       const def = doc.meshes[mesh];
       if (isAdditive(def)) continue;
       for (const part of def.parts ?? []) {
@@ -33,6 +33,7 @@ export class LevelCollision implements CollisionWorld {
         const only = new THREE.BufferGeometry();
         only.setAttribute('position', g.getAttribute('position').clone());
         only.setIndex(g.getIndex()!.clone());
+        if (offset) only.translate(offset[0], offset[1], offset[2]); // objeto posicionado (nó 0x03)
         only.applyMatrix4(toWorld);
         geos.push(only);
       }

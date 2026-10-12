@@ -1,0 +1,7 @@
+# Sistema de animação: strings-âncora
+2e1970 anim_update
+2ee358 anim_instance_play
+2ed718 anim_blend_root
+2db320 animsound_cpp
+# gate de disparo
+at:102a88 fire_gate

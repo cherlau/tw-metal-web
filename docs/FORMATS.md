@@ -71,26 +71,33 @@ Tipo do nó = **6 bits baixos** do 1º word (bits 6..7 = flags, ex.: `0x41` = gr
 
 | Tipo | Layout | Percurso |
 |---|---|---|
-| `0x01` grupo | `+0x08` nº filhos (16 bits), `+0x10` bounding sphere, filhos em `+0x20` | todos |
-| `0x02` LOD | `+0x04` n; entradas de 16 bytes em `+0x20`: (?, f32 distância², *filho, ?) | menor distância = mais detalhado |
-| `0x03`, `0x12` | `+0x08` n, parâmetros em `+0x10..+0x1B` (🟡 escala/animação), filhos em `+0x1C` | todos |
-| `0x05` **slot de efeito** | n no byte `+0x0B`, filhos em `+0x0C` | **fora da pose base** → `effects` (escudo, gelo, fogo, turbo, fachos de farol, sombra) |
+| `0x01` grupo | `+0x04` *pacote de estado do GS (ou 0), `+0x08` nº filhos (16 bits), `+0x10` bounding sphere, filhos em `+0x20` | todos; o estado vale para os filhos (ver abaixo) |
+| `0x02` LOD | `+0x04` n; entradas de 16 bytes em `+0x20`: (?, f32 distância², *filho, ?) | **opção com mais triângulos** (empate: menor distância). "Menor distância" falhava: opção vazia com d²=0 (Arena, 19 nós), carro inteiro na 2ª opção (Tank Car) |
+| `0x03`, `0x12` | `+0x08` n, **translação em `+0x10..+0x18`** (FUN_0021b3c0 soma `R·t`), filhos em `+0x1C` | todos; nos carros vira osso fixo em `tools/rig.py` (Twister 0x10b10 leva a roda traseira à origem do osso); nos níveis aplica a posição às malhas modeladas na origem |
+| `0x05` **seletor** | n no byte `+0x0B`, filhos em `+0x0C`; `+0x04..+0x0A` zerados (o filho ativo é estado do jogo); byte 3 do word = tipo | byte 3 = `0x06` (pose do personagem: braços/foice do Mr. Grimm): 1º filho não vazio ⚠️; byte 3 = `0x01` com 1º filho > 500 tri (carroceria do hc_sweet/hc_chrom): 1º filho ⚠️; demais: **fora da pose base** → `effects` (escudo, gelo, fogo, turbo, fachos, clarão) |
 | `0x06` lista de objetos | `+0x04` n, `+0x08` n ponteiros para objetos `0x11` (nos níveis **não relocados**) | carros: o próprio objeto; níveis: exportados em `objects` (prefabs centrados na origem = instanciados pelo jogo) |
 | `0x07` BSP (níveis) | `+0x04` frente, `+0x08` trás, `+0x10` esfera, `+0x20` *plano | ambos |
 | `0x0A` plano/portal (níveis) | 🟡 | ignorado |
 | `0x0C` grade de setores (níveis) | `u16 w, u16 h`, f32 célula, f32 ?, 4 f32 limites, `*A`, `*B`, células `(i<<10)|1`… | nós visuais referenciados na faixa entre `min(A,B)` e a grade (Tokyo B só é alcançável assim) |
-| `0x0D` osso | `+0x1C` flags: bits 8..15 = nº filhos, bit 7 = tem matrizes, bits 16..22 = índice do osso; se bit 7: `+0x20` **inversa do bind**, `+0x60` pose local, filhos em `+0xA0`; senão filhos em `+0x20` | todos |
+| `0x0D` osso | `+0x04/+0x08` f32 x, y (pivô); `+0x1C` flags: bits 8..15 = nº filhos, **bit 7 = inversa do bind em `+0x20`**, **bit 6 = bind em `+0x60`**, bit 5 = pivô de roda/suspensão (x, y em `+0x04/+0x08`, sem z), bits 16..22 = índice do osso. Filhos: `+0x20` (sem matrizes), `+0x60` (só bit 7 — ex.: `0x84` no Mr. Grimm), `+0xA0` (bits 7 e 6) | todos |
 | `0x11` objeto | `+0x28` byte baixo = nº de partes, partes em `+0x2C` | todas |
 | `0x13` estado de dano | `+0x08` n, `+0x0C` stride (12); entradas (*filho, ?, limiar): 0x7FFF intacto, 0x3FFF, 0x28F, 0 | 1ª entrada (intacto) |
+| `0x12` escala | `+0x04` *? (animação), `+0x08` n, `+0x20..+0x28` escala (x, y, z), **n filhos em `+0x2C`** (antes lido em `+0x1C`: ícones Remote Bomb e Napalm saíam vazios) | todos (escala ainda não aplicada 🟡) |
 | `0x14` | `+0x08` → filho | — |
-| `0x15` | `+0x10` inversa do bind + **malha inline em `+0x50`** | — |
-| `0x1F` | condição em `+0x08` (🟡), filho em `+0x1C` | segue |
-| `0x08` locator, `0x0E` vazio, `0x17` marcador, `0x18` partículas, `0x19` gatilho/emissor, `0x1A` controlador de animação, `0x1B`/`0x1E` colisão, registros `0x00F0xxxx/0x00F8xxxx` | — | ignorados (sem malha) |
-| `0x0B` | trilha de animação (nº de quadros f32, canais com keyframes; ex.: rotação -2π das rodas) | não usado ainda |
+| `0x15` | entrada de paleta: `+0x04` n de filhos, `+0x08` slot (0..0xE no Grimm), `+0x0C` filhos, `+0x10` **inversa do bind** do osso filho (nó de 0x50 bytes) | segue os filhos. A malha que vem logo depois na memória **não** é dele (Grimm 0x2f60 = roda dianteira, filha do osso 0x38f0). A inversa não entra no desenho; serve para achar a pose de bind (`rig.rest`) |
+| `0x1F` | **rotação s16 em `+0x08/+0x0A/+0x0C`** (× π/32768; mesma regra de sinal dos ossos), `+0x0E` u16 **nº de filhos**, translação `+0x10..+0x18`, filhos a partir de `+0x1C` (FUN_0021b3c0) | carros: osso fixo em `tools/rig.py` (Grimm 0x47e0 = −45° + (0, −2,68, 1,46) põe o garfo e o guidão no lugar). Níveis: só translação e 1º filho ainda (ver PENDENTES) |
+| registro `0x00F0xxxx` (carros) | **marca de lançador**: slot = `(word & 0xFFFF) >> 6` = **tipo de arma do jogo** (2 Fire, 3 Homing, 4 Napalm, 6 Power, 7 Ricochet… — `FUN_00120ba0`; o jogo põe ali o modelo do projétil, `FUN_00147568`); fica entre os filhos de um osso `0x0D` com **bit 31** nas flags (o lançador). Irmãos: malha base + ossos `0x0D` com matrizes = **portas** (dobradiça = translação do bind `+0x60`). O cabeçalho do osso-lançador traz y, z (`+0x08/+0x0C`); x vem do `0x00F8` do slot | `tools/launchers.py` → `launchers` |
+| registro `0x00F8xxxx` (carros) | **ponto de montagem de arma**: slot = `(word & 0xFFFF) >> 6` (= id do pickup), posição (x, y, z) em `+0x10` | exportado em `mounts` |
+| `0x08` locator, `0x0E` vazio, `0x17` marcador, `0x18` escala (`+0x04` n, `+0x20..+0x28` escala, `+0x30..+0x38` posição, filhos em `+0x60`; ATV 0xc4a0 tem malha — 🟡), `0x19` gatilho/emissor, `0x1A` controlador de animação, `0x1B`/`0x1E` colisão, registros `0x00F0xxxx/0x00F8xxxx` | — | ignorados (sem malha) |
+| `0x0B` | **clipe** (FUN_00212290): f32 início `+0x04`, fim `+0x08` (quadros 1/60 s), u16 n `+0x0C`, u16 deslocamentos `+0x12`; trilhas ANTES do cabeçalho (`p −= 4·desl[i]`): u16 tipo, u16 canal; 7 amostradores (tabela `0x2c77e0`) — detalhes em `tools/rig.py` | carros: `rig.clips` (papel pela categoria, suportes de arma por `MOUNT_CLIPS`) |
 
-**Malhas estão no espaço do modelo** (pose de bind): a matriz em `+0x20` dos ossos é a inversa do bind (`p @ invBind` leva a peça para perto da origem do osso — testado). Na pose base a transformação é a identidade; para animar: `p @ invBind @ mundoAnimado(osso)`. 🟡 `+0x60` nem sempre é o inverso de `+0x20` (ex.: rodas do Crimson Fury) — provável pose local; confirmar quando as animações forem implementadas.
+**Malhas estão no espaço do modelo** (pose de bind): a matriz em `+0x20` dos ossos é a inversa do bind (`p @ invBind` leva a peça para perto da origem do osso — testado). Na pose base a transformação é a identidade; para animar: `p @ invBind @ mundoAnimado(osso)`. 🟡 `+0x60` nem sempre é o inverso de `+0x20` (rodas do Crimson Fury: Y com o mesmo sinal nas duas) — o jogo deve posicionar essas rodas por outra fonte; ver **Rodas** abaixo.
 
-Escolha do host (confirmar no ELF): texturas de gelo `88a28`/`b5a20` tratadas como efeito "freeze" (`CODE_FX_TEXTURES` em `tools/convert_model.py`); flag de malha bit 15 = translúcida/aditiva.
+**Estado do GS por grupo** ✅: o `+0x04` de um grupo `0x01` aponta para um pacote VIF `… FLUSH, DIRECT n` + GIF tag A+D (NLOOP n, REGS=0xE) + n escritas. Nos carros (camada de reflexo e clarão): `ALPHA_1=0x44` → (Cs−Cd)·As+Cd, `TEST_1` z ≥, `ZBUF_1` **ZMSK=1** (não grava z), `CLAMP_1=0`. A camada de reflexo (malhas com flag bit 1, `…0312`) é uma **cópia da carroceria** com a textura de reflexo (`6ea3c`) e **alfa de vértice ≈ 0,15–0,30** — desenhada opaca, cobria a pintura. O conversor exporta `gs` por malha e a cor com alfa (`colorA`); o runtime usa mistura normal, sem gravar z.
+
+**Rodas** (`tools/wheels.py`): o jogo as posiciona pela suspensão; o `.ngp` nem sempre traz a pose de repouso. Casos: A (já posicionadas — Warthog, Axel, Twister, Roadkill, Cop: intocadas); B (osso coerente, pivô x,y da suspensão ≠ osso: roda na origem → Hammerhead, Hearse, Spectre, Sweet Tooth, dianteiras do Grasshopper); C (bind ≠ inversa⁻¹, 4 rodas: Crimson Fury → pontos nativos da física); D (rodas em `0x15` com conjunto deslocado em x: ATV → recentralizado). ⚠️ altura (z) nos casos B/C/D = escolha do host. **Com o esqueleto (`tools/rig.py`), nenhum caso é usado nos carros**: as rodas saem dos ossos, nós `0x1F`/`0x03` e canais.
+
+Escolha do host (confirmar no ELF): clarão do tiro = texturas `8a480`/`8fed0` → efeito `code:muzzle` (o runtime acende 60 ms por tiro); texturas de gelo `88a28`/`b5a20` tratadas como efeito "freeze" (`CODE_FX_TEXTURES` em `tools/convert_model.py`); flag de malha bit 15 = translúcida/aditiva.
 
 ### Coordenadas ✅
 **Z para cima** (ondas de choque planas em XY; caminhão do Sweet Tooth alongado em Y), metros. Conversão para o Three: rotação de -90° em X, `(x, y, z) → (x, z, -y)`, sem espelho — confirmado pelo texto "A-12" legível no capô da viatura. Regra única em `src/coords.ts`.

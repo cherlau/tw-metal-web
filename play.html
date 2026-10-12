@@ -2,6 +2,7 @@
 <html lang="pt-BR">
   <head>
     <meta charset="utf-8" />
+    <link rel="icon" href="data:," />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Twisted Metal Web</title>
     <style>
@@ -20,14 +21,36 @@
       #hud .dead { color: #f55; font-size: 20px; font-weight: bold; }
       #help { position: fixed; bottom: 8px; left: 8px; background: #000a; padding: 4px 8px; border-radius: 4px; }
       #loading { position: fixed; inset: 0; display: grid; place-items: center; font-size: 18px; background: #111; }
-      #loading[hidden] { display: none; }
+      #loading[hidden], #menu[hidden], #hud[hidden], #help[hidden] { display: none; }
+      #menu { position: fixed; inset: 0; overflow: auto; padding: 16px; box-sizing: border-box; background: radial-gradient(ellipse at 50% 30%, #3a1414, #0c0c0e 70%); }
+      #menu h1 { margin: 0 0 12px; font: 900 34px/1 Impact, 'Arial Black', sans-serif; letter-spacing: 2px; color: #ff5a1f; text-shadow: 0 2px 0 #000, 0 0 18px #f305; }
+      #menu h1 small { display: block; margin-top: 6px; font: 12px system-ui, sans-serif; letter-spacing: 0; color: #bbb; text-shadow: none; }
+      #menu h2 { margin: 12px 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #f96; }
+      #menu .cols { display: grid; grid-template-columns: 1fr minmax(280px, 1.1fr) 1fr; gap: 16px; align-items: start; }
+      #menu .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 6px; }
+      #menu button { font: inherit; color: #eee; background: #222a; border: 1px solid #444; border-radius: 4px; padding: 6px 8px; cursor: pointer; text-align: left; }
+      #menu button:hover { border-color: #f96; }
+      #menu button.on { background: #b3260f; border-color: #ff7a3d; color: #fff; font-weight: bold; }
+      #menu .preview { position: sticky; top: 0; display: flex; flex-direction: column; gap: 10px; }
+      #preview { height: 300px; border-radius: 8px; background: radial-gradient(circle at 50% 60%, #444, #111 75%); }
+      #menu .carname { font: 900 26px Impact, 'Arial Black', sans-serif; text-align: center; letter-spacing: 1px; }
+      #menu .bots { display: flex; gap: 8px; align-items: center; justify-content: center; }
+      #menu button.start { text-align: center; font: 900 22px Impact, 'Arial Black', sans-serif; padding: 12px; background: #ff5a1f; color: #111; border: 0; letter-spacing: 2px; }
+      #menu button.start:hover { background: #ff7a3d; }
+      #menu .keys { margin: 0; text-align: center; font-size: 11px; opacity: .7; }
+      @media (max-width: 900px) {
+        #menu .cols { grid-template-columns: 1fr; }
+        #menu .preview { position: static; order: -1; }
+        #preview { height: 220px; }
+      }
     </style>
   </head>
   <body>
     <div id="game"></div>
     <div id="hud"></div>
-    <div id="help">W/↑ acelerar · S/↓ freio/ré · A/D virar · Espaço freio de mão · <b>J</b> metralhadora · <b>K</b> arma especial · <b>L</b> trocar arma · <b>Shift</b> turbo · R renascer · C câmera · M som · gamepad: RT/LT, RB tiro, B especial, Y troca, LB turbo</div>
+    <div id="help">W/↑ acelerar · S/↓ freio/ré · A/D virar · Espaço freio de mão · <b>J</b> metralhadora · <b>K</b> arma especial · <b>L</b> trocar arma · <b>Shift</b> turbo · R renascer · C câmera · M som · Esc menu · gamepad: RT/LT, RB tiro, B especial, Y troca, LB turbo</div>
     <div id="loading">carregando…</div>
-    <script type="module" src="/src/game.ts"></script>
+    <div id="menu" hidden></div>
+    <script type="module" src="/src/play.ts"></script>
   </body>
 </html>

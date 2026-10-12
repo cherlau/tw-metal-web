@@ -53,3 +53,24 @@ for (const name of ['arena', 'tokyodm']) {
     assert.ok(checked >= 8);
   });
 }
+
+// Regressão: no Egito o carro nascia de frente para um paredão (nós PTS não têm direção).
+for (const name of ['arena', 'tokyodm']) {
+  const has = existsSync(`public/assets/lvl/${name}.json`);
+  test(`${name}: o carro nasce virado para um espaço livre`, { skip: !has && 'assets ausentes' }, async () => {
+    const { Match } = await import('../src/game/match');
+    const { forwardOf } = await import('../src/physics/vehicle');
+    const { doc, collision } = loadLevel(name);
+    const pts = spawns(doc);
+    const match = new Match(collision, pts, (p) => p);
+    for (const p of pts.filter((_, i) => i % Math.ceil(pts.length / 12) === 0)) {
+      const hit = collision.raycast(v3(p.x, p.y + 40, p.z), v3(0, -1, 0), 400);
+      if (!hit) continue;
+      const pos = v3(p.x, p.y + 40 - hit.distance - SHAPE.bottom + 2, p.z);
+      const yaw = match.openYaw(pos, SHAPE);
+      const o = v3(pos.x, pos.y, pos.z);
+      const ahead = collision.raycast(o, forwardOf(yaw), 300);
+      assert.ok(!ahead || ahead.distance >= 20, `parede a ${ahead?.distance.toFixed(1)} pés em ${JSON.stringify(p)}`);
+    }
+  });
+}

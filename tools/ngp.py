@@ -349,6 +349,8 @@ class Instance:
     mesh: int  # offset do cabeçalho da malha
     bone: int  # nó de transformação mais próximo (0x0D/0x15) ou -1
     path: list[int]  # nós percorridos (para depuração)
+    state: int = -1  # pacote de estado do GS do grupo mais próximo (grupo 0x01 com +0x04 ≠ 0) ou -1
+    offset: tuple[float, float, float] = (0.0, 0.0, 0.0)  # translação acumulada dos nós 0x03 (níveis)
 
 
 @dataclass
@@ -377,7 +379,8 @@ def _mat(b: bytes, p: int) -> np.ndarray:
     return np.array(struct.unpack_from("<16f", b, p), dtype=np.float64).reshape(4, 4)
 
 
-def scene(data: bytes, ptr: bytes, meshes: list[Mesh], root: int | None = None, lenient: bool = False) -> SceneReport:
+def scene(data: bytes, ptr: bytes, meshes: list[Mesh], root: int | None = None, lenient: bool = False,
+          _lod_cache: dict[int, int] | None = None, place_objects: bool = False) -> SceneReport:
     """Percorre o grafo a partir da raiz (.ngp+0x08): LOD mais detalhado, estado intacto."""
     relocs = relocations(data, ptr)
     mesh_at = {m.offset for m in meshes}
@@ -398,14 +401,57 @@ def scene(data: bytes, ptr: bytes, meshes: list[Mesh], root: int | None = None, 
             if c is not None:
                 visit(c, bone, path, depth + 1)
 
+    tri_of = {m.offset: sum(max(0, len(st.pos) - 2) for st in m.strips) for m in meshes}
+    lod_cache: dict[int, int] = {} if _lod_cache is None else _lod_cache
+
+    def _subtree_tris(c: int) -> int:
+        if c not in lod_cache:
+            lod_cache[c] = 0  # contra ciclos
+            sub = scene(data, ptr, meshes, root=c, lenient=lenient, _lod_cache=lod_cache)
+            lod_cache[c] = sum(tri_of.get(i.mesh, 0) for i in sub.instances)
+        return lod_cache[c]
+
     sink: list[list[Instance]] = [rep.instances]  # destino atual (pose base ou um slot de efeito)
+    states: list[int] = [-1]  # estado do GS em vigor (grupos 0x01 com +0x04 -> pacote VIF/GIF)
+    offsets: list[tuple[float, float, float]] = [(0.0, 0.0, 0.0)]  # translação dos objetos (nós 0x03)
+    mesh_by_off = {m.offset: m for m in meshes}
+    local_cache: dict[int, bool] = {}
+
+    def _is_local(c: int, t: tuple[float, float, float]) -> bool:
+        """A subárvore é um modelo centrado na origem (objeto a posicionar) e não geometria já no mundo?"""
+        if c not in local_cache:
+            sub = scene(data, ptr, meshes, root=c, lenient=lenient, _lod_cache=lod_cache)
+            pts = [np.asarray(st.pos)[:, :3] for i in sub.instances for st in mesh_by_off[i.mesh].strips]
+            if not pts:
+                local_cache[c] = False
+            else:
+                allp = np.concatenate(pts)
+                lo, hi = allp.min(0), allp.max(0)
+                center, half = (lo + hi) / 2, (hi - lo) / 2
+                # centro perto da origem em x,y (comparado ao tamanho) e longe do ponto de destino
+                # Local = bem mais perto da origem que do destino (telhados do Coliseu DM a 48 da origem e
+                # destino a 1400); já no mundo = perto do destino (pivôs, segmentos de Tóquio DM).
+                d0 = float(np.hypot(center[0], center[1]))
+                dt = float(np.hypot(center[0] - t[0], center[1] - t[1]))
+                local_cache[c] = bool(d0 < 0.25 * dt and dt > 20.0)
+        return local_cache[c]
 
     def visit(p: int, bone: int, path: list[int], depth: int) -> None:
         if depth > 64 or p in path:
             return
         path = path + [p]
         if p in mesh_at:
-            sink[-1].append(Instance(p, bone, path))
+            off = offsets[-1]
+            if any(off):
+                # Decide por malha: o mesmo posicionador mistura peças locais (estátua intacta, centrada na
+                # origem) e peças já no mundo (destroços no destino) — Grécia DM.
+                m = mesh_by_off[p]
+                if m.strips:
+                    allp = np.concatenate([np.asarray(st.pos)[:, :3] for st in m.strips])
+                    c = (allp.min(0) + allp.max(0)) / 2
+                    if np.hypot(c[0], c[1]) >= 0.5 * np.hypot(c[0] - off[0], c[1] - off[1]):
+                        off = (0.0, 0.0, 0.0)
+            sink[-1].append(Instance(p, bone, path, states[-1], off))
             return
         word = _u32(data, p)
         if word >> 24 == 0 and (word >> 16) & 0xFF in (0xF0, 0xF8):
@@ -417,8 +463,11 @@ def scene(data: bytes, ptr: bytes, meshes: list[Mesh], root: int | None = None, 
                 visit(c, bone, path, depth + 1)
         elif t == 0x11:  # objeto: partes em +0x2C, contagem no byte baixo de +0x28
             children(p, p + 0x2C, _u32(data, p + 0x28) & 0xFF, bone, path, depth)
-        elif t == 0x01:  # grupo: filhos em +0x20, contagem em +0x08 (16 bits baixos)
+        elif t == 0x01:  # grupo: filhos em +0x20, contagem em +0x08 (16 bits baixos); +0x04 -> estado do GS
+            st = ptr_at(p + 4)
+            states.append(st if st is not None and gs_state(data, st) is not None else states[-1])
             children(p, p + 0x20, _u32(data, p + 8) & 0xFFFF, bone, path, depth)
+            states.pop()
         elif t == 0x02:  # LOD: n entradas de 16 bytes em +0x20: (?, f32 distância², *filho, ?)
             opts = []
             for i in range(_u32(data, p + 4)):
@@ -427,32 +476,92 @@ def scene(data: bytes, ptr: bytes, meshes: list[Mesh], root: int | None = None, 
                 if c is not None:
                     opts.append((struct.unpack_from("<f", data, q + 4)[0], c))
             if opts:
-                visit(min(opts)[1], bone, path, depth + 1)  # menor distância = mais detalhado
-        elif t == 0x0D:  # transformação/osso: +0x1C flags (bits 8..15 = nº de filhos, bit 7 = tem matrizes)
+                # Mais detalhado = mais triângulos (empate: menor distância). "Menor distância" sozinha
+                # falha: opção vazia com d²=0 (Arena, 19 nós) e carro inteiro na 2ª opção (Tank Car).
+                best = max(opts, key=lambda o: (_subtree_tris(o[1]), -o[0]))
+                visit(best[1], bone, path, depth + 1)
+        elif t == 0x0D:  # transformação/osso: +0x1C flags (bits 8..15 = nº de filhos)
+            # bit 7 = inversa do bind em +0x20; bit 6 = bind em +0x60; filhos logo depois das matrizes.
+            # Sem o bit 6 (ex.: 0x84 no Mr. Grimm) só há a inversa e os filhos começam em +0x60.
             flags = _u32(data, p + 0x1C)
             n = (flags >> 8) & 0xFF
             if flags & 0x80:
-                rep.bones.setdefault(p, Bone(p, bone, _mat(data, p + 0x20), _mat(data, p + 0x60)))
-                children(p, p + 0xA0, n, p, path, depth)
+                has_bind = bool(flags & 0x40)
+                rep.bones.setdefault(p, Bone(p, bone, _mat(data, p + 0x20), _mat(data, p + 0x60) if has_bind else None))
+                children(p, p + (0xA0 if has_bind else 0x60), n, p, path, depth)
             else:
                 children(p, p + 0x20, n, bone, path, depth)
-        elif t == 0x15:  # inversa do bind em +0x10 + malha inline em +0x50
+        elif t == 0x15:
+            # Entrada de paleta de pele (FUN_0021b3c0): u32 nº de filhos, u32 slot da paleta, filhos a partir
+            # de +0x0C, inversa do bind do osso filho em +0x10. O nó tem 0x50 bytes: a malha que costuma vir
+            # logo depois NÃO é dele (no Mr. Grimm 0x2f60 é a roda dianteira, filha do osso 0x38f0).
             rep.bones.setdefault(p, Bone(p, bone, _mat(data, p + 0x10), None))
-            visit(p + 0x50, p, path, depth + 1)
+            children(p, p + 0x0C, max(1, min(_u32(data, p + 4), 16)), p, path, depth)
         elif t == 0x14:  # invólucro -> +0x08
             c = ptr_at(p + 8)
             if c is not None:
                 visit(c, bone, path, depth + 1)
+        elif t == 0x05 and (word >> 24) == 0x06:
+            # Seletor de pose (byte 3 = 0x06; ex.: braços/foice do Mr. Grimm): o filho ativo é estado do jogo
+            # (campos +0x04..+0x0A zerados no arquivo). ⚠️ ESCOLHA DO HOST: pose base = 1º filho não vazio.
+            for i in range(data[p + 0x0B]):
+                c = ptr_at(p + 0x0C + 4 * i)
+                if c is not None and _u32(data, c) & 0x3F != 0x08:
+                    visit(c, bone, path, depth + 1)
+                    break
+        elif t == 0x05 and (word >> 24) == 0x01 and (c0 := ptr_at(p + 0x0C)) is not None                 and _u32(data, c0) & 0x3F != 0x08 and _subtree_tris(c0) > 500:
+            # Seletor cujo 1º filho é a carroceria (hc_sweet/hc_chrom: forma normal × transformada).
+            # ⚠️ ESCOLHA DO HOST: 1º filho = estado padrão, só quando é grande (> 500 tri); os pequenos
+            # (14–38 tri, um por carro) ficam como efeito até achar o significado no ELF.
+            visit(c0, bone, path, depth + 1)
         elif t == 0x05:  # slot de efeito: N filhos a partir de +0x0C (N no byte +0x0B); fora da pose base
             if p not in rep.effects:
                 rep.effects[p] = []
                 sink.append(rep.effects[p])
                 children(p, p + 0x0C, data[p + 0x0B], bone, path, depth)
                 sink.pop()
-        elif t in (0x03, 0x12):  # N filhos a partir de +0x1C (parâmetros em +0x10..+0x1B: 🟡)
+        elif t == 0x03 and place_objects:
+            # Objeto posicionado (níveis): +0x10..+0x18 = posição (x, y, z); a malha filha costuma estar
+            # centrada na origem (prédios/cúpula do Coliseu DM empilhados no centro sem isto). Quando a
+            # subárvore já está no mundo (segmentos de Tóquio DM, pivôs), a posição não é aplicada.
+            tr = struct.unpack_from("<3f", data, p + 0x10)
+            n = _u32(data, p + 8)
+            first = ptr_at(p + 0x1C)
+            if any(abs(v) > 1.0 for v in tr) and first is not None:
+                o = offsets[-1]
+                offsets.append((o[0] + tr[0], o[1] + tr[1], o[2] + tr[2]))
+                children(p, p + 0x1C, n, bone, path, depth)
+                offsets.pop()
+            else:
+                children(p, p + 0x1C, n, bone, path, depth)
+        elif t == 0x12:  # escala: +0x04 *animação?, +0x08 n, +0x20..+0x28 escala (x, y, z), n filhos em +0x2C
+            children(p, p + 0x2C, _u32(data, p + 8), bone, path, depth)
+        elif t == 0x03:  # N filhos a partir de +0x1C (parâmetros em +0x10..+0x1B: 🟡)
             children(p, p + 0x1C, _u32(data, p + 8), bone, path, depth)
-        elif t == 0x1F:  # filho condicional em +0x1C (condição em +0x08: 🟡)
-            children(p, p + 0x1C, 1, bone, path, depth)
+        elif t == 0x1F and (word >> 24) == 0x06:
+            # Condicional "de evento" (byte 3 = 0x06): figura que sai pela escotilha do hc_hears, peças do
+            # hc_suv. Visível só quando o jogo liga a condição -> slot de efeito, fora da pose base. ⚠️
+            if p not in rep.effects:
+                rep.effects[p] = []
+                sink.append(rep.effects[p])
+                children(p, p + 0x1C, max(1, min(struct.unpack_from("<H", data, p + 0x0E)[0], 16)), bone, path, depth)
+                sink.pop()
+        elif t == 0x1F and place_objects:
+            # Níveis: objeto posicionado com distância de desenho (+0x0C ≈ distância², ex. 0x1bf81 ≈ 338²)
+            # e posição em +0x10..+0x18, como o 0x03 (prédios da cidade do Coliseu DM empilhados no centro).
+            tr = struct.unpack_from("<3f", data, p + 0x10)
+            first = ptr_at(p + 0x1C)
+            if any(abs(v) > 1.0 for v in tr) and first is not None:
+                o = offsets[-1]
+                offsets.append((o[0] + tr[0], o[1] + tr[1], o[2] + tr[2]))
+                children(p, p + 0x1C, 1, bone, path, depth)
+                offsets.pop()
+            else:
+                children(p, p + 0x1C, 1, bone, path, depth)
+        elif t == 0x1F:
+            # FUN_0021b3c0: rotação s16 em +0x08/+0x0A/+0x0C, translação +0x10..+0x18 (aplicadas em tools/rig.py)
+            # e u16 em +0x0E filhos a partir de +0x1C (Mr. Grimm 0x47e0: roda dianteira + 0x42b0).
+            children(p, p + 0x1C, max(1, min(struct.unpack_from("<H", data, p + 0x0E)[0], 16)), bone, path, depth)
         elif t == 0x07:  # BSP (níveis): +0x04 frente, +0x08 trás, +0x10 esfera, +0x20 *plano
             children(p, p + 0x04, 2, bone, path, depth)
         elif t == 0x0A:  # plano/portal (níveis; 🟡 água/espelho?) — sem malha
@@ -487,9 +596,39 @@ def scene(data: bytes, ptr: bytes, meshes: list[Mesh], root: int | None = None, 
                 continue  # lista de objetos: exportada à parte (level_objects)
             visit(r, -1, [], 0)
     # A mesma malha pode ser alcançada por caminhos diferentes; como está no espaço do modelo, uma basta.
-    seen: set[int] = set()
-    rep.instances = [i for i in rep.instances if not (i.mesh in seen or seen.add(i.mesh))]
+    # A varredura da grade de setores também alcança os filhos dos nós 0x03 pelos ponteiros, sem a
+    # posição: a cópia na origem de uma malha que foi posicionada é descartada.
+    placed = {i.mesh for i in rep.instances if any(i.offset)}
+    rep.instances = [i for i in rep.instances if any(i.offset) or i.mesh not in placed]
+    seen: set[tuple] = set()
+    keyf = lambda i: (i.mesh, tuple(round(v, 2) for v in i.offset))  # noqa: E731
+    rep.instances = [i for i in rep.instances if not (keyf(i) in seen or seen.add(keyf(i)))]
     return rep
+
+
+def gs_state(data: bytes, p: int) -> dict[int, int] | None:
+    """Pacote de estado do GS de um grupo: VIF (… FLUSH, DIRECT/DIRECTHL n) + GIF tag A+D + n escritas.
+
+    Ex. (carros, camada de reflexo e clarão): ALPHA_1=0x44 (Cs-Cd)*As+Cd, TEST_1 (z ≥), ZBUF_1 ZMSK=1
+    (não grava profundidade), CLAMP_1=0. Devolve {registrador: valor de 64 bits} ou None se não for um.
+    """
+    for q in range(p, min(p + 0x20, len(data) - 4), 4):
+        code = _u32(data, q)
+        if (code >> 24) & 0x7F in (0x50, 0x51) and code & 0xFFFF:
+            g = q + 4
+            g += -g % 16  # GIF tag alinhado em 16 bytes
+            if g + 16 > len(data):
+                return None
+            lo, hi = struct.unpack_from("<QQ", data, g)
+            nloop, flg, nreg, regs = lo & 0x7FFF, (lo >> 58) & 3, (lo >> 60) & 0xF, hi & 0xF
+            if flg != 0 or nreg != 1 or regs != 0xE or not 1 <= nloop <= 16 or g + 16 * (nloop + 1) > len(data):
+                return None
+            out = {}
+            for i in range(nloop):
+                val, reg = struct.unpack_from("<QQ", data, g + 16 * (i + 1))
+                out[reg & 0xFF] = val
+            return out
+    return None
 
 
 def roots(data: bytes) -> list[int]:

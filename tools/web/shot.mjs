@@ -13,7 +13,7 @@ const logs = [];
 page.on('console', (m) => logs.push(`[${m.type()}] ${m.text()}`));
 page.on('pageerror', (e) => logs.push(`[pageerror] ${e.message}`));
 await page.goto(url);
-await page.waitForFunction(() => window.__ready === true || /Falha/.test(document.body.innerText), null, { timeout: 60000 });
+await page.waitForFunction(() => window.__ready === true || /Falha/.test(document.body.innerText), null, { timeout: 300000 });
 if (script) await page.evaluate(script);
 await page.waitForTimeout(800);
 await page.screenshot({ path: out });

@@ -141,7 +141,11 @@ class RealCarTests(unittest.TestCase):
 
     def test_scene_graph(self):
         """Pose base: contagens fixadas e nenhum tipo de nó desconhecido no caminho."""
-        expected = {"axel": (21, 6, 17), "sweet": (55, 7, 31), "cop": (70, 7, 41)}
+        # axel 21 -> 37 e mrgrim 19 -> 33: o walker passou a seguir o filho de +0x0C dos nós 0x15, o layout
+        # 0x0D sem bind (bit 6) e os seletores de pose 0x05 (byte 3 = 0x06) — rodas/braços do Mr. Grimm.
+        # axel 44 -> 45 e mrgrim 33 -> 34: nós 0x1F têm nº de filhos em +0x0E (FUN_0021b3c0); a malha que segue
+        # um nó 0x15 na memória não é dele (roda dianteira do Grimm vem do osso 0x38f0)
+        expected = {"axel": (45, 6, 43), "sweet": (55, 6, 31), "cop": (70, 6, 41), "mrgrim": (34, 7, 49)}
         for car, (inst, fx, bones) in expected.items():
             b = GAME / "cars" / car / car
             d, p = b.with_suffix(".ngp").read_bytes(), b.with_suffix(".ptr").read_bytes()

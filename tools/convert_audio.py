@@ -21,37 +21,22 @@ SRC = ROOT / "source" / "disc" / "vag"
 OUT = ROOT / "public" / "assets" / "music"
 
 # arena (public/assets/lvl) -> faixas (sem extensão)
+# Só as 7 arenas de deathmatch são publicadas (pedido do usuário, 2026-10-11); as demais faixas
+# não são convertidas.
 LEVEL_MUSIC = {
-    "coliseum": ["colelec", "colorch"],
-    "egypt": ["egyorch", "egyrock"],
-    "fway": ["laelec", "larock"],
-    "paris": ["prsorch", "prsrock"],
-    "russia": ["rsqelec", "rsqorch", "rsqrock"],
-    "greece": ["grceorch", "grcerock"],
-    "monaco": ["monelec", "monrock"],
-    "castle": ["tranorch", "tranrock"],
-    "fwayboss": ["laelec", "larock"],
-    "tokyo": ["tstrelec", "tstrrock"],
-    "rooftops": ["trftelec", "trftrock"],
+    "arena": ["stdmelec", "stdmrock"],
+    "castledm": ["tranorch", "tranrock"],
     "colisdm": ["tm_high"],
     "greecedm": ["tm_high"],
     "parisdm": ["tm_high"],
     "tokyodm": ["tm_high"],
     "egyptdm": ["tm_high"],
-    "arena": ["stdmelec", "stdmrock"],
-    "castledm": ["tranorch", "tranrock"],
-    "hc_gd": ["roofbatl"],
-    "hc_nd": ["prisnex"],
-    "hc_sc": ["dthmat1"],
-    "hc_st": ["dmtch2"],
-    "hc_su": ["tm_high"],
-    "asylum": ["prsnbatl", "prisnex"],
-    "impound": ["jnkyrdam", "jnkyrdex"],
-    "tokyob": ["tstrelec", "tstrrock"],
 }
 # Faixas estéreo guardadas como dois VAG mono (L, R).
 STEREO_PAIRS = {"hoshell": ("hoshelll", "hoshellr"), "hcshell": ("hcshelll", "hcshellr")}
 BITRATE = "128k"
+MENU = ["hoshell", "hcshell"]
+USED = {t for ts in LEVEL_MUSIC.values() for t in ts} | set(MENU)
 
 
 def ffmpeg(args: list[str]) -> None:
@@ -73,10 +58,12 @@ def main() -> int:
     jobs: list[tuple[str, list[str]]] = []
     for f in sorted(SRC.iterdir()):
         name = f.stem.lower()
-        if name in paired or f.suffix.lower() not in (".vag", ".vpk"):
+        if name in paired or f.suffix.lower() not in (".vag", ".vpk") or name not in USED:
             continue
         jobs.append((name, ["-i", str(f)]))
     for name, (l, r) in STEREO_PAIRS.items():
+        if name not in USED:
+            continue
         jobs.append((name, ["-i", str(SRC / f"{l}.vag"), "-i", str(SRC / f"{r}.vag"), "-filter_complex", "[0:a][1:a]join=inputs=2:channel_layout=stereo[a]", "-map", "[a]"]))
     for name, inputs in jobs:
         dest = OUT / f"{name}.m4a"
@@ -88,7 +75,7 @@ def main() -> int:
     if missing:
         print("ERRO: faixas sem arquivo:", missing, file=sys.stderr)
         return 1
-    index = {"tracks": tracks, "levels": LEVEL_MUSIC, "menu": ["hoshell", "hcshell"]}
+    index = {"tracks": tracks, "levels": LEVEL_MUSIC, "menu": MENU}
     (OUT / "index.json").write_text(json.dumps(index, indent=1), "utf-8")
     print(f"{len(tracks)} faixas, {sum(t['bytes'] for t in tracks.values()) / 2**20:.0f} MB")
     return 0

@@ -106,6 +106,26 @@ export class Match {
     return add(c.state.pos, v3(0, (c.shape.top + c.shape.bottom) / 2, 0));
   }
 
+  /**
+   * Direção mais livre a partir do spawn (16 raios na altura do carro). Os nós PTS não têm direção;
+   * antes o carro podia nascer de cara para um paredão (Egito). ⚠️ ESCOLHA DO HOST.
+   */
+  openYaw(pos: V3, shape: VehicleShape): number {
+    const o = v3(pos.x, pos.y + (shape.top + shape.bottom) / 2, pos.z);
+    let best = 0;
+    let bestD = -1;
+    for (let i = 0; i < 16; i++) {
+      const yaw = (i / 16) * Math.PI * 2;
+      const hit = this.world.raycast(o, forwardOf(yaw), 300);
+      const d = hit ? hit.distance : 300;
+      if (d > bestD + 1e-6) {
+        bestD = d;
+        best = yaw;
+      }
+    }
+    return best;
+  }
+
   respawn(car: Car) {
     // Nasce no spawn mais longe dos outros carros vivos.
     const others = this.cars.filter((c) => c !== car && c.deadFor === 0).map((c) => c.state.pos);
@@ -120,7 +140,8 @@ export class Match {
         if (!others.length) break;
       }
     }
-    car.state = createVehicle(this.ground(best, car.shape), (car.id * 2.1) % (Math.PI * 2));
+    const pos = this.ground(best, car.shape);
+    car.state = createVehicle(pos, this.openYaw(pos, car.shape));
     car.health = MATCH_RULES.maxHealth;
     car.turbo = MATCH_RULES.turboMax;
     car.deadFor = 0;

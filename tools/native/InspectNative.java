@@ -116,6 +116,11 @@ public class InspectNative extends GhidraScript {
 
     private void addFunc(Address a, String why) {
         Function f = getFunctionContaining(a);
+        if (f == null) {
+            // alcançada só por tabela de ponteiros (sem análise): cria a função em memória (projeto -readOnly)
+            disassemble(a);
+            f = createFunction(a, null);
+        }
         if (f == null) unresolved.add(why + " @" + a);
         else root(f, why);
     }

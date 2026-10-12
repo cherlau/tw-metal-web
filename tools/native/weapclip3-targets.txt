@@ -1,0 +1,6 @@
+at:148b84 weapon_clip_open_close
+at:14cfbc clip_12_play
+at:14cff4 clip_12_rev
+at:1dd450 clip_var_play
+at:1dd300 clip_d_16_reset
+at:117478 clip_rev_a

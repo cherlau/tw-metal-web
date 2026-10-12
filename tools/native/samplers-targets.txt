@@ -1,0 +1,19 @@
+# Amostradores de trilha de clipe (tabela 0x2c77e0: tipo&7 × variante (tipo>>1)&0x1c)
+at:2a62f0 k0
+at:2a63a0 k1a
+at:2a6490 k1b
+at:2a66d0 k1c
+at:2a6908 k2a
+at:2a69a0 k2b
+at:2a6a68 k2c
+at:213898 k3
+at:2a6b20 k4a
+at:2a6c20 k4b
+at:2a6e70 k4c
+at:2a70a8 k5a
+at:2a7138 k5b
+at:2a7238 k5c
+at:2a7338 k6a
+at:2a7400 k6b
+at:2a7558 k6c
+at:2124b8 blend
