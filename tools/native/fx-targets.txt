@@ -1,0 +1,3 @@
+# Sistema de efeitos (destroços/fumaça ao trocar de estado de dano): gerenciador em 0x2f4b70
+range:100c00:101c00 fxsys
+2f4b70 fxmgr

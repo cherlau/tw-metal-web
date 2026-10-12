@@ -12,6 +12,7 @@ import { v3, type V3 } from './physics/vec';
 import { buildBatched, isAdditive, solidBox } from './render';
 import { buildLevelLights, buildSky } from './levelfx';
 import { CarRig, type RigDoc } from './rig';
+import { DebrisSystem } from './debris';
 
 const params = new URLSearchParams(location.search);
 const levelName = params.get('lvl') ?? 'arena';
@@ -79,7 +80,7 @@ async function loadVehicleRules(): Promise<Record<string, { wheels: number[][] }
   return r.ok ? (await r.json()).vehicles : {};
 }
 
-type CarAsset = { template: THREE.Group; shape: VehicleShape; mounts: Record<string, number[]>; doc: ModelDoc; bin: ArrayBuffer };
+type CarAsset = { template: THREE.Group; shape: VehicleShape; doc: ModelDoc; bin: ArrayBuffer };
 const carCache = new Map<string, Promise<CarAsset>>();
 function loadCarModel(name: string, rules: Record<string, { wheels: number[][] }>) {
   let p = carCache.get(name);
@@ -125,7 +126,7 @@ function loadCarModel(name: string, rules: Record<string, { wheels: number[][] }
       // Rodas da tabela nativa (coords do PS2, frente +Y) -> espaço do carro no Three: (x, y, z) -> (-x, z, y).
       const w = rules[name]?.wheels;
       if (w?.length === 4) shape.wheels = w.map(([x, y, z]) => v3(-x, z, y));
-      return { template, shape, mounts: (doc as ModelDoc & { mounts?: Record<string, number[]> }).mounts ?? {}, doc, bin };
+      return { template, shape, doc, bin };
     })();
     carCache.set(name, p);
   }
@@ -211,46 +212,29 @@ async function loadGlobalObject(doc: ModelDoc, bin: ArrayBuffer, index: number):
   return holder;
 }
 
-/** Arma -> slot de montagem no carro (= id do pickup; registros 0x00F8 do .ngp). Remote: sem slot 11 nos
- *  carros Head-On -> 15 (traseira baixa). ⚠️ ESCOLHA DO HOST para o fallback. */
-const WEAPON_SLOT: Record<WeaponId, number[]> = {
-  machinegun: [],
-  fire: [1],
-  homing: [2],
-  swarmer: [3],
-  napalm: [4],
-  ricochet: [5],
-  power: [6],
-  remote: [11, 15],
+/** Máquina do piloto por modelo (FUN_0011e3d0: tipo 0x67/0x7a/0x73 → FUN_00125688 'a'; 0x65/0x77 → 'b'). */
+const DRIVER_VARIANT: Record<string, 'a' | 'b'> = { mrgrim: 'a', hc_axel: 'a', edatv: 'a', axel: 'b', edplayer: 'b' };
+
+/** Arma -> tipo de arma do jogo (FUN_00120ba0; índice dos marcadores 0x00F0 e dos seletores de projétil). */
+const WEAPON_TYPE: Record<WeaponId, number> = {
+  machinegun: 0, fire: 2, homing: 3, napalm: 4, power: 6, ricochet: 7, swarmer: 9, remote: 10,
 };
 const WEAPON_PICKUP: Record<WeaponId, number> = {
   machinegun: 0, fire: 1, homing: 2, swarmer: 3, napalm: 4, ricochet: 5, power: 6, remote: 11,
 };
 
 /**
- * Modelo da arma para montar no carro, em coordenadas do PS2 (o grupo de montagem aplica
- * VEHICLE_TO_THREE): centrado, eixo mais longo alinhado à frente do carro (+Y) e tamanho fixo.
- * ⚠️ ESCOLHA DO HOST: orientação e tamanho (o jogo monta pelo código).
+ * Modelo do projétil pendurado no marcador 0x00F0 do lançador (FUN_00147568), em escala nativa e no quadro do
+ * marcador (coordenadas do PS2). O jogo pega o modelo numa tabela por tipo (0x37cbf0+0xda24, preenchida em
+ * runtime); ⚠️ ESCOLHA DO HOST: o objeto do GLOBALS é o do ícone do pickup da arma (identificação visual).
  */
-async function loadMountModel(doc: ModelDoc, bin: ArrayBuffer, index: number): Promise<THREE.Group> {
+async function loadProjectileModel(doc: ModelDoc, bin: ArrayBuffer, index: number): Promise<THREE.Group> {
   const { group } = await buildBatched(doc, bin, doc.objects?.[index]?.instances ?? []);
   group.traverse((o) => {
     const mesh = o as THREE.Mesh;
     if (mesh.isMesh) (mesh.material = (mesh.material as THREE.Material).clone()).side = THREE.FrontSide;
   });
-  const box = new THREE.Box3().setFromObject(group);
-  const size = box.getSize(new THREE.Vector3());
-  const center = box.getCenter(new THREE.Vector3());
-  group.position.sub(center);
-  const holder = new THREE.Group();
-  holder.add(group);
-  // eixo longo -> +Y (frente do carro no PS2)
-  if (size.z >= size.x && size.z >= size.y) holder.rotation.x = -Math.PI / 2;
-  else if (size.x >= size.y && size.x >= size.z) holder.rotation.z = Math.PI / 2;
-  holder.scale.setScalar(2.8 / Math.max(size.x, size.y, size.z, 1e-3));
-  const out = new THREE.Group();
-  out.add(holder);
-  return out;
+  return group;
 }
 
 async function loadGlobals() {
@@ -266,12 +250,12 @@ async function loadGlobals() {
     holder.add(icon, auraSprite(aura));
     pickups.set(Number(id), holder);
   }
-  const mounts = new Map<WeaponId, THREE.Group>();
+  const projectiles = new Map<WeaponId, THREE.Group>();
   for (const [w, id] of Object.entries(WEAPON_PICKUP) as [WeaponId, number][]) {
     const obj = PICKUP_MODELS[id]?.obj;
-    if (obj !== undefined && obj !== 20) mounts.set(w, await loadMountModel(doc, bin, obj));
+    if (obj !== undefined && obj !== 20) projectiles.set(w, await loadProjectileModel(doc, bin, obj));
   }
-  return { ...out, pickups, mounts };
+  return { ...out, pickups, projectiles };
 }
 
 function spawnPoints(doc: ModelDoc, collision: LevelCollision): V3[] {
@@ -327,40 +311,61 @@ async function main() {
       const asset = i === 0 ? cars[0] : cars[i];
       const doc = asset.doc as ModelDoc & { rig?: RigDoc };
       if (!doc.rig) return null;
-      const r = await CarRig.build(doc as ModelDoc & { rig: RigDoc }, asset.bin, doc.scene);
+      // Pose base + entradas de dano dos nós 0x13 (a vida escolhe qual aparece: CarRig.setHealth) + filhos dos
+      // seletores 0x05 (o estado escolhe: turbo, lanternas, projétil no suporte…).
+      const r = await CarRig.build(doc as ModelDoc & { rig: RigDoc }, asset.bin, [...doc.scene, ...(doc.damageScene ?? []), ...(doc.selectScene ?? [])]);
       models[i].add(r.group);
       return r;
     }),
   );
   const muzzles = models.map((m) => m.getObjectByName('muzzle') ?? null);
   const wheelPhase = match.cars.map(() => 0);
+  const wasDead = match.cars.map(() => false);
   const lastYaw = match.cars.map((c) => c.state.yaw);
   // Suportes de arma (FUN_00148978): clipe que abre quando a arma é selecionada e fecha (ao contrário) quando
   // outra é escolhida; só um suporte se move por vez. Estado: 0 fechado, 1 aberto/abrindo, 2 fechando.
   const mountsOf = rigs.map((r) =>
-    (r?.clipsWithRole('weapon') ?? []).map((clip) => ({ clip, weapons: clip.weapons ?? [], state: 0, t: 0 })),
+    // Uma máquina de estado por arma (FUN_00148978 percorre as armas; as que dividem o suporte dividem o clipe).
+    (r?.clipsWithRole('weapon') ?? []).flatMap((clip) => (clip.weapons ?? []).map((w) => ({ clip, weapon: w as WeaponId, state: 0, t: 0 }))),
   );
-  // Armas montadas no carro (visíveis enquanto houver munição), nos pontos 0x00F8 do modelo.
-  const mounted = match.cars.map((c, i) => {
-    const info = i === 0 ? cars[0] : cars[i];
-    const frame = new THREE.Group();
-    frame.matrixAutoUpdate = false;
-    frame.matrix.copy(VEHICLE_TO_THREE);
-    models[i].add(frame);
-    const map = new Map<WeaponId, THREE.Object3D>();
-    for (const [w, src] of globals.mounts) {
-      const slot = WEAPON_SLOT[w].find((k) => info.mounts[String(k)]);
-      if (slot === undefined) continue;
-      if (mountsOf[i].some((m) => m.weapons.includes(w))) continue; // o suporte do próprio carro representa a arma
-      const o = src.clone();
-      const [x, y, z] = info.mounts[String(slot)];
-      o.position.set(x, y, z);
-      o.visible = false;
-      frame.add(o);
-      map.set(w, o);
-    }
-    return map;
-  });
+  // Modelo do projétil de cada carro no marcador do lançador (um clone por carro e arma).
+  const projModels = match.cars.map(() => new Map<WeaponId, THREE.Object3D>());
+  const projectileFor = (i: number, w: WeaponId) => {
+    let o = projModels[i].get(w);
+    const src = globals.projectiles.get(w);
+    if (!o && src) projModels[i].set(w, (o = src.clone()));
+    return o ?? null;
+  };
+  // Sombra (seletor de categoria 0 com malha plana; ⚠️ host: projetada no chão sob o carro).
+  const shadows = await Promise.all(
+    match.cars.map(async (c, i) => {
+      const asset = i === 0 ? cars[0] : cars[i];
+      const node = Object.entries(asset.doc.selectors ?? {}).find(([, d]) => d.role === 'shadow')?.[0];
+      if (!node) return null;
+      const list = (asset.doc.selectScene ?? []).filter((x) => x.sel?.some(([n, k]) => n === node && k === 1));
+      const { group } = await buildBatched(asset.doc, asset.bin, list);
+      group.traverse((o) => {
+        const mesh = o as THREE.Mesh;
+        if (!mesh.isMesh) return;
+        const mat = (mesh.material as THREE.Material).clone();
+        mat.depthWrite = false;
+        mat.polygonOffset = true;
+        mat.polygonOffsetFactor = -2;
+        mat.polygonOffsetUnits = -2;
+        mesh.material = mat;
+      });
+      const holder = new THREE.Group();
+      holder.matrixAutoUpdate = false;
+      group.matrixAutoUpdate = false;
+      group.matrix.copy(VEHICLE_TO_THREE);
+      holder.add(group);
+      scene.add(holder);
+      return holder;
+    }),
+  );
+  // Destroços e ações soltas pelos nós 0x13 ao piorar de estado (actionDispatch.cpp).
+  const debris = new DebrisSystem(scene, collision);
+  const carFrame = new THREE.Matrix4();
   const muzzleUntil = match.cars.map(() => 0);
   // Pickups: ícone girando por cima do ponto do PKP.
   const pickupObjs = match.pickups.map((p) => {
@@ -428,7 +433,11 @@ async function main() {
       audio.play('global', LAUNCH[e.weapon], { pos: e.pos });
     }
     else if (e.kind === 'impact') audio.play('global', e.speed > 60 ? 'V_MAJOR_COLL' : 'V_CRASH', { pos: e.pos, volume: Math.min(1, e.speed / 60) });
-    else if (e.kind === 'explosion') {
+    else if (e.kind === 'hit') {
+      // Golpe direto nas peças destrutíveis do carro (categoria ≠ 0x46; FUN_00171838). ⚠️ host: peça mais perto.
+      const r = rigs[e.car];
+      if (r) r.hitPart(r.group.worldToLocal(new THREE.Vector3(e.pos.x, e.pos.y, e.pos.z)), e.amount, performance.now() / 1000, 4);
+    } else if (e.kind === 'explosion') {
       explode(e.pos, e.weapon === 'power' || e.weapon === 'napalm' || e.weapon === 'remote');
       audio.play('global', EXPLO[e.weapon], { pos: e.pos });
     } else if (e.kind === 'pickup') {
@@ -443,6 +452,21 @@ async function main() {
       toast(k && k !== v ? `${k.name} destruiu ${v.name}` : `${v.name} foi destruído`);
     }
   };
+
+  /** Sombra sob o carro: ponto e normal do chão abaixo do centro, girada pelo yaw do carro. ⚠️ host. */
+  const shadowUp = new THREE.Vector3(0, 1, 0);
+  const shadowQ = new THREE.Quaternion();
+  const shadowYaw = new THREE.Quaternion();
+  function placeShadow(holder: THREE.Group, st: VehicleState, dead: boolean) {
+    const hit = !dead && collision.raycast(v3(st.pos.x, st.pos.y + 5, st.pos.z), v3(0, -1, 0), 60);
+    holder.visible = !!hit;
+    if (!hit) return;
+    const n = new THREE.Vector3(hit.normal?.x ?? 0, hit.normal?.y ?? 1, hit.normal?.z ?? 0);
+    if (n.y < 0) n.negate();
+    shadowQ.setFromUnitVectors(shadowUp, n.normalize()).multiply(shadowYaw.setFromAxisAngle(shadowUp, st.yaw));
+    holder.matrix.compose(new THREE.Vector3(st.pos.x, st.pos.y + 5 - hit.distance + 0.05, st.pos.z), shadowQ, new THREE.Vector3(1, 1, 1));
+    holder.matrixWorldNeedsUpdate = true;
+  }
 
   // Câmera.
   const shape = player.shape;
@@ -501,7 +525,13 @@ async function main() {
     // Carros (pose interpolada).
     match.cars.forEach((c, i) => {
       const m = models[i];
-      m.visible = c.deadFor === 0;
+      const r = rigs[i];
+      const dead = c.deadFor > 0;
+      if (wasDead[i] && !dead) r?.resetDamage(); // renasceu (FUN_0012ea48)
+      wasDead[i] = dead;
+      // Estado de dano dos nós 0x13 pela vida; morto (vida 0) = carcaça até renascer. Sem nós 0x13, some.
+      r?.setHealth(c.health / MATCH_RULES.maxHealth, now / 1000);
+      m.visible = !dead || r?.hasDamage === true;
       if (!m.visible) return;
       const prev = prevStates[i] ?? c.state;
       const pos = lerp(prev.pos, c.state.pos, alpha);
@@ -509,9 +539,23 @@ async function main() {
       basisM.makeBasis(new THREE.Vector3(b.x.x, b.x.y, b.x.z), new THREE.Vector3(b.y.x, b.y.y, b.y.z), new THREE.Vector3(b.z.x, b.z.y, b.z.z));
       m.position.set(pos.x, pos.y, pos.z);
       m.quaternion.setFromRotationMatrix(basisM);
-      for (const [w, o] of mounted[i]) o.visible = (c.ammo[w] ?? 0) > 0;
-      const r = rigs[i];
+      const shadow = shadows[i];
+      if (shadow) placeShadow(shadow, c.state, dead);
       if (r) {
+        // Ações dos nós 0x13 (destroços) soltas neste quadro, no quadro do carro (PS2 local -> mundo).
+        if (r.released.length) {
+          m.updateMatrixWorld(true);
+          carFrame.multiplyMatrices(m.matrixWorld, VEHICLE_TO_THREE);
+          for (const rel of r.released.splice(0)) {
+            const asset = i === 0 ? cars[0] : cars[i];
+            const action = asset.doc.actions?.[rel.action];
+            if (action) debris.dispatch(asset.doc, asset.bin, action, carFrame, now / 1000);
+          }
+        }
+        // Seletores (FUN_00230138): chama do turbo (0x44, FUN_001238c8) e lanternas (0x41: 2 com freio,
+        // FUN_0011f1e8; o filho 1 depende de um flag que o código nunca liga, como o brilho dos faróis 0x40).
+        r.setSelector(0x44, c.boosting ? 1 : 0);
+        r.setSelector(0x41, c.braking ? 2 : 0);
         // Rodas: giro pela distância percorrida (raio ~2 pés ⚠️), esterço pela taxa de giro, suspensão no meio.
         const spd = Math.hypot(c.state.vel.x, c.state.vel.z) * Math.sign(c.state.vel.x * Math.sin(c.state.yaw) + c.state.vel.z * Math.cos(c.state.yaw) || 1);
         wheelPhase[i] = (((wheelPhase[i] + (spd * dt) / (2 * Math.PI * 2)) % 1) + 1) % 1;
@@ -523,24 +567,44 @@ async function main() {
         for (const cl of r.clipsWithRole('steer')) r.time.set(cl.category, 0.5 + 0.5 * steer);
         for (const cl of r.clipsWithRole('susp')) r.time.set(cl.category, 0.5);
         r.setDirect(wheelPhase[i], steer);
+        // Piloto (FUN_0011e3d0): FUN_00125688 em Mr. Grimm/HC Axel/ATV, FUN_001258f0 em Axel/Cousin Eddy.
+        if (r.hasDriver)
+          r.drive({ steer01: 0.5 + 0.5 * c.steer, speed: Math.hypot(c.state.vel.x, c.state.vel.z), airFrames: c.airFrames }, dt,
+            DRIVER_VARIANT[c.model] ?? 'b');
         // Suportes de arma (FUN_0014a168 → FUN_00148978): abre o da arma selecionada (com munição) só quando
         // nenhum suporte está aberto ou fechando; fecha os demais. Clipe a mountSpeed × 60 quadros/s.
         const sel = c.selected && (c.ammo[c.selected] ?? 0) > 0 ? c.selected : null;
         const mounts = mountsOf[i];
         const busy = mounts.some((mt) => mt.state !== 0);
         const speed = (r.rig.mountSpeed ?? 1) * 60;
+        const clipT = new Map<number, number>();
         for (const mt of mounts) {
-          const mine = sel !== null && mt.weapons.includes(sel);
-          if (mine && mt.state === 0 && !busy) mt.state = 1;
-          else if (!mine && mt.state === 1) mt.state = 2;
+          const mine = sel === mt.weapon;
+          if (mine && mt.state === 0 && !busy) {
+            // Abre (FUN_00148978): seletores de projétil 0x1b1 (2→1, 3→2) e 0x1b2 (6→1, 9→2) e o modelo do
+            // projétil no marcador 0x00F0 do tipo (FUN_00147568).
+            mt.state = 1;
+            const t = WEAPON_TYPE[mt.weapon];
+            r.setSelector(0x1b1, t === 2 ? 1 : t === 3 ? 2 : 0);
+            r.setSelector(0x1b2, t === 6 ? 1 : t === 9 ? 2 : 0);
+            r.setProjectile(t, projectileFor(i, mt.weapon));
+          } else if (!mine && mt.state === 1) {
+            mt.state = 2; // fecha: seletores voltam a 0; o modelo sai quando o clipe termina (FUN_001474f0)
+            r.setSelector(0x1b1, 0);
+            r.setSelector(0x1b2, 0);
+          }
           const len = Math.max(mt.clip.duration - (mt.clip.start ?? 0), 1);
           if (mt.state === 1) mt.t = Math.min(1, mt.t + (dt * speed) / len);
           else if (mt.state === 2) {
             mt.t = Math.max(0, mt.t - (dt * speed) / len);
-            if (mt.t <= 0) mt.state = 0;
+            if (mt.t <= 0) {
+              mt.state = 0;
+              r.setProjectile(WEAPON_TYPE[mt.weapon], null);
+            }
           }
-          r.time.set(mt.clip.category, mt.t);
+          clipT.set(mt.clip.category, Math.max(clipT.get(mt.clip.category) ?? 0, mt.t));
         }
+        for (const [cat, t] of clipT) r.time.set(cat, t);
         r.update();
       }
     });
@@ -566,6 +630,7 @@ async function main() {
     tracerList.forEach((tr, i) => tracerPos.set([tr.from.x, tr.from.y, tr.from.z, tr.to.x, tr.to.y, tr.to.z], i * 6));
     tracerGeo.attributes.position.needsUpdate = true;
     tracerGeo.setDrawRange(0, tracerList.length * 2);
+    debris.update(dt, t);
     // Explosões: crescem e somem.
     for (let i = fx.length - 1; i >= 0; i--) {
       const f = fx[i];
@@ -648,7 +713,7 @@ async function main() {
 
   // Ganchos para QA (tools/web).
   (window as any).__doorsDebug = () => ({
-    mounts: mountsOf.map((ms) => ms.map((m) => ({ category: m.clip.category, weapons: m.weapons, state: m.state, t: +m.t.toFixed(2) }))),
+    mounts: mountsOf.map((ms) => ms.map((m) => ({ category: m.clip.category, weapon: m.weapon, state: m.state, t: +m.t.toFixed(2) }))),
     now: performance.now() / 1000,
     ammo: match.cars[0].ammo,
   });
@@ -658,6 +723,11 @@ async function main() {
     state: () => player.state,
     setState: (s: VehicleState) => (player.state = s),
     match,
+    damage: () => rigs.map((r) => r?.damageStates() ?? null),
+    selectors: () => rigs.map((r) => r?.selectorStates() ?? null),
+    debris: () => debris.count,
+    debrisSys: debris,
+    rigs,
     spawns,
     collision,
     THREE,

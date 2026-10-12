@@ -1,0 +1,2 @@
+# Métodos do gerenciador 0x37cbf0 (tabela de modelos de projétil em +0xda24)
+range:1fb000:1fe800 projmgr

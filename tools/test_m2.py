@@ -145,7 +145,9 @@ class RealCarTests(unittest.TestCase):
         # 0x0D sem bind (bit 6) e os seletores de pose 0x05 (byte 3 = 0x06) — rodas/braços do Mr. Grimm.
         # axel 44 -> 45 e mrgrim 33 -> 34: nós 0x1F têm nº de filhos em +0x0E (FUN_0021b3c0); a malha que segue
         # um nó 0x15 na memória não é dele (roda dianteira do Grimm vem do osso 0x38f0)
-        expected = {"axel": (45, 6, 43), "sweet": (55, 6, 31), "cop": (70, 6, 41), "mrgrim": (34, 7, 49)}
+        # axel 45 -> 50 e sweet 55 -> 56: os nós 0x18 (escala; FUN_0021b3c0) passaram a ser percorridos (anéis do
+        # especial do Axel, ocultos pela visibilidade do osso; bolha de reflexo aditiva a 0,2 dentro do carro), cop 70 -> 71, mrgrim 34 -> 50 (braços e peças da moto que sumiam)
+        expected = {"axel": (50, 6, 43), "sweet": (56, 6, 31), "cop": (71, 6, 41), "mrgrim": (50, 7, 55)}
         for car, (inst, fx, bones) in expected.items():
             b = GAME / "cars" / car / car
             d, p = b.with_suffix(".ngp").read_bytes(), b.with_suffix(".ptr").read_bytes()

@@ -221,3 +221,27 @@ Os níveis aplicavam só a translação dos `0x1F` e visitavam só o 1º filho. 
 Tentativa descartada: aplicar a transformação do `0x1F` sempre (sem a heurística "malha já no mundo"). Pôs um bloco de prédios em cima da muralha do Coliseu DM (`0x125c80`) — a heurística continua valendo (pendente em `docs/PENDENTES.md`).
 
 Resultado: 723 instâncias com rotação (Grécia 348, Arena 214, Coliseu 51, Egito 42, Paris 41, Castelo 27, Tóquio 0) e 51 peças que sumiam (Arena +40, Coliseu +11). QA antes/depois de cima (`tools/web/level-view.mjs`): Coliseu DM (blocos da cidade alinhados às ruas), Grécia DM e Arena sem peças fora do lugar. `level_survey` 7/7 jogáveis, Python 58/58 (novo `tools/test_levels_1f.py`), TS 21/21.
+
+## 2026-10-12 — Estados de dano dos carros (nós `0x13`)
+
+Pendência A "animação de dano: o runtime sempre usa o intacto". RE completa em `docs/NATIVE.md` ("Estados de dano"): o desenho escolhe a entrada pelo byte de estado do nó `0x14` pai; nos carros esse byte vem da vida (`FUN_0012e8c0`): `f = vida/vidaMáx` (0 < f < 0,01 vira 0,02), entrada = 1ª com limiar ≤ int(f·65535) (`FUN_00171560`), piora aplicada 2 tiques depois (`FUN_00172768`), melhora e renascimento na hora. Só os nós de categoria `0x46` seguem a vida (283 nos 37 carros); os demais (54, carros HC) são destrutíveis por golpe e ficam intactos (pendente).
+
+Implementado: conversor exporta as entradas ≥ 1 em `damageScene` e a regra em `damage` (só carros; `scene` continua igual — conferido nos 74 JSON); `CarRig.setHealth` escolhe a entrada e esconde/mostra os lotes marcados; com vida 0 a carcaça fica à vista até renascer (antes o carro sumia). QA `tools/web/damage-qa.mjs`: viatura com vida 100 intacta, 45 amassada, 20/0,5 sem vidros e para-choques, 0 carcaça queimada; ATV: a "falta de chassi" era a carcaça na 2ª entrada. Python 61/61 (novo `tools/test_damage.py`), TS 22/22 (novo `tests/damage.test.ts`), `cars-qa` 5/6 (dark2 já falhava antes: chefe fora do menu).
+
+## 2026-10-12 — Pendências "Carros": destroços, seletores, piloto, nós `0x18`
+
+RE em `docs/NATIVE.md` ("Ações e destroços", "Seletores dos carros", "Piloto", "Marcadores e pontos de disparo").
+
+| Pendência | Resultado |
+|---|---|
+| Destroços ao trocar de estado | `fx` = nó de ação (`actionDispatch.cpp`). Os 142 dos carros são lista → transformação → destroços (ação 3). `tools/actions.py` decodifica; `src/debris.ts` lança as peças (impulso (base+1)·1000/60, giro pelo canto da caixa, gravidade −128, vida 180 tiques, fade nos últimos 60). QA `tools/web/carfx-qa.mjs`: morte da viatura solta 6 peças que caem e somem |
+| Peças HC por golpe | `CarRig.hitPart` (regra de `FUN_00171838`); evento `hit` do `Match`. ⚠️ peça escolhida pela caixa mais próxima do ponto (o jogo usa o id da colisão) |
+| Modelos de arma montados | Os `0x00F8` são **pontos de disparo** (cat. `0x3E`), o jogo não desenha nada ali → saíram as "armas de reserva" do host. O projétil aparece no marcador `0x00F0` do lançador ao abrir o suporte (`FUN_00147568`), em escala nativa, e os seletores `0x1b1`/`0x1b2` mostram os mísseis próprios do carro (`FUN_00148978`). Suportes agora com máquina por arma (fogo↔teleguiado trocam o modelo) |
+| Sirene/luzes/faróis/turbo | Seletores `0x05` exportados com todos os filhos (`selectScene`); filho = byte `+0x08`. Turbo (`0x44`) liga com o turbo, lanternas (`0x41`) vão ao filho 2 no freio; brilho dos faróis (`0x40`) nunca liga no jogo. As lanternas acesas (filho 0) passaram a aparecer. Sprites agora desenhados nos carros (giroflex vermelho/azul) |
+| Sombra | Seletor de cat. 0 com malha plana (só nos modelos que têm a malha). ⚠️ projetada no chão pelo host |
+| Nó `0x18` | Escala + translação; filhos eram ignorados → braços e peças do Mr. Grimm voltaram (34 → 50 instâncias) |
+| Esterço do Grimm / animações do piloto / ociosa | Clipes `0x22..0x25` com a máquina de `FUN_001258f0`/`FUN_00125688`. Clipes agora lidos da tabela do objeto (1º por categoria): um clipe do 2º objeto do Grimm sobrescrevia a suspensão traseira. Clipes de piloto fora da pose de repouso (garfo deixou de ficar travado). QA `tools/web/driver-qa.mjs` |
+| hc_suv, ATV | Conferidos visualmente após os seletores: nada pendurado no hc_suv; ATV vivo com carroceria e piloto |
+| Malhas sem textura | Herdam a última textura do GS (giroflex da viatura deixou de ser branco) |
+
+Python 67/67 (novo `tools/test_actions.py`; contagens de `test_m2` atualizadas pelos `0x18`), TS 26/26 (novo `tests/debris.test.ts`), `tsc` ok.

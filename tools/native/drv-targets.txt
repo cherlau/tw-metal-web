@@ -1,0 +1,4 @@
+# Clipes de piloto (0x22..0x25, FUN_00127060): quem dá tempo ao 0x22 (carro+0x3c+0x2c8) e quem chama
+at:128460 drv22
+at:139a24 drv_b
+at:13c184 drv_c

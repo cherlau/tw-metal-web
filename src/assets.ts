@@ -46,6 +46,51 @@ export interface InstanceDef {
   offset?: [number, number, number];
   /** Transformação com rotação (nós 0x1F dos níveis): 4x4 linha-major, vetor-linha (p' = p·M). */
   matrix?: number[];
+  /** Entradas de nós 0x13 no caminho ([nó, entrada]): visível só quando cada nó está nessa entrada. */
+  dmg?: [string, number][];
+  /** Filhos de seletores 0x05 no caminho ([nó, filho]): visível só quando cada seletor está nesse filho. */
+  sel?: [string, number][];
+  /** Carros com esqueleto: índice do osso (tools/rig.py), -1 = raiz. */
+  b?: number;
+}
+
+/** Nó 0x13 (estado de dano): limiares u16 (fração da vida × 65535) por entrada — tools/ngp.py: DamageNode. */
+export interface DamageDef {
+  category: number;
+  thresholds: number[];
+  maxHp: number;
+  minDamage: number;
+  /** nó de ação solto ao entrar em cada entrada (chave em ModelDoc.actions) */
+  fx: (string | null)[];
+}
+
+/** Seletor 0x05: filho desenhado = byte +0x08 (state), trocado pelo código do jogo por categoria. */
+export interface SelectorDef {
+  category: number;
+  id: number;
+  kind: number;
+  state: number;
+  count: number;
+  /** ⚠️ host: 'shadow' = sombra (malha plana; projetada no chão pelo runtime) */
+  role?: 'shadow';
+}
+
+/** Nó de ação (actionDispatch.cpp, tools/actions.py): atraso em tiques de 1/60 s. */
+export type ActionDef =
+  | { type: 0; delay: number; items: ActionDef[] }
+  | { type: 1; delay: number; matrix: number[]; child: ActionDef | null }
+  | { type: 2; delay: number; object: number; flags: number; clip: number }
+  | { type: 3; delay: number; mass: number; mode: number; center: number[]; speed: number; pieces: { model: string; pos: number[] }[] }
+  | { type: 4; delay: number; sound: number; name?: string; near?: number; far?: number }
+  | { type: 5 | 6 | 7; delay: number };
+
+/** Peça de destroço: malhas (no espaço da peça, mais `offset`), caixa (centro + 3 semi-eixos) e raio. */
+export interface DebrisModelDef {
+  instances: InstanceDef[];
+  offset: number[];
+  center: number[];
+  axes: number[][];
+  radius: number;
 }
 
 /** Transformação de uma instância posicionada (ou null): `matrix` do PS2 ou a translação `offset`. */
@@ -70,6 +115,15 @@ export interface ModelDoc {
   counts: Record<string, number>;
   errors: string[];
   scene: InstanceDef[];
+  /** Carros: instâncias das entradas ≥ 1 dos nós 0x13 (fora da pose base) e a regra de cada nó. */
+  damageScene?: InstanceDef[];
+  damage?: Record<string, DamageDef>;
+  /** Carros: filhos de todos os seletores 0x05 (marcados em `sel`) e cada seletor. */
+  selectScene?: InstanceDef[];
+  selectors?: Record<string, SelectorDef>;
+  /** Carros: ações dos nós 0x13 e modelos das peças de destroço. */
+  actions?: Record<string, ActionDef>;
+  debris?: Record<string, DebrisModelDef>;
   bones: Record<string, BoneDef>;
   effects: Record<string, InstanceDef[]>;
   objects?: { node: string; inScene: boolean; instances: InstanceDef[] }[];

@@ -1,0 +1,2 @@
+# Quem chama FUN_0011c6e0 (renasce o carro)
+11c6e0 respawn_car

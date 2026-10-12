@@ -1,0 +1,2 @@
+# Modelos de projétil por tipo de arma: tabela 0x37cbf0 + 0xda24 + 4·tipo (FUN_001fd4c8), preenchida em runtime
+refsrange:38a600:38a660 projtab

@@ -1,0 +1,19 @@
+# Seletores 0x05 dos carros (FUN_00124288: cat 0x40..0x44 -> carro+0x62c0..0x62d4; 0x53 -> +0x6414)
+at:11bf48 sel_init
+at:1224d0 sel_62c0_a
+at:123058 sel_62c0_b
+at:123118 sel_62c0_c
+at:126c68 sel_62c0_d
+at:16a84c sel_62c0_e
+at:1208a4 sel_62c8_a
+at:1f8a20 sel_62c8_b
+at:11bb08 sel_62cc_a
+at:11f214 sel_62cc_b
+at:11f130 sel_62d0_a
+at:13a354 sel_62d0_b
+at:12244c sel_62d4_a
+at:1238f8 sel_62d4_b
+at:123b58 sel_62d4_c
+at:17b2bc sel_62d4_d
+at:1d09d8 sel_62d4_e
+at:11c1e0 sel_6414

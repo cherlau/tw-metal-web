@@ -38,6 +38,14 @@ export interface Car {
   cooldown: number;
   gunCooldown: number;
   deadFor: number; // > 0: morto há x s
+  /** Turbo ligado neste passo (controle+0x0C ≠ 0 no jogo: chama do turbo, FUN_001238c8). */
+  boosting: boolean;
+  /** Freio acionado neste passo (controle+0x10 > 0: lanternas no filho 2, FUN_0011f1e8). */
+  braking: boolean;
+  /** Esterço pedido neste passo (−1..1; o jogo guarda 0..1 com 0,5 = centro em carro+0x4a8). */
+  steer: number;
+  /** Passos seguidos sem tocar o chão (carro+0x7c8). */
+  airFrames: number;
   kills: number;
   deaths: number;
   /** Memória da IA: tempo acelerando sem andar, e tempo restante de ré para desatolar. */
@@ -57,6 +65,7 @@ export type MatchEvent =
   | { kind: 'launch'; car: number; weapon: WeaponId; pos: V3 }
   | { kind: 'impact'; a: number; b: number; pos: V3; speed: number }
   | { kind: 'explosion'; pos: V3; weapon: WeaponId }
+  | { kind: 'hit'; car: number; amount: number; pos: V3 }
   | { kind: 'pickup'; car: number; pickupId: number; name: string }
   | { kind: 'killed'; victim: number; killer: number | null; pos: V3 }
   | { kind: 'respawn'; car: number };
@@ -80,7 +89,7 @@ export class Match {
       id, name, model, bot, shape,
       state: createVehicle(v3()),
       health: MATCH_RULES.maxHealth, turbo: MATCH_RULES.turboMax,
-      ammo: {}, selected: null, cooldown: 0, gunCooldown: 0, deadFor: 0, kills: 0, deaths: 0, botStuck: 0, botReverse: 0,
+      ammo: {}, selected: null, cooldown: 0, gunCooldown: 0, deadFor: 0, kills: 0, deaths: 0, botStuck: 0, botReverse: 0, boosting: false, braking: false, steer: 0, airFrames: 0,
     };
     this.cars.push(car);
     this.respawn(car);
@@ -154,6 +163,7 @@ export class Match {
     const bodies = this.bodies();
     for (const car of this.cars) {
       if (car.deadFor > 0) {
+        car.boosting = car.braking = false;
         car.deadFor += dt;
         if (car.deadFor >= MATCH_RULES.respawnDelay) {
           this.respawn(car);
@@ -164,8 +174,12 @@ export class Match {
       const a = car.bot ? this.botActions(car, bodies, dt) : actions.get(car.id) ?? NO_ACTIONS;
       // Turbo: aceleração extra enquanto houver carga.
       const boosting = a.turbo && car.turbo > 1 && a.throttle > 0;
+      car.boosting = boosting;
+      car.braking = a.brake > 0;
+      car.steer = a.steer;
       car.turbo = Math.min(MATCH_RULES.turboMax, car.turbo + (boosting ? -MATCH_RULES.turboDrain : MATCH_RULES.turboRegen) * dt);
       stepVehicle(car.state, car.shape, { ...a, throttle: boosting ? MATCH_RULES.turboAccelMul : a.throttle }, this.world, dt);
+      car.airFrames = car.state.grounded ? 0 : car.airFrames + 1;
       this.weapons(car, a, bodies, dt);
     }
     this.collideCars();
@@ -266,6 +280,7 @@ export class Match {
   private damage(id: number, amount: number, by: number | null, at: V3) {
     const car = this.cars[id];
     if (car.deadFor > 0) return;
+    this.events.push({ kind: 'hit', car: id, amount, pos: at });
     car.health -= amount;
     if (car.health <= 0) {
       car.health = 0;

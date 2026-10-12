@@ -64,14 +64,17 @@ export async function buildBatched(
   doc: ModelDoc,
   bin: ArrayBuffer,
   instances: InstanceDef[],
-  opt: RenderOptions & { filter?: (key: string, def: MeshDef) => boolean } = {},
+  opt: RenderOptions & { filter?: (key: string, def: MeshDef) => boolean; sprites?: boolean } = {},
 ): Promise<{ group: THREE.Group; drawCalls: number; triangles: number }> {
   const buckets = new Map<string, { material: THREE.Material; geos: THREE.BufferGeometry[] }>();
+  const sprites: THREE.Sprite[] = [];
   for (const inst of instances) {
     const key = inst.mesh;
     const def = doc.meshes[key];
     const xf = instanceMatrix(inst);
     if (opt.filter && !opt.filter(key, def)) continue;
+    // Sprites (brilhos aditivos: luz de freio, turbo) — opcional; os níveis desenham os seus em levelfx.
+    if (opt.sprites) for (const s of def.sprites ?? []) sprites.push(await spriteFor(doc, def, s, xf));
     for (const part of def.parts ?? []) {
       const { key: mk, material } = await materialFor(doc, def, part.texture, opt);
       if (!buckets.has(mk)) buckets.set(mk, { material, geos: [] });
@@ -88,7 +91,42 @@ export async function buildBatched(
     triangles += merged.index!.count / 3;
     group.add(new THREE.Mesh(merged, material));
   }
-  return { group, drawCalls: buckets.size, triangles };
+  for (const sp of sprites) group.add(sp);
+  return { group, drawCalls: buckets.size + sprites.length, triangles };
+}
+
+const spriteMaterials = new Map<string, THREE.SpriteMaterial>();
+
+/** Sprite aditivo de uma malha (lote de sprite da VU1: centro, tamanho, cor, retângulo de UV), como levelfx. */
+async function spriteFor(doc: ModelDoc, def: MeshDef, s: NonNullable<MeshDef['sprites']>[number], xf: THREE.Matrix4 | null) {
+  const texDef = def.texture ? doc.textures[def.texture] : undefined;
+  const key = `${doc.source}|${def.texture}|${s.color.join(',')}|${s.uv.join(',')}`;
+  let mat = spriteMaterials.get(key);
+  if (!mat) {
+    let map: THREE.Texture | null = null;
+    if (texDef) {
+      map = (await loadTexture(texDef)).clone();
+      const [u0, v0, u1, v1] = s.uv;
+      map.offset.set(Math.min(u0, u1), Math.min(v0, v1));
+      map.repeat.set(Math.abs(u1 - u0) || 1, Math.abs(v1 - v0) || 1);
+      map.needsUpdate = true;
+    }
+    mat = new THREE.SpriteMaterial({
+      map,
+      color: new THREE.Color(s.color[0], s.color[1], s.color[2]),
+      opacity: Math.min(1, s.color[3] * 2), // alfa do PS2: 0x80 = 1,0
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      transparent: true,
+    });
+    spriteMaterials.set(key, mat);
+  }
+  const sp = new THREE.Sprite(mat);
+  sp.position.set(...s.center);
+  if (xf) sp.position.applyMatrix4(xf);
+  sp.scale.setScalar(s.size);
+  sp.renderOrder = 2;
+  return sp;
 }
 
 /** Uma malha (todas as partes + sprites) como Group nomeado (para listas e destaque). */

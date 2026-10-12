@@ -1,0 +1,3 @@
+# Destroços (ação tipo 3 do actionDispatch): FUN_001729e0 -> FUN_0016e678
+at:16e678 debris
+at:2a0648 fx_timer_cb

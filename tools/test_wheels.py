@@ -136,7 +136,9 @@ class RenderStateTests(unittest.TestCase):
     def test_reflection_layer_state(self):
         """Camada de reflexo: grupo com pacote GS (ALPHA (Cs-Cd)*As+Cd, ZMSK) e alfa de vértice ~0,3."""
         d, meshes, rep = load("sweet")
-        refl = [i for i in rep.instances if meshes[i.mesh].flags & 2 and meshes[i.mesh].strips]
+        # (sem as aditivas, bit 15: a bolha de reflexo 0x8312 sob o nó 0x18 é outra coisa)
+        refl = [i for i in rep.instances if meshes[i.mesh].flags & 2 and not meshes[i.mesh].flags & 0x8000
+                and meshes[i.mesh].strips]
         self.assertTrue(refl)
         for inst in refl:
             regs = ngp.gs_state(d, inst.state)

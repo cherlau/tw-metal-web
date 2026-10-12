@@ -1,0 +1,5 @@
+# Flag carro+0x62e0 bit 32 (faróis/lanternas, FUN_0011f110/FUN_0011f1e8)
+at:11ba44 flag_a
+at:11c87c flag_b
+at:11c300 flag_c
+at:11b9c4 flag_d

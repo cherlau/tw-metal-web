@@ -25,6 +25,7 @@ Clipe (nó tipo 0x0B com categoria = word >> 18; FUN_00212290): f32 início em +
 
 from __future__ import annotations
 
+import bisect
 import struct
 from dataclasses import dataclass, field
 
@@ -74,6 +75,8 @@ class Clip:
     duration: float  # fim (+0x08), em quadros
     start: float = 0.0  # início (+0x04)
     tracks: list[Track] = field(default_factory=list)
+    # bit 1 do u16 em +0x0E: a instância toca em laço (FUN_00211348 copia para o bit 0x10000 da instância)
+    loop: bool = False
 
 
 def bone_of(data: bytes, node: int, parent: int) -> Bone:
@@ -106,11 +109,12 @@ def build(data: bytes, instances: list[ngp.Instance]) -> tuple[list[Bone], dict[
         parent = -1
         for n in inst.path[:-1]:
             kind = _u32(data, n) & 0x3F
-            if kind not in (0x0D, 0x1F, 0x03):
+            if kind not in (0x0D, 0x1F, 0x03, 0x18):
                 continue
             if n not in index:
                 index[n] = len(bones)
-                bones.append(bone_of(data, n, parent) if kind == 0x0D else fixed_of(data, n, parent, kind))
+                bones.append(bone_of(data, n, parent) if kind == 0x0D else
+                             scale_of(data, n, parent) if kind == 0x18 else fixed_of(data, n, parent, kind))
             parent = index[n]
     return bones, index
 
@@ -125,6 +129,15 @@ def fixed_of(data: bytes, node: int, parent: int, kind: int = 0x1F) -> Bone:
     ang = [v * np.pi / 32768 for v in struct.unpack_from("<3h", data, node + 8)] if kind == 0x1F else [0.0] * 3
     t = list(struct.unpack_from("<3f", data, node + 0x10))
     return Bone(node, parent, [round(float(c), 6) for c in ang + t], [-1] * 6, -1, None, None)
+
+
+def scale_of(data: bytes, node: int, parent: int) -> Bone:
+    """Nó 0x18 (FUN_0021b3c0): escala em +0x20..+0x28 como matriz `pre`, translação +0x30..+0x38."""
+    sx, sy, sz = struct.unpack_from("<3f", data, node + 0x20)
+    t = list(struct.unpack_from("<3f", data, node + 0x30))
+    pre = [sx, 0, 0, 0, 0, sy, 0, 0, 0, 0, sz, 0, 0, 0, 0, 1]
+    return Bone(node, parent, [0.0, 0.0, 0.0] + [round(float(c), 6) for c in t], [-1] * 6, -1,
+                [round(float(v), 6) for v in pre], None)
 
 
 def leaf_bone(data: bytes, inst: ngp.Instance, index: dict[int, int]) -> int:
@@ -175,21 +188,49 @@ def _track(data: bytes, p: int) -> Track:
     return Track(channel, kind, round(step, 7), round(base, 7), round(scale, 8), keys, round(t0, 6))
 
 
+def _clip(data: bytes, n: int) -> Clip:
+    clip = Clip(_u32(data, n) >> 18, round(_f32(data, n + 8), 4), round(_f32(data, n + 4), 4),
+                loop=bool((_u32(data, n + 0x0C) >> 17) & 1))
+    p = n
+    for i in range(struct.unpack_from("<H", data, n + 0x0C)[0]):
+        p -= 4 * struct.unpack_from("<H", data, n + 0x12 + 2 * i)[0]
+        clip.tracks.append(_track(data, p))
+    return clip
+
+
+def clip_table(data: bytes) -> list[int] | None:
+    """Tabela de clipes do objeto do carro (1º objeto da lista 0x06): objeto+0x20 → u16 n, n ponteiros em +0x10.
+    É a lista que FUN_002110d8 percorre (o 1º clipe de cada categoria vence)."""
+    for r in ngp.roots(data):
+        if _u32(data, r) & 0xFF != 0x06 or not _u32(data, r + 4):
+            continue
+        obj = _u32(data, r + 8)
+        t = _u32(data, obj + 0x20) if obj + 0x24 <= len(data) else 0
+        if not t or t + 0x10 > len(data):
+            return None
+        n = struct.unpack_from("<H", data, t)[0]
+        return [_u32(data, t + 0x10 + 4 * i) for i in range(n)]
+    return None
+
+
 def clips(data: bytes, ptr: bytes) -> list[Clip]:
-    """Clipes dos nós 0x0B alcançados por ponteiro, com as trilhas lidas como FUN_00212290 (ver topo).
-    A categoria 0x63 (120 quadros, fora da tabela de instâncias do carro, FUN_00127060) fica de fora."""
-    relocs = ngp.relocations(data, ptr)
-    starts = sorted({_u32(data, q) for q in relocs
-                     if _u32(data, q) + 0x14 <= len(data) and _u32(data, _u32(data, q)) & 0x3F == 0x0B
-                     and _u32(data, _u32(data, q)) >> 18 != 0x63})
-    out = []
-    for n in starts:
-        clip = Clip(_u32(data, n) >> 18, round(_f32(data, n + 8), 4), round(_f32(data, n + 4), 4))
-        p = n
-        for i in range(struct.unpack_from("<H", data, n + 0x0C)[0]):
-            p -= 4 * struct.unpack_from("<H", data, n + 0x12 + 2 * i)[0]
-            clip.tracks.append(_track(data, p))
-        out.append(clip)
+    """Clipes do carro na ordem da tabela do objeto (clip_table), só o 1º de cada categoria (FUN_002110d8), com as
+    trilhas lidas como FUN_00212290 (ver topo). Sem tabela: os nós 0x0B alcançados por ponteiro. A categoria 0x63
+    (120 quadros, fora da tabela de instâncias do carro, FUN_00127060) fica de fora."""
+    table = clip_table(data)
+    if table is None:
+        relocs = ngp.relocations(data, ptr)
+        table = sorted({_u32(data, q) for q in relocs
+                        if _u32(data, q) + 0x14 <= len(data) and _u32(data, _u32(data, q)) & 0x3F == 0x0B})
+    out, seen = [], set()
+    for n in table:
+        if not n or _u32(data, n) & 0x3F != 0x0B:
+            continue
+        cat = _u32(data, n) >> 18
+        if cat == 0x63 or cat in seen:
+            continue
+        seen.add(cat)
+        out.append(_clip(data, n))
     return out
 
 
@@ -308,6 +349,39 @@ def launcher_slots(data: bytes, ptr: bytes) -> dict[int, list[int]]:
     return out
 
 
+def launch_marks(data: bytes, ptr: bytes, index: dict[int, int]) -> list[dict]:
+    """Marcadores de projétil (registros 0x00F0xxxx = categoria 0x3C, id = tipo de arma): FUN_00124288 os guarda em
+    carro+0x61d8 + 4·tipo e FUN_00147568 pendura neles o modelo do projétil ao abrir o suporte (tipo 3/0x1F: filho em
+    +0x1C, na translação +0x10; tipo 1: filho em +0x20, na origem do quadro). Devolve [{type, bone, pos}] com o osso
+    do esqueleto mais próximo acima do marcador (ou -1)."""
+    relocs = ngp.relocations(data, ptr)
+    parent: dict[int, int] = {}
+    starts = sorted({_u32(data, q) for q in relocs if _u32(data, q) + 4 <= len(data)})
+    owners = starts
+    for q in relocs:
+        c = _u32(data, q)
+        k = bisect.bisect_right(owners, q) - 1
+        if k >= 0 and q - owners[k] < 0x200 and c != owners[k]:
+            parent.setdefault(c, owners[k])
+    out = []
+    for rec in starts:
+        w = _u32(data, rec)
+        if w >> 16 != 0x00F0 or rec + 0x20 > len(data):
+            continue
+        kind = w & 0x1F
+        pos = list(struct.unpack_from("<3f", data, rec + 0x10)) if kind in (3, 0x1F) else [0.0, 0.0, 0.0]
+        bone, cur = -1, rec
+        for _ in range(8):
+            cur = parent.get(cur, -1)
+            if cur < 0:
+                break
+            if cur in index:
+                bone = index[cur]
+                break
+        out.append({"type": (w & 0xFFFF) >> 6, "bone": bone, "pos": [round(float(v), 4) for v in pos]})
+    return out
+
+
 # Tipo de arma do jogo (FUN_00120ba0: pickup -> tipo; o mesmo índice dos marcadores 0x00F0/0x00F8 do .ngp).
 # 0 = metralhadora (inventário à parte), 1 = especial, 5 = só nos HC (🟡 desconhecida), 8 = ataque de ambiente.
 WEAPON_TYPES = {2: "fire", 3: "homing", 4: "napalm", 6: "power", 7: "ricochet", 9: "swarmer", 10: "remote"}
@@ -322,6 +396,12 @@ MOUNT_CLIPS: dict[int, dict[int, int]] = {
     **{v: {**_HC, 5: 0x15} for v in (0x7A, 0x7B, 0x81)},
     0x84: {**_HC, 6: 0x17},
 }  # 0x76 (Dark2), 0x87 (StockCar), 0x88 (Tank Car) e desconhecidos: nenhum suporte
+
+
+# Veículos com piloto animado (FUN_00127060 cria as instâncias 0x22..0x25; FUN_0011e3d0 roda a máquina do piloto:
+# FUN_00125688 em 0x67/0x7a/0x73, FUN_001258f0 em 0x65/0x77).
+DRIVER_VEHICLES = {0x65: "b", 0x77: "b", 0x67: "a", 0x7A: "a", 0x73: "a"}
+DRIVER_CLIPS = {0x22: "steer", 0x23: "air", 0x24: "land", 0x25: "ride"}
 
 
 def clip_speed(vehicle: int | None) -> float:
@@ -350,13 +430,17 @@ def classify(bones: list[Bone], clip_list: list[Clip], vehicle: int | None) -> l
             role, wheel = "steer", cat - 8
         elif cat in mounts:
             role = "weapon"
-        entry = {"category": cat, "start": c.start, "duration": c.duration, "role": role,
+        elif cat in DRIVER_CLIPS and vehicle in DRIVER_VEHICLES:
+            role = "driver"
+        entry = {"category": cat, "start": c.start, "duration": c.duration, "role": role, "loop": c.loop,
                  "tracks": [{"ch": t.channel, "kind": t.kind, "step": t.step, "base": t.base,
                              "scale": t.scale, "t0": t.t0, "keys": t.keys} for t in c.tracks]}
         if wheel is not None:
             entry["wheel"] = wheel
         if role == "weapon":
             entry["weapons"] = sorted(mounts[cat])
+        if role == "driver":
+            entry["driver"] = DRIVER_CLIPS[cat]
         out.append(entry)
     return out
 

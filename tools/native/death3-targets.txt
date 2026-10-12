@@ -1,0 +1,2 @@
+# Modo de jogo: estado por jogador em +0x244 (2 = renascer, FUN_001b5478)
+range:1b4000:1b6400 mode

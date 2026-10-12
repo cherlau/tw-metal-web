@@ -24,6 +24,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import ngp  # noqa: E402
 import tex  # noqa: E402
+import actions  # noqa: E402
 import launchers  # noqa: E402
 import rig  # noqa: E402
 import wheels  # noqa: E402
@@ -130,17 +131,20 @@ def convert(name: str, folder: str) -> dict:
     textures = {f"{t.id:x}": save_texture(t) for t in tex.decode(tex_bytes)}
     meshes = ngp.find_meshes(ngp_bytes, ptr_bytes)
     errors: list[str] = []
-    scene_rep = ngp.scene(ngp_bytes, ptr_bytes, meshes, place_objects=folder == "lvl")
+    # Carros: todas as entradas dos nós 0x13 (estado de dano escolhido pela vida no runtime, FUN_0012e8c0).
+    # Carros: seletores 0x05 com todos os filhos (o runtime mostra o do estado; FUN_0022cd58 / FUN_00230138).
+    scene_rep = ngp.scene(ngp_bytes, ptr_bytes, meshes, place_objects=folder == "lvl",
+                          damage_states=folder in ("cars", "aicars"), selectors=folder in ("cars", "aicars"))
     # Estado do GS herdado do grupo (camada de reflexo: mistura pelo alfa de vértice, sem gravar z).
     mesh_state: dict[int, dict] = {}
-    for inst in scene_rep.instances + [i for v in scene_rep.effects.values() for i in v]:
+    for inst in scene_rep.instances + scene_rep.damaged + scene_rep.selected + [i for v in scene_rep.effects.values() for i in v]:
         if inst.state >= 0 and inst.mesh not in mesh_state:
             regs = ngp.gs_state(ngp_bytes, inst.state)
             if regs:
                 mesh_state[inst.mesh] = gs_blend(regs)
     # Camada de reflexo (flag de malha bit 1) sem grupo de estado, mas com alfa de vértice < 0,9 (Twister:
     # 0,297 como nos demais): recebe o mesmo estado dos outros carros (ALPHA_1=0x44, ZMSK). ⚠️ host.
-    for inst in scene_rep.instances:
+    for inst in scene_rep.instances + scene_rep.damaged + scene_rep.selected:
         m = next((x for x in meshes if x.offset == inst.mesh), None)
         if m is None or inst.mesh in mesh_state or not m.flags & 2 or not m.strips:
             continue
@@ -156,6 +160,20 @@ def convert(name: str, folder: str) -> dict:
         native = json.loads(rules_path.read_text("utf-8"))["vehicles"].get(name) if rules_path.exists() else None
         wheel_fixes = {f.mesh: f for f in wheels.plan(ngp_bytes, scene_rep, {m.offset: m for m in meshes}, native)
                        if not use_rig}  # com esqueleto as rodas vêm dos ossos (o ATV também, com os nós 0x03)
+    # Malha sem textura no cabeçalho (nenhum TEX0 no pacote): o GS continua com a última textura ligada. Nos
+    # carros, a ordem do percurso dá a anterior (giroflex da viatura: atlas da carroceria). Evidência: malhas
+    # 0x800310 sem id de textura, com UV dentro do atlas.
+    inherited: dict[int, int] = {}
+    if folder in ("cars", "aicars"):
+        last = 0
+        for inst in scene_rep.instances + scene_rep.damaged + scene_rep.selected:
+            m = next((x for x in meshes if x.offset == inst.mesh), None)
+            if m is None or not m.strips:
+                continue
+            if m.textures:  # textura do último strip desenhado
+                last = m.textures[min(m.strips[-1].texture, len(m.textures) - 1)]
+            elif last and inst.mesh not in inherited:
+                inherited[inst.mesh] = last
     out = BinWriter()
     mesh_json = {}
     for m in meshes:
@@ -190,7 +208,8 @@ def convert(name: str, folder: str) -> dict:
                 if m.offset in wheel_fixes:
                     attrs["position"] = (attrs["position"] + wheel_fixes[m.offset].offset).astype(np.float32)
                 entry["parts"].append({
-                    "texture": f"{m.textures[slot]:x}" if m.textures else None,
+                    "texture": f"{m.textures[slot]:x}" if m.textures else
+                    (f"{inherited[m.offset]:x}" if m.offset in inherited else None),
                     "attributes": {
                         "position": out.add(attrs["position"]),
                         "normal": out.add(attrs["normal"]),
@@ -251,6 +270,16 @@ def convert(name: str, folder: str) -> dict:
         if kind:
             scene_rep.instances.remove(inst)
             scene_rep.code_effects.setdefault(kind, []).append(inst)
+    # Estados de dano: as mesmas peças ligadas pelo código (fachos, armas, clarão) ficam fora.
+    scene_rep.damaged = [i for i in scene_rep.damaged if not code_fx(i)
+                         and by_offset[i.mesh].flags & 0xFFFF != 0x8A00
+                         and not any(struct.unpack_from("<I", ngp_bytes, n)[0] & 0x3F == 0x12 for n in i.path[:-1])]
+    # Seletores: o clarão do tiro (texturas de código) continua ligado pelo runtime, fora do seletor.
+    for inst in list(scene_rep.selected):
+        kind = code_fx(inst)
+        if kind:
+            scene_rep.selected.remove(inst)
+            scene_rep.code_effects.setdefault(kind, []).append(inst)
 
     def level_objects_json() -> list[dict]:
         base = {i.mesh for i in scene_rep.instances}
@@ -291,7 +320,7 @@ def convert(name: str, folder: str) -> dict:
     rig_index: dict[int, int] = {}
     rig_json = None
     if use_rig:
-        all_insts = scene_rep.instances + [i for v in scene_rep.effects.values() for i in v] +             [i for v in scene_rep.code_effects.values() for i in v]
+        all_insts = scene_rep.instances + scene_rep.damaged + scene_rep.selected +             [i for v in scene_rep.effects.values() for i in v] + [i for v in scene_rep.code_effects.values() for i in v]
         rig_bones, rig_index = rig.build(ngp_bytes, all_insts)
         clip_list = rig.clips(ngp_bytes, ptr_bytes)
         wheel_like = set()
@@ -308,7 +337,10 @@ def convert(name: str, folder: str) -> dict:
         vehicle = 0x65 + native["id"] if native else None  # tipo do veículo no jogo (tabela 0x2ba990)
         clip_json = rig.classify(rig_bones, clip_list, vehicle)
         driven = {t["ch"] for c in clip_json if c["role"] != "other" for t in c["tracks"]}
-        rest = rig.rest_channels(ngp_bytes, rig_bones, clip_list, driven)
+        # Clipes do piloto ficam fora do repouso: a máquina do piloto os toca (o t=0 do 0x22 é esterço todo para um
+        # lado; FUN_001fa2f8 só amostra 0..11, 0x18, 0x19 e 0x0C).
+        drv_cats = {c["category"] for c in clip_json if c["role"] == "driver"}
+        rest = rig.rest_channels(ngp_bytes, rig_bones, [c for c in clip_list if c.category not in drv_cats], driven)
         rig_json = {
             "bones": [{"parent": b.parent, "const": b.const, "chan": b.chan, "vis": b.vis,
                        "pre": b.pre, "post": b.post} for b in rig_bones],
@@ -318,6 +350,8 @@ def convert(name: str, folder: str) -> dict:
             # valor de repouso por canal (clipes em t=0; pose de bind nos ossos com nó 0x15)
             "rest": {str(k): round(float(v), 6) for k, v in sorted(rest.items())},
             "direct": rig.direct_channels(rig_bones, clip_list, wheel_like),
+            # Marcadores 0x00F0 (cat. 0x3C): o modelo do projétil aparece ali com o suporte aberto (FUN_00147568).
+            "launchMarks": rig.launch_marks(ngp_bytes, ptr_bytes, rig_index),
         }
 
     def inst_json(i: ngp.Instance) -> dict:
@@ -328,7 +362,29 @@ def convert(name: str, folder: str) -> dict:
             out["matrix"] = [round(float(v), 6) for v in i.matrix.reshape(-1)]
         elif any(abs(v) > 1e-6 for v in i.offset):
             out["offset"] = [round(float(v), 4) for v in i.offset]  # objeto posicionado (nó 0x03/0x1F)
+        if i.damage:  # entradas de nós 0x13 no caminho: visível só quando todas estão no estado atual
+            out["dmg"] = [[f"n{n:06x}", e] for n, e in i.damage]
+        if i.select:  # filhos de seletores 0x05 no caminho: visível só quando todos estão no filho atual
+            out["sel"] = [[f"n{n:06x}", c] for n, c in i.select]
         return out
+
+    # Ações soltas pelos nós 0x13 (actionDispatch.cpp) e os modelos das peças de destroço (tools/actions.py).
+    piece_info: dict[int, dict] = {}
+    action_json = {f"n{x:06x}": actions.decode(ngp_bytes, x, piece_info)
+                   for d in scene_rep.damage.values() for x in d.fx if x}
+    pieces = actions.piece_models(ngp_bytes, ptr_bytes, meshes, piece_info)
+
+    def selector_role(node: int) -> str | None:
+        """Sombra: seletor de categoria 0 com 2 filhos, o 1º vazio e o 2º uma malha plana (z constante) — o jogo
+        não o registra por categoria (FUN_00124288); ⚠️ host: o runtime a projeta no chão."""
+        sl = scene_rep.selectors[node]
+        if sl.category or sl.count != 2:
+            return None
+        kids = [[i for i in scene_rep.selected if (node, c) in i.select] for c in range(2)]
+        if kids[0] or not kids[1]:
+            return None
+        zs = [np.asarray(st.pos)[:, 2] for i in kids[1] for st in by_offset[i.mesh].strips]
+        return "shadow" if zs and all(float(z.max() - z.min()) < 0.01 for z in zs) else None
 
     def mat(m) -> list[float] | None:
         return None if m is None else [round(float(v), 6) for v in m.reshape(-1)]
@@ -357,7 +413,24 @@ def convert(name: str, folder: str) -> dict:
                        for f in wheel_fixes.values()},
         # Pose base (LOD mais detalhado, estado intacto): malhas já no espaço do modelo.
         "scene": [inst_json(i) for i in scene_rep.instances],
-        # Pontos de montagem das armas por slot (= id do pickup), coordenadas do PS2.
+        # Estados de dano (nós 0x13): instâncias das entradas ≥ 1 e a regra de cada nó. Carro: estado = 1ª
+        # entrada com limiar ≤ int(vida/vidaMáx · 65535) nos nós de categoria 0x46 (FUN_0012e8c0/FUN_00171560).
+        **({"damageScene": [inst_json(i) for i in scene_rep.damaged],
+            "damage": {f"n{d.node:06x}": {"category": d.category, "thresholds": d.thresholds, "maxHp": d.max_hp,
+                                          "minDamage": d.min_damage,
+                                          "fx": [f"n{x:06x}" if x else None for x in d.fx]}
+                       for d in scene_rep.damage.values()}} if scene_rep.damage else {}),
+        # Seletores 0x05 (carros): filho desenhado = byte +0x08 (state); o runtime troca pelos categorias conhecidas.
+        **({"selectScene": [inst_json(i) for i in scene_rep.selected],
+            "selectors": {f"n{n:06x}": {"category": sl.category, "id": sl.id, "kind": sl.kind, "state": sl.state,
+                                        "count": sl.count, **({"role": r} if (r := selector_role(n)) else {})}
+                          for n, sl in scene_rep.selectors.items()}} if scene_rep.selectors else {}),
+        **({"actions": action_json,
+            "debris": {f"n{m:06x}": {"instances": [{**inst_json(i), "b": -1} for i in pc["instances"]],
+                                     "offset": pc["offset"], "center": pc["center"], "axes": pc["axes"],
+                                     "radius": pc["radius"]}
+                       for m, pc in pieces.items()}} if action_json else {}),
+        # Pontos de disparo por tipo de arma (registros 0x00F8 = categoria 0x3E; FUN_00124288), coordenadas do PS2.
         **({"mounts": weapon_mounts()} if folder in ("cars", "aicars") else {}),
         # Esqueleto (ossos 0x0D como FUN_0022c678) e clipes de animação (nós 0x0B com categoria).
         **({"rig": rig_json} if rig_json else {}),

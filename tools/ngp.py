@@ -353,6 +353,53 @@ class Instance:
     offset: tuple[float, float, float] = (0.0, 0.0, 0.0)  # translação acumulada dos nós 0x03/0x1F (níveis)
     # transformação acumulada (4x4, vetor-linha p' = p·M) quando há rotação (nós 0x1F dos níveis); None = só offset
     matrix: np.ndarray | None = None
+    # entradas de estado de dano no caminho: ((nó 0x13, índice da entrada), …); () = fora de nó 0x13
+    damage: tuple[tuple[int, int], ...] = ()
+    # filhos de seletores 0x05 no caminho: ((nó 0x05, índice do filho), …); () = fora de seletor
+    select: tuple[tuple[int, int], ...] = ()
+
+
+# Vida máxima por classe (byte +0x09 do nó 0x13 = 1..5; tabela 0x2e0ff8, FUN_00171650).
+DAMAGE_HP = (1, 20, 60, 100, 300)
+
+
+@dataclass
+class DamageNode:
+    """Nó 0x13 (estado de dano). Layout: categoria = word >> 18; +0x04 u16 vida máxima (quando a classe é 0);
+    +0x06 u16 dano mínimo de um golpe; +0x08 n; +0x09 classe de vida; +0x0C deslocamento do byte de estado no
+    nó 0x14 pai (o u16 seguinte recebe o id do objeto); entradas de 12 bytes em +0x10: (*filho, *efeito, limiar)."""
+    node: int
+    category: int
+    thresholds: list[int]  # u16 por entrada, fração da vida × 65535 (0x7FFF = 50%)
+    max_hp: int
+    min_damage: int
+    fx: list[int]  # nó de efeito/destroços solto ao entrar no estado (0 = nenhum)
+
+    @staticmethod
+    def read(data: bytes, p: int) -> DamageNode:
+        n, cls = data[p + 8], data[p + 9]
+        hp = struct.unpack_from("<H", data, p + 4)[0] if cls == 0 else DAMAGE_HP[cls - 1] if cls <= 5 else 1
+        return DamageNode(p, _u32(data, p) >> 18,
+                          [struct.unpack_from("<H", data, p + 0x18 + 12 * i)[0] for i in range(n)], hp,
+                          struct.unpack_from("<H", data, p + 6)[0],
+                          [_u32(data, p + 0x14 + 12 * i) for i in range(n)])
+
+
+@dataclass
+class Selector:
+    """Nó 0x05: o filho desenhado é o byte +0x08 (FUN_0022cd58: filho em +0x0C + 4·byte), gravado pelo código do
+    jogo por categoria (FUN_00230138, só se < n); n no byte +0x0B; byte 3 do word = tipo."""
+    node: int
+    category: int  # word >> 18 (FUN_00124288 guarda o nó no carro por categoria)
+    id: int  # (word >> 6) & 0xFFF
+    kind: int  # byte 3 do word
+    state: int  # byte +0x08 no arquivo (filho inicial)
+    count: int
+
+    @staticmethod
+    def read(data: bytes, p: int) -> Selector:
+        w = _u32(data, p)
+        return Selector(p, w >> 18, (w >> 6) & 0xFFF, w >> 24, data[p + 8], data[p + 0x0B])
 
 
 @dataclass
@@ -370,6 +417,12 @@ class SceneReport:
     # Slots de efeito (nós 0x05): escudo, gelo, fogo, turbo, faróis, sombra… ligados pelo código do jogo.
     effects: dict[int, list[Instance]] = field(default_factory=dict)
     code_effects: dict[str, list[Instance]] = field(default_factory=dict)  # preenchido pelo conversor
+    # Com damage_states: nós 0x13 alcançados e as instâncias das entradas ≥ 1 (fora da pose base)
+    damage: dict[int, DamageNode] = field(default_factory=dict)
+    damaged: list[Instance] = field(default_factory=list)
+    # Com selectors: seletores 0x05 genéricos e as instâncias de TODOS os filhos (marcadas em Instance.select)
+    selectors: dict[int, Selector] = field(default_factory=dict)
+    selected: list[Instance] = field(default_factory=list)
     unknown: dict[int, list[int]] = field(default_factory=dict)  # word de tipo -> nós não interpretados
 
 
@@ -399,13 +452,25 @@ def fixed_matrix(data: bytes, p: int, kind: int) -> np.ndarray:
     return m
 
 
+def scale_matrix(data: bytes, p: int) -> np.ndarray:
+    """Matriz local de um nó 0x18: escala (+0x20..+0x28) e translação (+0x30..+0x38), vetor-linha p' = p·S + t."""
+    m = np.diag([*struct.unpack_from("<3f", data, p + 0x20), 1.0])
+    m[3, :3] = struct.unpack_from("<3f", data, p + 0x30)
+    return m
+
+
 def _mat(b: bytes, p: int) -> np.ndarray:
     return np.array(struct.unpack_from("<16f", b, p), dtype=np.float64).reshape(4, 4)
 
 
 def scene(data: bytes, ptr: bytes, meshes: list[Mesh], root: int | None = None, lenient: bool = False,
-          _lod_cache: dict[int, int] | None = None, place_objects: bool = False) -> SceneReport:
-    """Percorre o grafo a partir da raiz (.ngp+0x08): LOD mais detalhado, estado intacto."""
+          _lod_cache: dict[int, int] | None = None, place_objects: bool = False,
+          damage_states: bool = False, selectors: bool = False) -> SceneReport:
+    """Percorre o grafo a partir da raiz (.ngp+0x08): LOD mais detalhado, estado intacto.
+
+    damage_states: visita também as entradas ≥ 1 dos nós 0x13 (em rep.damaged, marcadas em Instance.damage).
+    selectors: os seletores 0x05 genéricos (slots de efeito) entram com todos os filhos em rep.selected,
+    marcados em Instance.select; rep.effects continua com a lista achatada de cada um."""
     relocs = relocations(data, ptr)
     mesh_at = {m.offset for m in meshes}
     rep = SceneReport()
@@ -436,6 +501,8 @@ def scene(data: bytes, ptr: bytes, meshes: list[Mesh], root: int | None = None, 
         return lod_cache[c]
 
     sink: list[list[Instance]] = [rep.instances]  # destino atual (pose base ou um slot de efeito)
+    dmg: list[tuple[int, int]] = []  # entradas de nós 0x13 no caminho atual
+    sel: list[tuple[int, int]] = []  # filhos de seletores 0x05 no caminho atual
     states: list[int] = [-1]  # estado do GS em vigor (grupos 0x01 com +0x04 -> pacote VIF/GIF)
     xforms: list[np.ndarray] = [np.eye(4)]  # transformação acumulada dos objetos posicionados (nós 0x03/0x1F)
     mesh_by_off = {m.offset: m for m in meshes}
@@ -477,7 +544,8 @@ def scene(data: bytes, ptr: bytes, meshes: list[Mesh], root: int | None = None, 
                     c = (allp.min(0) + allp.max(0)) / 2
                     if any(off) and np.hypot(c[0], c[1]) >= 0.5 * np.hypot(c[0] - off[0], c[1] - off[1]):
                         off, rotated = (0.0, 0.0, 0.0), False
-            sink[-1].append(Instance(p, bone, path, states[-1], off, xf.copy() if rotated else None))
+            sink[-1].append(Instance(p, bone, path, states[-1], off, xf.copy() if rotated else None, tuple(dmg),
+                                     tuple(sel)))
             return
         word = _u32(data, p)
         if word >> 24 == 0 and (word >> 16) & 0xFF in (0xF0, 0xF8):
@@ -527,7 +595,18 @@ def scene(data: bytes, ptr: bytes, meshes: list[Mesh], root: int | None = None, 
             c = ptr_at(p + 8)
             if c is not None:
                 visit(c, bone, path, depth + 1)
-        elif t == 0x05 and (word >> 24) == 0x06:
+        elif t == 0x05 and selectors and any(sink[-1] is x for x in (rep.instances, rep.damaged, rep.selected)):
+            # Seletor (FUN_0022cd58): desenha o filho do byte +0x08. Todos os filhos vão para rep.selected com a
+            # marca (nó, índice); o runtime mostra o do estado atual (o do arquivo até o código mudar).
+            if p not in rep.selectors:
+                rep.selectors[p] = Selector.read(data, p)
+                sink.append(rep.selected)
+                for i in range(data[p + 0x0B]):
+                    sel.append((p, i))
+                    children(p, p + 0x0C + 4 * i, 1, bone, path, depth)
+                    sel.pop()
+                sink.pop()
+        elif t == 0x05 and (word >> 24) == 0x06 and not selectors:
             # Seletor de pose (byte 3 = 0x06; ex.: braços/foice do Mr. Grimm): o filho ativo é estado do jogo
             # (campos +0x04..+0x0A zerados no arquivo). ⚠️ ESCOLHA DO HOST: pose base = 1º filho não vazio.
             for i in range(data[p + 0x0B]):
@@ -535,7 +614,7 @@ def scene(data: bytes, ptr: bytes, meshes: list[Mesh], root: int | None = None, 
                 if c is not None and _u32(data, c) & 0x3F != 0x08:
                     visit(c, bone, path, depth + 1)
                     break
-        elif t == 0x05 and (word >> 24) == 0x01 and (c0 := ptr_at(p + 0x0C)) is not None                 and _u32(data, c0) & 0x3F != 0x08 and _subtree_tris(c0) > 500:
+        elif t == 0x05 and not selectors and (word >> 24) == 0x01 and (c0 := ptr_at(p + 0x0C)) is not None                 and _u32(data, c0) & 0x3F != 0x08 and _subtree_tris(c0) > 500:
             # Seletor cujo 1º filho é a carroceria (hc_sweet/hc_chrom: forma normal × transformada).
             # ⚠️ ESCOLHA DO HOST: 1º filho = estado padrão, só quando é grande (> 500 tri); os pequenos
             # (14–38 tri, um por carro) ficam como efeito até achar o significado no ELF.
@@ -592,9 +671,35 @@ def scene(data: bytes, ptr: bytes, meshes: list[Mesh], root: int | None = None, 
             children(p, p + 0x04, 2, bone, path, depth)
         elif t == 0x0A:  # plano/portal (níveis; 🟡 água/espelho?) — sem malha
             pass
-        elif t == 0x13:  # estado de dano: entradas de 12 bytes (*filho, ?, limiar) em +0x10; 1ª = intacto
+        elif t == 0x13 and damage_states:
+            # Estado de dano (FUN_0022cd58: entrada = byte de estado no nó 0x14 pai; o jogo começa na 0).
+            # Entradas ≥ 1 vão para rep.damaged (só fora dos slots de efeito).
+            rep.damage.setdefault(p, DamageNode.read(data, p))
+            for i in range(data[p + 8]):
+                if i and not any(sink[-1] is x for x in (rep.instances, rep.damaged, rep.selected)):
+                    break
+                dmg.append((p, i))
+                pushed = i and sink[-1] is rep.instances
+                if pushed:
+                    sink.append(rep.damaged)
+                children(p, p + 0x10 + 12 * i, 1, bone, path, depth)
+                if pushed:
+                    sink.pop()
+                dmg.pop()
+        elif t == 0x13:  # estado de dano: entradas de 12 bytes (*filho, *efeito, limiar) em +0x10; 1ª = intacto
             children(p, p + 0x10, 1, bone, path, depth)
-        elif t in (0x08, 0x0E, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1E):
+        elif t == 0x18:
+            # Escala (FUN_0021b3c0): escala +0x20..+0x28, translação +0x30..+0x38, n filhos (+0x04) em +0x60. Nos
+            # carros vira osso fixo em tools/rig.py (braços do Mr. Grimm, anéis do especial do Axel). ⚠️ a translação
+            # entra como p·S + t (o jogo divide a translação acumulada pela escala; ver docs/NATIVE.md).
+            n = _u32(data, p + 4)
+            if 0 < n <= 16:
+                if place_objects:
+                    xforms.append(scale_matrix(data, p) @ xforms[-1])
+                children(p, p + 0x60, n, bone, path, depth)
+                if place_objects:
+                    xforms.pop()
+        elif t in (0x08, 0x0E, 0x17, 0x19, 0x1A, 0x1B, 0x1E):
             pass  # localizador, vazio (0x0E), marcador (0x17), partículas, gatilho (0x19), animação, colisão (0x1B, 0x1E)
         else:
             rep.unknown.setdefault(word, []).append(p)
@@ -629,8 +734,13 @@ def scene(data: bytes, ptr: bytes, meshes: list[Mesh], root: int | None = None, 
     rep.instances = [i for i in rep.instances if moved(i) or i.mesh not in placed]
     seen: set[tuple] = set()
     keyf = lambda i: (i.mesh, tuple(round(v, 2) for v in i.offset),  # noqa: E731
-                      None if i.matrix is None else tuple(np.round(i.matrix[:3, :3].reshape(-1), 4)))
+                      None if i.matrix is None else tuple(np.round(i.matrix[:3, :3].reshape(-1), 4)), i.damage)
     rep.instances = [i for i in rep.instances if not (keyf(i) in seen or seen.add(keyf(i)))]
+    rep.damaged = [i for i in rep.damaged if not (keyf(i) in seen or seen.add(keyf(i)))]
+    keys = lambda i: (keyf(i), i.select)  # noqa: E731
+    rep.selected = [i for i in rep.selected if not (keys(i) in seen or seen.add(keys(i)))]
+    for node in rep.selectors:  # lista achatada por seletor, como antes (slots de efeito)
+        rep.effects[node] = [i for i in rep.selected if any(n == node for n, _ in i.select)]
     return rep
 
 

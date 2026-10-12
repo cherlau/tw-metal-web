@@ -101,3 +101,53 @@ Exportados em `artifacts/native/weapclip*`, `carapi`, `mounts*`, `samplers`, `pk
 | `FUN_00120ba0` | pickup → tipo de arma: 1→2 Fire, 2→3 Homing, 3→9 Swarmer (HC: 10), 4→4 Napalm, 5→7 Ricochet, 6→6 Power, 9→8 Ambiente, 11→10 Remote; 0 = metralhadora (inventário carro+0x4dc4) |
 | `FUN_0014cf78` / `FUN_0014cfd8` | arma tipo 8 (ataque de ambiente) toca o clipe 0x12 e fecha 0x12/0x13/0x14 |
 | `FUN_001dd1c0` | especial: zera o clipe do suporte da arma selecionada (2,3→0x15; 4→0x0E; 6→0x16; 7→0x0D) |
+
+## Estados de dano — nós `0x13` (2026-10-12)
+Exportados em `artifacts/native/dmg*` (alvos `tools/native/dmg-targets.txt`, reescrito a cada rodada).
+
+| Endereço | Evidência |
+|---|---|
+| `FUN_0022cd58` / `FUN_0022c978` | escolha da entrada: `byte[(nó 0x14 atual) + nó0x13[+0x0C]]` → filho em `+0x10 + 12·i`; o u16 seguinte (`0x14 + 0x0E`) vira o id do objeto atingido (`DAT_0041b71c`) |
+| `FUN_0021b3c0` caso `0x13` | chama o callback do topo da pilha (`DAT_0038fd18`) com o nó e empilha **todas** as entradas — é o percurso de **coleta** na criação dos objetos, não o desenho |
+| `FUN_00168aa8` (níveis) / `FUN_00124288` (carros) | callbacks desse percurso: cada `0x13` vira um objeto de `0xE0` bytes (`FUN_00170f98`, vtable `0x2d75c8`, `destruct.cpp`): `+0x90` = nó `0x13`, `+0x94` = nó `0x14`, `+0xA4` → vida (float). Nos carros, categoria (`word >> 18`) **`0x46`** → lista em `carro+0x6190` (`FUN_0012e9e0`, até 16) |
+| `FUN_00171650` | vida máxima: classe = byte `+0x09`; 1..5 → tabela `0x2e0ff8` = **1, 20, 60, 100, 300**; 0 → u16 `+0x04` (dark2: 375); outra → 1 |
+| `FUN_001715c0` → `FUN_00171560` | fração = vida/máx; entrada = **1ª com limiar (u16 `+0x18 + 12·i`) ≤ int(f·65535)**, senão a última. Limiares vistos: `0xE665` 90%, `0x7FFF` 50%, `0x5999` 35%, `0x3FFF` 25%, `0x3332` 20%, `0x28F` 1%, `0` |
+| `FUN_00172768` | piora: se acima do alvo `+0xA2`, agenda `FUN_00172908` (grava `+0xA2` no byte) para **agora + 2 tiques** (`FUN_0025e918`; `0x2e1010`/`0x424` = "destruct.cpp", linha) e solta o efeito da entrada (`+0x14 + 12·i`, `FUN_00172938`); melhora: grava na hora |
+| `DAT_002f4548` | relógio dos temporizadores: +1 a cada 9600 contagens do timer do EE (576 kHz) = **60 Hz** (`0x264380`, `0x2644dc`) |
+| `FUN_0012e8c0` (`FUN_0011e3d0`, `FUN_00122620`) | por quadro: `f = carro+0x4dc0 / FUN_002a0670(carro+0x4db0)` (vida/vida máx.); **0 < f < 0,01 → 0,02** (vivo nunca chega à última entrada); se mudou, `FUN_00171498(f)` em cada parte: vida = f·máx → seleção acima |
+| `FUN_0012ea48` (renascer) | `FUN_00171410` (zera `+0xA2`, libera efeitos presos no byte `+1` do estado) e vida cheia → entrada 0 |
+| `FUN_00171838` / `FUN_00171fc8` (vtable `+0x10`/`+0x20`) | golpe nos destrutíveis (arenas, peças HC): ignora dano ≤ u16 `+0x06`; tipos 4/0x29 e categorias `0x4658..0x4674` têm regras próprias; `0x468C` só a ≤ 10 pés |
+
+Implementação: `tools/ngp.py` (`DamageNode`, `scene(damage_states=True)`), `tools/convert_model.py` (`damageScene`, `damage`, marca `dmg` nas instâncias; só carros), `src/rig.ts` (`damageEntry`, `CarRig.setHealth`/`resetDamage`), `src/game.ts` (vida por quadro; carcaça visível enquanto morto).
+
+## Ações e destroços (2026-10-12)
+Exportados em `artifacts/native/fx`, `fx2` (alvos `tools/native/fx*-targets.txt`).
+
+| Endereço | Evidência |
+|---|---|
+| `FUN_00172938` | solta o `fx` do nó `0x13`: tipo 1 → recursa no filho `+0x08` com a matriz `+0x10`; senão `FUN_00100f78` (normal, com atraso) ou `FUN_001010b0` (imediato) no gerenciador `0x2f4b70`, na posição do objeto (`+0xB0`) |
+| `FUN_00101010` | agenda o handler para daqui a `(int) f32 +0x04` tiques (`FUN_0025e918`, "actionDispatch.cpp") |
+| `0x2dad48` | handlers por u16 tipo: 0 lista (`+0x08` n, ponteiros em `+0x0C`), 1 transformação, 2 clipe (`FUN_00101720`), 3 destroços (`FUN_00101800`), 4 som (`FUN_00101848` → `FUN_001a0db8`: id → `D_CONCRETE_SM`…, `tools/actions.py: SOUND_NAMES`), 5 tremor de câmera e 6+ "unsupported" |
+| `FUN_001729e0` → `FUN_0016e678` | destroços: n peças = (u64 `+0x08` >> 53) & 0x1FF (≤ 32); peças de 0x14 bytes em `+0x28` (pos `+4`, descritor `+0x10` = [*modelo, massa, 0,25, ?, *casco]); caixa = esfera/eixos do cabeçalho da malha (`+0x20`, colunas de `+0x30/+0x40/+0x50`) × 0,75, eixos < 1 normalizados; direção = peça − centro (`+0x10`) girada, ± 5 % do raio; impulso = (vel. `+0x1C` + fator) × 1000 (`gp−0x75e4`) / 60 (`DAT_002f4544`) / massa, aplicado no canto máximo; fator = 1 sem golpe, peso por arma (2,25/2,5/4,5…) com golpe direto, \|v\|·20 em batida |
+| `FUN_00173a80` | por quadro: idade em tiques; a partir de vida (180) − 60 (`gp−0x75a4`) o alfa cai 1/s; voo livre `FUN_00251dc8(dt, −128)` |
+| `FUN_001738e0` | corpo: `+0x10` = 0,8, `+0x14` = 0,25 (🟡 atrito/restituição), inércia de caixa; 50 % de rastro de fumaça se o objeto se movia (não implementado) |
+
+## Seletores dos carros (2026-10-12)
+`FUN_00124288` (coleta) guarda cada nó por categoria no carro; `FUN_00230138(nó, i)` grava o filho (byte `+0x08`, só se < n). Exportados em `artifacts/native/sel*`.
+
+| Categoria | Campo | Quem troca |
+|---|---|---|
+| `0x40` (brilho dos faróis, sprites `bc9c8`) | `+0x62d0` | `FUN_0011f110`: 1 se `carro+0x62e0` bit 32 — **nunca ligado no código** (só zerado em `FUN_0011b670`/`FUN_0011c6e0`) |
+| `0x41` (lanternas) | `+0x62cc` | `FUN_0011f1e8`: 2 se controle `+0x10` (freio) > 0, 1 com o bit acima, senão 0 |
+| `0x43` (casca de fogo, textura `7dcf4`) | `+0x62c0` (+`0x62c4` no 0x83) | `FUN_00123010`: bit 2 de controle `+0x1C` liga por `gp−0x7e28` = 180 tiques e toca a instância `0x19`; gatilho do jogador não identificado (a IA liga o bit 4, `FUN_00104b28`) |
+| `0x44` (chama do turbo) | `+0x62d4` | `FUN_001238c8`: 1 enquanto controle `+0x0C` (turbo) ≠ 0, com emissores de partículas (não implementados) |
+| `0x1b1` / `0x1b2` | `+0x640c` / `+0x6410` | `FUN_00148978`: ao abrir o suporte, tipo 2→1, 3→2 / 6→1, 9→2; ao fechar, 0 |
+| `0x53` | `+0x6414` | 🟡 |
+| `0x3C` (registros `0x00F0`) | `+0x61d8 + 4·tipo` | `FUN_00147568` pendura o modelo da tabela `0x37cbf0+0xda24` (mesma do projétil em voo, `FUN_00203c68`) |
+| `0x3E` (registros `0x00F8`) | posições em registros de arma (passo `0x70`) | pontos de disparo — nada desenhado |
+
+## Piloto (2026-10-12)
+`FUN_00127060` cria `0x25` (+0xad), `0x22` (+0xb2, tempo direto), `0x23` (+0xb6), `0x24` (+0xbb) só nos veículos 0x65, 0x67, 0x73, 0x77, 0x7a. `FUN_0011e3d0`: `FUN_00125688` em 0x67/0x7a/0x73 (exige `carro+0x68c0` bit 49, desligado só durante a arma especial), `FUN_001258f0` em 0x65/0x77. Estado `+0x6338`: no ar (`+0x7c1`, `+0x7c8` > 5) → `0x23`; ao pousar → `0x24` e, no fim, `0x25`; esterço `+0x4a8` = 0,5 → `0x25`; senão `0x22` com tempo = esterço suavizado (`FUN_00253128`: 0,1/0,001 ou 0,09/1e-5). `0x25` a 0,25 (0,15) × abaixo de 7,33 pés/s, senão 1×. Trocas com mistura `FUN_00210b08` de 15 quadros (30 no esterço). Laço do clipe: bit 1 do u16 `+0x0E` (`FUN_00211348`). Tabela de clipes: objeto `+0x20` (u16 n, ponteiros em `+0x10`), 1º de cada categoria (`FUN_002110d8`).
+
+## Renascimento (parcial, 2026-10-12)
+`FUN_0011c6e0` (renasce o carro) é chamado pelos modos de jogo (`FUN_001b5478`, `FUN_001e8280`) quando o byte por jogador em `modo+0x244`/`+0x248` vale 2 (vira 3). Mensagem "PLAYER DEAD, RESPAWN IN %d" via tabela de textos `0x2c49a8`. Quem põe o 2 e o tempo ainda não achados.
