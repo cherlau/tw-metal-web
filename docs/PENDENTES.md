@@ -30,11 +30,7 @@ bits 48..62 = canal de **visibilidade** (bit 63 liga). Os canais são uma tabela
 
 | Pri | Pendência | Base |
 |---|---|---|
-| ✅ | Valores exatos dos canais ao disparar | feito 2026-10-12: são os clipes 0x0D/0x0E/0x15/0x16/0x17 do carro, tocados pelos suportes de arma (`FUN_00148978`); o leitor antigo trocava as trilhas de clipe (ver `VALIDATION.md`) |
-| ✅ | Visibilidade dos lançadores + deslizar para fora (canais `vis` e `tx`) | feito 2026-10-12; desde a correção do leitor, vêm dos próprios clipes dos suportes (o deslizamento de 3/s do host saiu) |
-| ✅ | Rodas girando/esterçando e suspensão | feito 2026-10-12: papel pela categoria do clipe (0..3 giro, 4..7 suspensão, 8..11 esterço — `FUN_00127060`); com o leitor corrigido todas as rodas têm clipe (`rig.direct` vazio) |
 | B | Partes móveis (cabeça do Sweet Tooth, sirene, antenas, escapamentos) | demais canais |
-| ✅ | Substituir a abertura "100°" do host pelos valores do jogo | feito 2026-10-12 (velocidade 2 nos carros Head-On, 1 nos HC; um suporte por vez) |
 | B | Ataque de ambiente (arma tipo 8) e arma especial (tipo 1) nos suportes | tipo 8 toca o clipe 0x12 e fecha 0x12/0x13/0x14 (`FUN_0014cf78`/`FUN_0014cfd8`); o especial zera clipes (`FUN_001dd1c0`) e usa 0x1A..0x1F; nada disso existe no runtime |
 | B | Pontos `0x00F8` usam o tipo de arma do jogo, não o id do pickup | `WEAPON_SLOT` em `src/game.ts` ainda usa ids de pickup (Fire 1, Swarmer 3…); o jogo indexa por tipo (Fire 2, Homing 3, Napalm 4, Power 6, Ricochet 7, Swarmer 9, Remote 10). Só afeta as armas montadas de reserva (carros sem suporte); conferir pontos 8/9/12/13 |
 | C | Tipo de arma 5 (só nos HC) | aparece em `FUN_00148e00` nos carros HC; nenhum pickup gera tipo 5 em `FUN_00120ba0` |
@@ -48,7 +44,7 @@ bits 48..62 = canal de **visibilidade** (bit 63 liga). Os canais são uma tabela
 | A | **Objetos destrutíveis** (tiro quebra/derruba; troca de modelo) | 514 nós `0x13` nas 7 arenas; o jogo os chama de "interactive" (strings no ELF) |
 | A | Animação de texturas (fogo, letreiros, água, telões) | Controladores `0x1A` (454 na Arena, 300 em Paris): `+0x08/+0x0C` *dados, `+0x34` *nó animado; formato dos quadros a decodificar |
 | B | Peças que se movem (hélices, portões, bandeiras, elevadores) | Trilhas `0x0B` nos níveis |
-| A | **Rotação dos objetos posicionados (nós `0x1F`)** | Quase todos os `0x1F` das arenas têm rotação em s16 `+0x08/+0x0A/+0x0C` (Coliseu DM: 48/48, ex. −90°, 35,8°, 144°) e nº de filhos em `+0x0E` (um com 12). Hoje os níveis só aplicam a translação e o 1º filho: props saem com a orientação errada e filhos somem. A regra já está em `tools/rig.py: fixed_of` (carros); falta levar aos níveis (`InstanceDef` com matriz) e reconverter as 7 arenas |
+| B | Objetos `0x1F` com malha "já no mundo" | 2026-10-12: rotação e todos os filhos aplicados; malhas cujo centro já está perto do destino seguem sem transformação (heurística por malha, ⚠️ host). Aplicar sempre punha prédios em cima da muralha do Coliseu DM (`0x125c80`) — falta saber por que o jogo não os desloca (o grid de setores desenha outra cópia? outro caminho de desenho?). Ex.: a mesma malha em `0x141530` e `0x140020` |
 | B | Spawns, regras e eventos próprios de cada arena (DM) | Spawns atuais = nós PTS; os reais moram no ELF |
 | B | Sem céu no Estádio e em Tóquio DM | Os arquivos não trazem cúpula; ver se o ELF define cor de fundo/névoa |
 | C | Névoa/fundo por arena, cor do céu | Pacote de estado do GS por grupo pode trazer FOG |

@@ -3,7 +3,7 @@
 // usamos os triângulos de render, sem os translúcidos/aditivos (fogo, brilhos, vidro de efeito).
 import * as THREE from 'three';
 import { acceleratedRaycast, computeBoundsTree, disposeBoundsTree, MeshBVH } from 'three-mesh-bvh';
-import { buildGeometry, type ModelDoc } from './assets';
+import { buildGeometry, instanceMatrix, type ModelDoc } from './assets';
 import { isAdditive } from './render';
 import type { CollisionWorld, Hit } from './physics/vehicle';
 import type { V3 } from './physics/vec';
@@ -25,15 +25,16 @@ export class LevelCollision implements CollisionWorld {
 
   constructor(doc: ModelDoc, bin: ArrayBuffer, toWorld: THREE.Matrix4) {
     const geos: THREE.BufferGeometry[] = [];
-    for (const { mesh, offset } of doc.scene) {
-      const def = doc.meshes[mesh];
+    for (const inst of doc.scene) {
+      const def = doc.meshes[inst.mesh];
+      const xf = instanceMatrix(inst);
       if (isAdditive(def)) continue;
       for (const part of def.parts ?? []) {
         const g = buildGeometry(part, bin);
         const only = new THREE.BufferGeometry();
         only.setAttribute('position', g.getAttribute('position').clone());
         only.setIndex(g.getIndex()!.clone());
-        if (offset) only.translate(offset[0], offset[1], offset[2]); // objeto posicionado (nó 0x03)
+        if (xf) only.applyMatrix4(xf); // objeto posicionado (nós 0x03/0x1F)
         only.applyMatrix4(toWorld);
         geos.push(only);
       }

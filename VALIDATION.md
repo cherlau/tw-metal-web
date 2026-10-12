@@ -213,3 +213,11 @@ Pendência A "peças que abrem com a arma — falta o movimento exato". Achado n
 | Relógio | `DAT_002f4540` = delta em ticks de 1/60 s (temporizadores comparam com 0x78 = 2 s) |
 
 Implementado: `tools/rig.py` (leitor + 7 amostradores + papéis por categoria + `MOUNT_CLIPS`), `src/rig.ts` (mesmos amostradores), `src/game.ts` (máquina de estados do `FUN_00148978`; saíram as portas de 100°/0,9 s e o deslizamento de 3/s do host). Efeito colateral: todos os carros têm clipe de giro nas 4 rodas (`rig.direct` vazio). QA `tools/web/mount-anim-qa.mjs` no Sweet Tooth: Homing abre a janela de sorvete da direita mostrando o suporte de mísseis; ao trocar para Napalm o suporte fecha e as portas traseiras abrem. Python 55/55 (novo `tools/test_clips.py`), TS 21/21.
+
+## 2026-10-12 — Rotação dos objetos posicionados nas arenas (nós `0x1F`)
+
+Os níveis aplicavam só a translação dos `0x1F` e visitavam só o 1º filho. O u32 em `+0x0C`, lido como "distância²", é a rotação z (s16) + nº de filhos (u16 `+0x0E`), a mesma regra dos carros (`FUN_0021b3c0`). Agora `ngp.scene` acumula uma matriz 4×4 (`fixed_matrix`, rotação negada antes do Euler de `FUN_00236e50`, `local · pai`); a instância leva `matrix` quando há rotação; o runtime aplica no batch, na colisão e nas luzes (`instanceMatrix` em `src/assets.ts`).
+
+Tentativa descartada: aplicar a transformação do `0x1F` sempre (sem a heurística "malha já no mundo"). Pôs um bloco de prédios em cima da muralha do Coliseu DM (`0x125c80`) — a heurística continua valendo (pendente em `docs/PENDENTES.md`).
+
+Resultado: 723 instâncias com rotação (Grécia 348, Arena 214, Coliseu 51, Egito 42, Paris 41, Castelo 27, Tóquio 0) e 51 peças que sumiam (Arena +40, Coliseu +11). QA antes/depois de cima (`tools/web/level-view.mjs`): Coliseu DM (blocos da cidade alinhados às ruas), Grécia DM e Arena sem peças fora do lugar. `level_survey` 7/7 jogáveis, Python 58/58 (novo `tools/test_levels_1f.py`), TS 21/21.

@@ -42,8 +42,18 @@ export interface TextureDef {
 export interface InstanceDef {
   mesh: string;
   bone: string | null;
-  /** Translação do objeto (nós 0x03 dos níveis), coordenadas do PS2. */
+  /** Translação do objeto (nós 0x03/0x1F dos níveis), coordenadas do PS2. */
   offset?: [number, number, number];
+  /** Transformação com rotação (nós 0x1F dos níveis): 4x4 linha-major, vetor-linha (p' = p·M). */
+  matrix?: number[];
+}
+
+/** Transformação de uma instância posicionada (ou null): `matrix` do PS2 ou a translação `offset`. */
+export function instanceMatrix(i: InstanceDef): THREE.Matrix4 | null {
+  // linha-major vetor-linha -> fromArray lê coluna-major = transposta = forma do Three (p' = M·p)
+  if (i.matrix) return new THREE.Matrix4().fromArray(i.matrix);
+  if (i.offset) return new THREE.Matrix4().makeTranslation(i.offset[0], i.offset[1], i.offset[2]);
+  return null;
 }
 
 export interface BoneDef {

@@ -350,7 +350,9 @@ class Instance:
     bone: int  # nó de transformação mais próximo (0x0D/0x15) ou -1
     path: list[int]  # nós percorridos (para depuração)
     state: int = -1  # pacote de estado do GS do grupo mais próximo (grupo 0x01 com +0x04 ≠ 0) ou -1
-    offset: tuple[float, float, float] = (0.0, 0.0, 0.0)  # translação acumulada dos nós 0x03 (níveis)
+    offset: tuple[float, float, float] = (0.0, 0.0, 0.0)  # translação acumulada dos nós 0x03/0x1F (níveis)
+    # transformação acumulada (4x4, vetor-linha p' = p·M) quando há rotação (nós 0x1F dos níveis); None = só offset
+    matrix: np.ndarray | None = None
 
 
 @dataclass
@@ -373,6 +375,28 @@ class SceneReport:
 
 def _u32(b: bytes, p: int) -> int:
     return struct.unpack_from("<I", b, p)[0]
+
+
+def euler(rx: float, ry: float, rz: float) -> np.ndarray:
+    """Rotação exatamente como FUN_00236e50 (matriz 4x4 linha-major, uso p · M)."""
+    sx, sy, sz = np.sin(rx), np.sin(ry), np.sin(rz)
+    cx, cy, cz = np.cos(rx), np.cos(ry), np.cos(rz)
+    return np.array([
+        [cy * cz, -cy * sz, sy, 0],
+        [sx * sy * cz + cx * sz, -sx * sy * sz + cx * cz, -sx * cy, 0],
+        [-cx * sy * cz + sx * sz, cx * sy * sz + sx * cz, cx * cy, 0],
+        [0, 0, 0, 1],
+    ])
+
+
+def fixed_matrix(data: bytes, p: int, kind: int) -> np.ndarray:
+    """Matriz local de um nó 0x1F (rotação s16 +0x08/+0x0A/+0x0C × π/32768, negada como nos ossos) ou 0x03
+    (só translação); translação em +0x10..+0x18 (FUN_0021b3c0)."""
+    m = np.eye(4)
+    if kind == 0x1F:
+        m = euler(*[-v * np.pi / 32768 for v in struct.unpack_from("<3h", data, p + 8)])
+    m[3, :3] = struct.unpack_from("<3f", data, p + 0x10)
+    return m
 
 
 def _mat(b: bytes, p: int) -> np.ndarray:
@@ -413,7 +437,7 @@ def scene(data: bytes, ptr: bytes, meshes: list[Mesh], root: int | None = None, 
 
     sink: list[list[Instance]] = [rep.instances]  # destino atual (pose base ou um slot de efeito)
     states: list[int] = [-1]  # estado do GS em vigor (grupos 0x01 com +0x04 -> pacote VIF/GIF)
-    offsets: list[tuple[float, float, float]] = [(0.0, 0.0, 0.0)]  # translação dos objetos (nós 0x03)
+    xforms: list[np.ndarray] = [np.eye(4)]  # transformação acumulada dos objetos posicionados (nós 0x03/0x1F)
     mesh_by_off = {m.offset: m for m in meshes}
     local_cache: dict[int, bool] = {}
 
@@ -441,17 +465,19 @@ def scene(data: bytes, ptr: bytes, meshes: list[Mesh], root: int | None = None, 
             return
         path = path + [p]
         if p in mesh_at:
-            off = offsets[-1]
-            if any(off):
+            xf = xforms[-1]
+            off = tuple(float(v) for v in xf[3, :3])
+            rotated = not np.allclose(xf[:3, :3], np.eye(3), atol=1e-6)
+            if any(off) or rotated:
                 # Decide por malha: o mesmo posicionador mistura peças locais (estátua intacta, centrada na
                 # origem) e peças já no mundo (destroços no destino) — Grécia DM.
                 m = mesh_by_off[p]
                 if m.strips:
                     allp = np.concatenate([np.asarray(st.pos)[:, :3] for st in m.strips])
                     c = (allp.min(0) + allp.max(0)) / 2
-                    if np.hypot(c[0], c[1]) >= 0.5 * np.hypot(c[0] - off[0], c[1] - off[1]):
-                        off = (0.0, 0.0, 0.0)
-            sink[-1].append(Instance(p, bone, path, states[-1], off))
+                    if any(off) and np.hypot(c[0], c[1]) >= 0.5 * np.hypot(c[0] - off[0], c[1] - off[1]):
+                        off, rotated = (0.0, 0.0, 0.0), False
+            sink[-1].append(Instance(p, bone, path, states[-1], off, xf.copy() if rotated else None))
             return
         word = _u32(data, p)
         if word >> 24 == 0 and (word >> 16) & 0xFF in (0xF0, 0xF8):
@@ -528,10 +554,9 @@ def scene(data: bytes, ptr: bytes, meshes: list[Mesh], root: int | None = None, 
             n = _u32(data, p + 8)
             first = ptr_at(p + 0x1C)
             if any(abs(v) > 1.0 for v in tr) and first is not None:
-                o = offsets[-1]
-                offsets.append((o[0] + tr[0], o[1] + tr[1], o[2] + tr[2]))
+                xforms.append(fixed_matrix(data, p, 0x03) @ xforms[-1])
                 children(p, p + 0x1C, n, bone, path, depth)
-                offsets.pop()
+                xforms.pop()
             else:
                 children(p, p + 0x1C, n, bone, path, depth)
         elif t == 0x12:  # escala: +0x04 *animação?, +0x08 n, +0x20..+0x28 escala (x, y, z), n filhos em +0x2C
@@ -547,17 +572,18 @@ def scene(data: bytes, ptr: bytes, meshes: list[Mesh], root: int | None = None, 
                 children(p, p + 0x1C, max(1, min(struct.unpack_from("<H", data, p + 0x0E)[0], 16)), bone, path, depth)
                 sink.pop()
         elif t == 0x1F and place_objects:
-            # Níveis: objeto posicionado com distância de desenho (+0x0C ≈ distância², ex. 0x1bf81 ≈ 338²)
-            # e posição em +0x10..+0x18, como o 0x03 (prédios da cidade do Coliseu DM empilhados no centro).
+            # Níveis: objeto posicionado (FUN_0021b3c0) — rotação s16 em +0x08/+0x0A/+0x0C, u16 nº de filhos em
+            # +0x0E, posição em +0x10..+0x18, filhos a partir de +0x1C. (Antes: só a posição e o 1º filho; o
+            # u32 em +0x0C, lido como "distância²", é a rotação z + nº de filhos.)
             tr = struct.unpack_from("<3f", data, p + 0x10)
-            first = ptr_at(p + 0x1C)
-            if any(abs(v) > 1.0 for v in tr) and first is not None:
-                o = offsets[-1]
-                offsets.append((o[0] + tr[0], o[1] + tr[1], o[2] + tr[2]))
-                children(p, p + 0x1C, 1, bone, path, depth)
-                offsets.pop()
+            rot = struct.unpack_from("<3h", data, p + 8)
+            n = max(1, min(struct.unpack_from("<H", data, p + 0x0E)[0], 64))
+            if (any(abs(v) > 1.0 for v in tr) or any(rot)) and ptr_at(p + 0x1C) is not None:
+                xforms.append(fixed_matrix(data, p, 0x1F) @ xforms[-1])
+                children(p, p + 0x1C, n, bone, path, depth)
+                xforms.pop()
             else:
-                children(p, p + 0x1C, 1, bone, path, depth)
+                children(p, p + 0x1C, n, bone, path, depth)
         elif t == 0x1F:
             # FUN_0021b3c0: rotação s16 em +0x08/+0x0A/+0x0C, translação +0x10..+0x18 (aplicadas em tools/rig.py)
             # e u16 em +0x0E filhos a partir de +0x1C (Mr. Grimm 0x47e0: roda dianteira + 0x42b0).
@@ -598,10 +624,12 @@ def scene(data: bytes, ptr: bytes, meshes: list[Mesh], root: int | None = None, 
     # A mesma malha pode ser alcançada por caminhos diferentes; como está no espaço do modelo, uma basta.
     # A varredura da grade de setores também alcança os filhos dos nós 0x03 pelos ponteiros, sem a
     # posição: a cópia na origem de uma malha que foi posicionada é descartada.
-    placed = {i.mesh for i in rep.instances if any(i.offset)}
-    rep.instances = [i for i in rep.instances if any(i.offset) or i.mesh not in placed]
+    moved = lambda i: any(i.offset) or i.matrix is not None  # noqa: E731
+    placed = {i.mesh for i in rep.instances if moved(i)}
+    rep.instances = [i for i in rep.instances if moved(i) or i.mesh not in placed]
     seen: set[tuple] = set()
-    keyf = lambda i: (i.mesh, tuple(round(v, 2) for v in i.offset))  # noqa: E731
+    keyf = lambda i: (i.mesh, tuple(round(v, 2) for v in i.offset),  # noqa: E731
+                      None if i.matrix is None else tuple(np.round(i.matrix[:3, :3].reshape(-1), 4)))
     rep.instances = [i for i in rep.instances if not (keyf(i) in seen or seen.add(keyf(i)))]
     return rep
 

@@ -1,7 +1,7 @@
 // Montagem de malhas e materiais a partir do formato .json+.bin (compartilhado: visualizador e jogo).
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { buildGeometry, loadTexture, type InstanceDef, type MeshDef, type ModelDoc } from './assets';
+import { buildGeometry, instanceMatrix, loadTexture, type InstanceDef, type MeshDef, type ModelDoc } from './assets';
 
 export interface RenderOptions {
   /** Padrão true: textura × cor de vértice (a luz do PS2 vem pré-calculada nas cores). */
@@ -67,15 +67,17 @@ export async function buildBatched(
   opt: RenderOptions & { filter?: (key: string, def: MeshDef) => boolean } = {},
 ): Promise<{ group: THREE.Group; drawCalls: number; triangles: number }> {
   const buckets = new Map<string, { material: THREE.Material; geos: THREE.BufferGeometry[] }>();
-  for (const { mesh: key, offset } of instances) {
+  for (const inst of instances) {
+    const key = inst.mesh;
     const def = doc.meshes[key];
+    const xf = instanceMatrix(inst);
     if (opt.filter && !opt.filter(key, def)) continue;
     for (const part of def.parts ?? []) {
       const { key: mk, material } = await materialFor(doc, def, part.texture, opt);
       if (!buckets.has(mk)) buckets.set(mk, { material, geos: [] });
       const g = buildGeometry(part, bin);
-      // Objeto posicionado (nó 0x03): a mesma malha pode aparecer em vários lugares -> cópia transladada.
-      buckets.get(mk)!.geos.push(offset ? g.clone().translate(offset[0], offset[1], offset[2]) : g);
+      // Objeto posicionado (nós 0x03/0x1F): a mesma malha pode aparecer em vários lugares -> cópia transformada.
+      buckets.get(mk)!.geos.push(xf ? g.clone().applyMatrix4(xf) : g);
     }
   }
   const group = new THREE.Group();

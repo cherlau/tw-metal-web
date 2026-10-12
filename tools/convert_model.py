@@ -222,7 +222,7 @@ def convert(name: str, folder: str) -> dict:
     if folder == "lvl":
         for inst in list(scene_rep.instances):
             m = by_offset[inst.mesh]
-            if not m.strips or any(inst.offset):
+            if not m.strips or any(inst.offset) or inst.matrix is not None:
                 continue
             pos = np.concatenate([np.asarray(st.pos)[:, :3] for st in m.strips])
             c, size = (pos.min(0) + pos.max(0)) / 2, pos.max(0) - pos.min(0)
@@ -324,8 +324,10 @@ def convert(name: str, folder: str) -> dict:
         out = {"mesh": f"m{i.mesh:06x}", "bone": f"n{i.bone:06x}" if i.bone >= 0 else None}
         if use_rig:
             out["b"] = rig.leaf_bone(ngp_bytes, i, rig_index)
-        if any(abs(v) > 1e-6 for v in i.offset):
-            out["offset"] = [round(float(v), 4) for v in i.offset]  # objeto posicionado (nó 0x03)
+        if i.matrix is not None:  # objeto posicionado com rotação (nó 0x1F): 4x4 vetor-linha (p' = p·M)
+            out["matrix"] = [round(float(v), 6) for v in i.matrix.reshape(-1)]
+        elif any(abs(v) > 1e-6 for v in i.offset):
+            out["offset"] = [round(float(v), 4) for v in i.offset]  # objeto posicionado (nó 0x03/0x1F)
         return out
 
     def mat(m) -> list[float] | None:

@@ -1,7 +1,7 @@
 // Luzes dos níveis: sprites (brilhos de lâmpadas) e fachos (colunas/raios de luz) que o conversor já
 // exporta por malha mas o batching não desenha. Coordenadas do PS2: o grupo vai dentro da raiz do nível.
 import * as THREE from 'three';
-import { loadTexture, type InstanceDef, type MeshDef, type ModelDoc } from './assets';
+import { instanceMatrix, loadTexture, type InstanceDef, type MeshDef, type ModelDoc } from './assets';
 
 export interface BeamDef {
   points: number[][]; // (x, y, z, largura) — sempre em pares: cada par é um quadrilátero
@@ -94,11 +94,16 @@ export async function buildLevelLights(doc: ModelDoc, instances: InstanceDef[]):
   group.name = 'level-lights';
   const beamsByTex = new Map<string, BeamDef[]>();
   const seen = new Set<string>();
-  for (const { mesh, offset } of instances) {
-    const key = `${mesh}|${offset?.join(',') ?? ''}`;
+  const v = new THREE.Vector3();
+  for (const inst of instances) {
+    const { mesh } = inst;
+    const xf = instanceMatrix(inst);
+    const key = `${mesh}|${inst.matrix?.join(',') ?? inst.offset?.join(',') ?? ''}`;
     if (seen.has(key)) continue;
     seen.add(key);
-    const [ox, oy, oz] = offset ?? [0, 0, 0];
+    // ponto do modelo -> nível (objeto posicionado: nós 0x03/0x1F)
+    const place = (x: number, y: number, z: number): [number, number, number] =>
+      xf ? (v.set(x, y, z).applyMatrix4(xf), [v.x, v.y, v.z]) : [x, y, z];
     const def = doc.meshes[mesh] as MeshDef & { beams?: BeamDef[] };
     const texId = def.texture ?? def.textures?.[0];
     const texDef = texId ? doc.textures[texId] : undefined;
@@ -106,7 +111,7 @@ export async function buildLevelLights(doc: ModelDoc, instances: InstanceDef[]):
     if (def.beams?.length) {
       if (!beamsByTex.has(texId!)) beamsByTex.set(texId!, []);
       beamsByTex.get(texId!)!.push(
-        ...(offset ? def.beams.map((b) => ({ ...b, points: b.points.map((q) => [q[0] + ox, q[1] + oy, q[2] + oz, q[3]]) })) : def.beams),
+        ...(xf ? def.beams.map((b) => ({ ...b, points: b.points.map((q) => [...place(q[0], q[1], q[2]), q[3]]) })) : def.beams),
       );
     }
     if (def.sprites?.length) {
@@ -127,7 +132,7 @@ export async function buildLevelLights(doc: ModelDoc, instances: InstanceDef[]):
             transparent: true,
           }),
         );
-        sprite.position.set(s.center[0] + ox, s.center[1] + oy, s.center[2] + oz);
+        sprite.position.set(...place(s.center[0], s.center[1], s.center[2]));
         sprite.scale.setScalar(s.size);
         sprite.renderOrder = 2;
         group.add(sprite);

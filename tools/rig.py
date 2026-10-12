@@ -251,16 +251,7 @@ def clip_frame(clip: Clip, t01: float) -> float:
     return clip.start + t01 * (clip.duration - clip.start)
 
 
-def _euler(rx: float, ry: float, rz: float) -> np.ndarray:
-    """Rotação exatamente como FUN_00236e50 (matriz 4x4 linha-major, uso p · M)."""
-    sx, sy, sz = np.sin(rx), np.sin(ry), np.sin(rz)
-    cx, cy, cz = np.cos(rx), np.cos(ry), np.cos(rz)
-    return np.array([
-        [cy * cz, -cy * sz, sy, 0],
-        [sx * sy * cz + cx * sz, -sx * sy * sz + cx * cz, -sx * cy, 0],
-        [-cx * sy * cz + sx * sz, cx * sy * sz + sx * cz, cx * cy, 0],
-        [0, 0, 0, 1],
-    ])
+_euler = ngp.euler  # FUN_00236e50 (vetor-linha)
 
 
 def local(bone: Bone, ch: np.ndarray) -> np.ndarray:
