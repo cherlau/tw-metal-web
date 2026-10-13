@@ -1,0 +1,6 @@
+str:^SoundMgr\.cpp$ sndmgr
+str:^sound\.cpp$ snd
+str:^CarSound\.cpp$ carsnd
+at:2559c0 play_nome
+at:1149f0 play_carro
+at:1a1660 play_pos

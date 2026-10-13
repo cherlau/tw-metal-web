@@ -1,0 +1,5 @@
+# HUD: tabela de mensagens (0x2ba4c0, 121 textos: pickups, mortes, "Weapons Bay Full"…) e textos do modo (0x2c4964)
+2ba4c0 hud_msgtab
+refsrange:2ba4c0:2ba6a4 hud_msgtab_any
+2c4964 hud_modetab
+refsrange:2c4964:2c49b4 hud_modetab_any

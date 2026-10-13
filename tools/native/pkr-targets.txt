@@ -1,0 +1,7 @@
+# Renascimento dos pickups: faixa por tipo em 0x35a710 (FUN_001bddf0/FUN_001bde08), vida do Health (0x35b4d4)
+at:1bddf0 pk_min
+at:1bde08 pk_max
+refsrange:35a700:35a800 pk_tab
+refsrange:35b4c0:35b4e0 health_amt
+at:148638 inv_add
+at:1485d8 inv_ammo

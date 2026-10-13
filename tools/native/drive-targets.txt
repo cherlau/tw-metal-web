@@ -1,0 +1,16 @@
+# Controlador de direção (carro+0x340): leitores dos campos da tabela 0x2b8ab0
+at:12f388 c50c
+at:12f4d8 c518
+at:12f520 c514
+at:131ad4 c518b
+at:1323d0 c518c
+at:1326ec c518d
+at:1336fc c51c
+at:133744 c520
+at:13281c c524
+at:1322a4 c528
+at:13522c c530
+at:1308bc c534
+at:1330dc c538
+at:133024 c514b
+at:1346e0 c514c

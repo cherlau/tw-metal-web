@@ -1,0 +1,276 @@
+{
+ "source": "SHELL/UI.BDD + SCUS_976.21 (biografias)",
+ "icons": {
+  "axel": "cars/axel.png",
+  "hearse": "cars/hearse.png",
+  "mrgrim": "cars/mrgrim.png",
+  "rkill": "cars/rkill.png",
+  "sweet": "cars/sweet.png",
+  "thump": "cars/thump.png",
+  "spectre": "cars/spectre.png",
+  "twist": "cars/twist.png",
+  "mrslam": "cars/mrslam.png",
+  "cop": "cars/cop.png",
+  "crim": "cars/crim.png",
+  "hamr": "cars/hamr.png",
+  "grass": "cars/grass.png",
+  "wart": "cars/wart.png",
+  "edboss": "cars/edboss.png",
+  "edatv": "cars/edatv.png",
+  "dark1": "cars/dark1.png",
+  "dark2": "cars/dark2.png",
+  "hc_axel": "cars/hc_axel.png",
+  "hc_derby": "cars/hc_derby.png",
+  "hc_hears": "cars/hc_hears.png",
+  "hc_grim": "cars/hc_grim.png",
+  "hc_preac": "cars/hc_preac.png",
+  "hc_rkill": "cars/hc_rkill.png",
+  "hc_semi": "cars/hc_semi.png",
+  "hc_suv": "cars/hc_suv.png",
+  "hc_sweet": "cars/hc_sweet.png",
+  "hc_taxi": "cars/hc_taxi.png",
+  "hc_tow": "cars/hc_tow.png",
+  "hc_vette": "cars/hc_vette.png",
+  "hc_rock": "cars/hc_rock.png",
+  "hc_stock": "cars/hc_stock.png",
+  "hc_tank": "cars/hc_tank.png"
+ },
+ "cards": {
+  "axel": "cards/axel.png",
+  "hearse": "cards/hearse.png",
+  "mrgrim": "cards/mrgrim.png",
+  "rkill": "cards/rkill.png",
+  "sweet": "cards/sweet.png",
+  "thump": "cards/thump.png",
+  "spectre": "cards/spectre.png",
+  "twist": "cards/twist.png",
+  "mrslam": "cards/mrslam.png",
+  "cop": "cards/cop.png",
+  "crim": "cards/crim.png",
+  "hamr": "cards/hamr.png",
+  "grass": "cards/grass.png",
+  "wart": "cards/wart.png",
+  "edboss": "cards/edboss.png",
+  "dark1": "cards/dark1.png",
+  "dark2": "cards/dark2.png",
+  "edatv": "cards/edatv.png"
+ },
+ "levels": {
+  "arena": "levels/arena.png",
+  "egyptdm": "levels/egyptdm.png",
+  "parisdm": "levels/parisdm.png",
+  "greecedm": "levels/greecedm.png",
+  "colisdm": "levels/colisdm.png",
+  "castledm": "levels/castledm.png",
+  "tokyodm": "levels/tokyodm.png"
+ },
+ "levelNames": {
+  "arena": "Stadium Slaughter",
+  "tokyodm": "Tokyo Death Match",
+  "parisdm": "Paris Death Match",
+  "egyptdm": "Egypt Death Match",
+  "greecedm": "Greece Death Match",
+  "colisdm": "Rome Death Match",
+  "castledm": "Transylvania DM"
+ },
+ "bios": {
+  "rkill": {
+   "car": "Roadkill",
+   "driver": "Marcus Kane",
+   "bio": "Marcus Kane is a man plagued with nightmares of competing in past Twisted Metal competitions. Each dream is very real, but he believes it's all fake. He doesn't know it, but he's got a split personality. His other identity is Needles Kane (the driver of Sweet Tooth). Lately these nightmares,(which are actually memories that Calypso has tried to hide from Marcus), have gotten worse and worse. One day, he wakes up and there's a Twisted Metal vehicle waiting outside for him. Ready to put these nightmares to rest once and for all, he decides to compete in what he believes to be another nightmare; he doesn't realize this Twisted Metal is for real.",
+   "address": "0x2e62b8"
+  },
+  "hearse": {
+   "car": "Shadow",
+   "driver": "Mortimer Scharf",
+   "bio": "Mortimer, a former caretaker of wayward souls, has long since gone back to rest in his coffin. One night, some kids are goofing around near Mortimer's grave. One of them reads the \"Gone but not forgotten\" inscription on the tombstone and drunkenly decides to see if that's true. They dig up the grave and wake up Mortimer. This upsets Mortimer as he finds that he can't go back to sleep. Exhausted and desperate to go back to his eternal slumber, Mortimer enters Twisted Metal hoping Calypso can put him back to sleep.",
+   "address": "0x2e6588"
+  },
+  "mrgrim": {
+   "car": "Mr. Grimm",
+   "driver": "Mr. Grimm",
+   "bio": "Mr. Grimm is, in fact, the grim reaper himself. At some point during his centuries of work, he attempted to devour a soul himself instead of taking it to its next destination. He became hooked; needing to devour more and more souls. He found himself absorbing more souls than he was delivering. This craving was driving Mr. Grimm to the point of insanity. He realizes he can't take it anymore and enters Twisted Metal hoping that Calypso can give someone else the job of being the Grim Reaper.",
+   "address": "0x2e67d0"
+  },
+  "sweet": {
+   "car": "Sweet Tooth",
+   "driver": "Needles Kane",
+   "bio": "Needles is, by far, the most aggressive competitor Twisted Metal has ever known. He's competed in every Twisted Metal and has become known as the insane clown. He has become tired of this position as a simple competitor and with his wish hopes to take over Twisted Metal altogether.",
+   "address": "0x2e6a00"
+  },
+  "thump": {
+   "car": "Thumper",
+   "driver": "Angel",
+   "bio": "For years, Angel has wanted to compete with the big-boys and their lowriding, customised, bass pumping vehicles. Growing up, she watched her brothers and cousins gain notoriety building and modifying incredible vehicles. She has had to stand by the sidelines simply watching the car show competitions instead of competing herself. Twisted Metal was just the opportunity she was looking for. If she wins she will finally have the car that puts them all to shame.",
+   "address": "0x2e6b60"
+  },
+  "spectre": {
+   "car": "Spectre",
+   "driver": "Chuckie Floop",
+   "bio": "A popular radio station receives a confusing giveaway prize from an anonymous source. The prize?  A \"special\" vehicle to compete in a contest called Twisted Metal, and all you have to do to win is be the 7th caller. Of course the DJ's have no clue what they're giving away and the 7th caller, Chuckie Floop, is just happy to win something. Chuckie doesn't realize what he is in for and discovers from the mysterious contest creator that the winner will be granted any wish they desire. Not sure how this contest works or how anyone can grant wishes, Chuckie's mind focuses on the important \"what will I wish for?\".",
+   "address": "0x2e6d68"
+  },
+  "twist": {
+   "car": "Twister",
+   "driver": "Miranda Watts",
+   "bio": "Miranda's twin sister, Amanda, competed in Twisted Metal a few years ago and has been missing ever since. Miranda's been on an exhaustive search for her sister, but hasn't had any luck finding her. She eventually follows Amanda's trail to Calypso who offers her a seat in the upcoming Twisted Metal. Miranda is no stranger to racing as she and Amanda used to be the top two female Indy car racers in the world. She agrees and knows exactly what she'll wish for; her sister returned alive and well.",
+   "address": "0x2e7010"
+  },
+  "cop": {
+   "car": "Outlaw",
+   "driver": "Capt. Jamie Roberts & Sgt. Carl Roberts",
+   "bio": "Jamie and her brother Carl were once decorated and respected police officers. Jamie's brother had competed in and won a previous Twisted Metal. Upon making his wish, Calypso tricked and imprisoned him. Jamie entered and won a subsequent Twisted Metal and was able to rescue her brother. Now they're competing together with the goal of bringing down Calypso and Twisted Metal once and for all. Jamie hopes to merely bring the contest to an end. She doesn't know that her brother plans to kill Calypso if he gets the chance.",
+   "address": "0x2e7248"
+  },
+  "grass": {
+   "car": "Grasshopper",
+   "driver": "Krista Sparks",
+   "bio": "Krista Sparks is the long dead daughter of Calypso. Calypso, and his entire family were killed in a brutal car accident. Calypso escaped from death by stealing a demon's powers, but he was not able to bring his family with him. Calypso gets the idea to rescue his daughter from the afterlife. Upon attempting to do so, he discovers that while he will be able to summon her, it will only be temporary. In order for her to be truly living again she must win Twisted Metal and wish for this life herself.",
+   "address": "0x2e74b8"
+  },
+  "wart": {
+   "car": "Warthog",
+   "driver": "Colonel Hall",
+   "bio": "Colonel Hall wanted to be a military man since he was a little kid. Right from the start he excelled at all forms of combat, and tactics came naturally to him. The army has sent him to compete in Twisted Metal with the hope that he'll win and acquire an ultimate weapon. When he wins, Colonel Hall wishes for an ultimate weapon; something that will enable him to easily take out all the evil-doers of the world.",
+   "address": "0x2e76f8"
+  },
+  "axel": {
+   "car": "Axel",
+   "driver": "Axel",
+   "bio": "More than a decade ago, Axel was imprisoned in a massive, two-wheeled contraption by his father. At the end of Twisted Metal 2, he confronted his father about this and he was told he'd have to spend another decade imprisoned. In a show of defiance, he tore his arms free from the contraption and disappeared. Even though he was now free, he found he couldn't handle living without the thing he'd been part of for so long. He felt like he'd lost a part of his body. Axel met a doctor who constructed cybernetic arms and feet that would allow him to drive the vehicle once again, on the condition that Axel would have to turn over his wish should he win Twisted Metal.",
+   "address": "0x2e78d8"
+  },
+  "mrslam": {
+   "car": "Mr. Slam",
+   "driver": "Simon Whittlebone",
+   "bio": "Simon Whittlebone was the mastermind behind Whittlebone Tower; a skyscraper that was to stretch taller than any building that had come before it. While the building was under construction, Simon climbed to the top of the tower and shouted to the universe that this creation made him a god. He lost his balance and fell to the ground. With the mastermind dead, the tower was never finished. Companies tried to tear the remains down, but strange and ghostly things always kept people at bay; Simon's spirit has been haunting the tower. His spirit possesses one of the construction vehicles and he enters Twisted Metal with the hopes of being reborn so he can finish his tower.",
+   "address": "0x2e7ba8"
+  },
+  "crim": {
+   "car": "Crimson Fury",
+   "driver": "Agent Shepherd",
+   "bio": "Agent Shepherd is a good and dedicated FBI agent who's entered Twisted Metal with the goal of bringing the FBI's most wanted, Calypso, to justice. He's a simple and straightforward man. If he wins Twisted Metal, Shepherd hopes to capture Calypso with the help of the FBI.",
+   "address": "0x2e7e90"
+  },
+  "hamr": {
+   "car": "Hammerhead",
+   "driver": "Catfish",
+   "bio": "Catfish, a man who prides himself as the mighty hunter, decided to modify his favorite rig to compete in this year's Twisted Metal. After all, it's just another form of hunting, vehicular style. Catfish's illustrious and often illegal hunting obsession has resulted in the head of every type of big game creature to hang proudly in his favorite trophy room. Now, Catfish's ultimate dream is to hunt the most intelligent species in the animal kingdom, the Human, in an all-out, man vs. man survival of the fittest in the raw wilderness.",
+   "address": "0x2e7fe8"
+  },
+  "edboss": {
+   "car": "RV",
+   "driver": "Cousin Eddy",
+   "bio": "Cousin Eddy was born in a backwater Ozarks pigsty called Sour Creek. You won't find it on any map. A textbook case of what can go wrong when cousins marry cousins, Eddy was the strongest man in town by the time he was ten-- though his malformed, inbred brain had stopped developing at age three. Eddy only had two loves: \"smashin' things\" and collecting \"shiny things\". By age thirteen he owned all of the shiny things in Sour Creek. After he'd finished his smashing the place was kind of lonely, so he wandered off in search of more shiny things and more things to smash. When he stumbled across the Twisted Metal competition he thought he'd found paradise. Eddy had gathered a band of drifters - \"cousins\" he called them - who he coerced by brute strength into helping him transform a trashed RV into a nightmare killing machine. Now he could blast his way into Twisted Metal. So much to smash. So many shiny things...",
+   "address": "0x2e8240"
+  },
+  "edatv": {
+   "car": "ATV",
+   "driver": "Gene Ruttish",
+   "bio": "Gene Ruttish had always fancied himself a ladies' man... unfortunately no one ever told the ladies. All his life he'd tried one crazy ATV stunt after another in the vain attempt to gain their favor. For years he's been living by the credo, \"Bones heal. Chicks dig scars. Glory lasts forever.\" Years of trying crazy stunts have made him quite the skilled driver and willing risk-taker. Joining Cousin Eddy's caravan has given him a place to show off his skills and Twisted Metal is his latest attempt to \"wow\" the women. Gene knows exactly what he wants from Twisted Metal. When he wins, he will ask Calypso to make him the most desired man on the planet.",
+   "address": "0x2e8618"
+  },
+  "dark1": {
+   "car": "Dark Tooth",
+   "driver": "Marcus Kane & Needles Kane",
+   "bio": "Terrible things can happen when a man comes to grips with his dark side. Marcus has spent his life running from his nightmares. Needles has devoted his life to making his nightmares come true. When Marcus surrenders to Needles the whole is greater than the sum of the parts. Marcus' rational mind and Needles' fevered insanity descend into a vortex of sinister chaos. The only possible outcome is the total annihilation of anything that stands in their path.",
+   "address": "0x2e88e8"
+  },
+  "dark2": {
+   "car": "Tower Tooth",
+   "driver": "Marcus Kane & Needles Kane",
+   "bio": "Terrible things can happen when a man comes to grips with his dark side. Marcus has spent his life running from his nightmares. Needles has devoted his life to making his nightmares come true. When Marcus surrenders to Needles the whole is greater than the sum of the parts. Marcus' rational mind and Needles' fevered insanity descend into a vortex of sinister chaos. The only possible outcome is the total annihilation of anything that stands in their path.",
+   "address": "0x2e8b08"
+  },
+  "hc_rkill": {
+   "car": "Roadkill",
+   "driver": "John Doe",
+   "bio": "An undercover cop trying to bring down the Twisted Metal contest. The original John Doe was killed by Calypso at the end of Twisted Metal: Black\u0003. Rumor is, Midtown P.D. has a whole team of John Does, all with the same mission: take down Calypso.",
+   "address": "0x2e8d30"
+  },
+  "hc_derby": {
+   "car": "Crazy 8",
+   "driver": "No Face",
+   "bio": "No Face is obsessed with rebuilding his mutilated mug. Tracking and killing those he deems evil, he steals the eyes and tongues of his victims. He struggles to create a new face for himself, one that will allow him to smile at his baby daughter without making her burst into tears. After 8 years, still no luck.",
+   "address": "0x2e8e60"
+  },
+  "hc_grim": {
+   "car": "Mr. Grimm",
+   "driver": "Mr. Grimm",
+   "bio": "Grimm's taste for human flesh has not abated. Grimm's sanity has not returned. He now spends his nights racing through the streets of Midtown, searching for his next meal while speaking to the rotting skull of his dead friend that he wears as a helmet. In recent years he has begun to think he may actually be the Grim Reaper.",
+   "address": "0x2e8fd0"
+  },
+  "hc_hears": {
+   "car": "Shadow",
+   "driver": "Raven",
+   "bio": "Raven drives a haunted hearse filled with the vengeful souls of the dead that it once carried. Using her powerful voodoo dolls, she has become a hero to the people of Midtown; an urban legend who protects the innocent from the freaks and killers who roam the streets of this cursed city.",
+   "address": "0x2e9150"
+  },
+  "hc_preac": {
+   "car": "Brimstone",
+   "driver": "Preacher",
+   "bio": "This rejected evangelist took his own life at the end of Twisted Metal: Black®. Rejected by Heaven and Hell, Jebidiah's spirit now roams the Earth, searching for those who wronged him. Locals say if you see Jebidiah's ghost, you will be dead from a car accident within the year.",
+   "address": "0x2e92a0"
+  },
+  "hc_axel": {
+   "car": "Axel",
+   "driver": "Axel",
+   "bio": "Axel is still aching over the murder of his wife. Feeling her death was his fault, he chooses to stay strapped to the wheels, his feet dragging against hot asphalt, ripped apart, bleeding, and causing him tremendous pain. One day he hopes he will have done his penance and the spirit of his wife will forgive him.",
+   "address": "0x2e93f0"
+  },
+  "hc_semi": {
+   "car": "Darkside",
+   "driver": "Dollface",
+   "bio": "Choosing to stay locked in her dollmask, this once young girl has become a young woman. While her body and skull grow bigger, the mask does not yield. The crushing pressure on her brain has begun to take its toll.",
+   "address": "0x2e9558"
+  },
+  "hc_suv": {
+   "car": "Outlaw",
+   "driver": "Agent Stone",
+   "bio": "Caught in a time loop at the end of Twisted Metal: Black®, Agent Stone is forever forced to relive the night he won the Twisted Metal contest. Each night he stands before Calypso, prepared to be redeemed... and each night ends with a bullet straight through the brain. For Agent Stone, there is no escape...",
+   "address": "0x2e9668"
+  },
+  "hc_sweet": {
+   "car": "Sweet Tooth",
+   "driver": "Needles Kane",
+   "bio": "A serial killer on the streets of midtown, looking for his next victim. His brother, the driver of YellowJacket, is trying to kill him before the deranged clown can kill another innocent.",
+   "address": "0x2e97d8"
+  },
+  "hc_taxi": {
+   "car": "YellowJacket",
+   "driver": "Charlie Kane",
+   "bio": "The brother of Sweet Tooth controls his dead father via remote control. The macabre duo have decided to track and kill Sweet Tooth and then kill themselves. Doing so will destroy the family bloodline, putting an end to generations of murderers and psychopaths.",
+   "address": "0x2e98d0"
+  },
+  "hc_tow": {
+   "car": "Junkyard Dog",
+   "driver": "Billy Ray",
+   "bio": "At the end of Twisted Metal: Black®, Billy Ray embarked on his life's ambition: to outdo Sweet Tooth as midtown's most notorious serial killer. It's been almost 10 years since that vow, and he has yet to kill another soul. Until tonight...",
+   "address": "0x2e9a18"
+  },
+  "hc_vette": {
+   "car": "Spectre",
+   "driver": "Bloody Mary",
+   "bio": "In the years since Twisted Metal: Black®, Bloody Mary has lost all hold on reality. She is not sure what she wants anymore. She simply does what comes naturally to her: driving and killing. Secretly, she hopes to be killed in the contest, and have her suffering come to an end.",
+   "address": "0x2e9b48"
+  },
+  "hc_rock": {
+   "car": "Manslaughter",
+   "driver": "Black",
+   "bio": "No one knows where Black comes from, but he seems incapable of dying, and he has only one goal: to kill Calypso. The latest rumor is that Black actually comes from a parallel universe where a different, more colorful Calypso wants to use Black to murder his darker twin.",
+   "address": "0x2e9c98"
+  },
+  "hc_stock": {
+   "car": "12-Pak",
+   "driver": "Severed Sam",
+   "bio": "Sam Boomer was a rising star on the racing circuit until a spectacular crash took his life. His car was totaled, his body decapitated. Now he searches Midtown for the crazed fan who leapt from the stands on that tragic day and stole his severed head.",
+   "address": "0x2e9de0"
+  },
+  "hc_tank": {
+   "car": "Warthog",
+   "driver": "Cage",
+   "bio": "The fool assumed he could go head to head with Sweet Tooth and become Midtown's greatest killer. Sweet Tooth made quick work of him but kept him alive to serve as a lesson to others. Now simply a torso and head, no one is sure how Cage is controlling his vehicle.",
+   "address": "0x2e9f10"
+  }
+ }
+}

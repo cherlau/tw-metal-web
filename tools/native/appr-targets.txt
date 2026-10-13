@@ -1,0 +1,7 @@
+at:253740 approach
+at:2537e8 approach_ang
+at:253128 approach_exp
+at:215b48 wrap
+at:237430 yaw_to
+at:237480 pitch_to
+at:2646f8 ticks

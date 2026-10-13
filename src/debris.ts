@@ -36,6 +36,10 @@ export class DebrisBody {
   readonly omega = new THREE.Vector3();
   age = 0; // tiques
   alpha = 1;
+  /** Vida em tiques (Infinity = fica até ser reciclado, como as árvores tombadas de FUN_001e2000). */
+  life = DEBRIS_LIFE;
+  /** Quanto um canto pode ficar abaixo do chão sem contato (objetos que já nascem enterrados, como árvores). */
+  slop = 0;
   resting = false;
   private readonly invInertia: THREE.Vector3; // diagonal, no espaço local
   private readonly corners: THREE.Vector3[];
@@ -73,31 +77,33 @@ export class DebrisBody {
   /** Um tique: voo livre com gravidade −128 e contato com o chão (plano sob a peça). */
   step(dt: number, ground: GroundQuery | null): void {
     this.age += dt / TICK;
-    if (this.age > DEBRIS_LIFE - DEBRIS_FADE) this.alpha = Math.max(0, this.alpha - dt);
+    if (this.age > this.life - DEBRIS_FADE) this.alpha = Math.max(0, this.alpha - dt);
     if (this.resting) return;
     this.vel.y += DEBRIS_GRAVITY * dt;
     this.pos.addScaledVector(this.vel, dt);
     const w = this.omega.length();
     if (w > 1e-6) this.rot.premultiply(new THREE.Quaternion().setFromAxisAngle(this.omega.clone().divideScalar(w), w * dt)).normalize();
     if (!ground) return;
-    const hit = ground.raycast({ x: this.pos.x, y: this.pos.y + 30, z: this.pos.z }, { x: 0, y: -1, z: 0 }, 400);
-    if (!hit) return;
-    const n = new THREE.Vector3(hit.normal?.x ?? 0, hit.normal?.y ?? 1, hit.normal?.z ?? 0).normalize();
-    if (n.y < 0) n.negate();
-    const g = new THREE.Vector3(this.pos.x, this.pos.y + 30 - hit.distance, this.pos.z);
-    // canto mais fundo abaixo do plano do chão
+    // Canto mais fundo: raio curto por canto (sobe 3 pés e desce 6) — funciona em encosta e sob outras copas.
     let deepest = -1;
     let depth = 0;
+    const n = new THREE.Vector3(0, 1, 0);
     const c = new THREE.Vector3();
     for (let i = 0; i < this.corners.length; i++) {
-      const d = n.dot(this.cornerWorld(i, c).sub(g));
+      this.cornerWorld(i, c);
+      const top = c.y + 3 + this.slop;
+      const hit = ground.raycast({ x: c.x, y: top, z: c.z }, { x: 0, y: -1, z: 0 }, 6 + this.slop);
+      if (!hit) continue;
+      const d = c.y - (top - hit.distance) + this.slop; // < 0: canto abaixo da superfície além da folga
       if (d < depth) {
         depth = d;
         deepest = i;
+        n.set(hit.normal?.x ?? 0, hit.normal?.y ?? 1, hit.normal?.z ?? 0).normalize();
+        if (n.y < 0) n.negate();
       }
     }
     if (deepest < 0) return;
-    this.pos.addScaledVector(n, -depth);
+    this.pos.y -= depth;
     const p = this.cornerWorld(deepest, new THREE.Vector3());
     const r = p.clone().sub(this.pos);
     const vp = this.vel.clone().add(this.omega.clone().cross(r));
@@ -162,6 +168,16 @@ interface Piece {
   body: DebrisBody;
   obj: THREE.Object3D;
   faded: boolean;
+  /** grupo de reciclagem (ex.: 'topple', no máximo 15 — FUN_001e2000) */
+  pool?: string;
+}
+
+/** Corpo de caixa a partir dos cantos locais (espaço do objeto), posto no mundo por `frame`. */
+export function boxBody(corners: THREE.Vector3[], frame: THREE.Matrix4, mass = 1): DebrisBody {
+  const b = new DebrisBody(mass, corners);
+  b.pos.setFromMatrixPosition(frame);
+  b.rot.setFromRotationMatrix(new THREE.Matrix4().extractRotation(frame));
+  return b;
 }
 
 /** Despacha ações (com atraso em tiques) e simula/desenha as peças de destroço soltas. */
@@ -264,6 +280,32 @@ export class DebrisSystem {
       const m = o as THREE.Mesh;
       if (m.isMesh) (m.material as THREE.Material).opacity = alpha * ((m.material as THREE.Material).userData.baseOpacity ?? 1);
     });
+  }
+
+  /** Folga inicial: maior profundidade em que os cantos já nascem abaixo do chão (raio a partir de `fromY`). */
+  static embed(body: DebrisBody, ground: GroundQuery, fromY: number): number {
+    let worst = 0;
+    const c = new THREE.Vector3();
+    for (let i = 0; i < 8; i++) {
+      body.cornerWorld(i, c);
+      if (c.y >= fromY) continue;
+      const hit = ground.raycast({ x: c.x, y: fromY, z: c.z }, { x: 0, y: -1, z: 0 }, fromY - c.y + 50);
+      if (hit) worst = Math.max(worst, fromY - hit.distance - c.y);
+    }
+    return worst;
+  }
+
+  /** Acrescenta um corpo já pronto (objeto no espaço local do corpo). `pool`/`max`: recicla o mais velho. */
+  add(obj: THREE.Object3D, body: DebrisBody, pool?: string, max = Infinity): void {
+    const same = this.pieces.filter((p) => p.pool === pool && pool !== undefined);
+    if (same.length >= max) {
+      const old = same[0];
+      this.scene.remove(old.obj);
+      this.pieces.splice(this.pieces.indexOf(old), 1);
+    }
+    obj.matrixAutoUpdate = false;
+    this.scene.add(obj);
+    this.pieces.push({ body, obj, faded: false, pool });
   }
 
   clear(): void {

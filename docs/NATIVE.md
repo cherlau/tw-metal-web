@@ -41,10 +41,10 @@
 
 ## Escolhas do host que continuam (até achar no ELF)
 Em `VEHICLE_RULES`: aceleração, vel. máxima, aderência, mola/amortecimento, raios de parede; modelo arcade em vez do corpo rígido original. (Gravidade já é nativa.)
-Massa (`carro+0x848`): **origem não encontrada** — nenhum `swc1/sw` direto em `+0x848` no código do jogo (as gravações em `0x286xxx–0x287xxx` são de outro struct); provável cópia em bloco.
+Massa, giro e vel. máx. (`carro+0x848/+0x854/+0x858`): **achados em 2026-10-13** — tabela 0x2b8ab0 copiada por `FUN_0012ece0` (ver "Direção").
 
 ## Escolhas do host do combate (a trocar quando achar no ELF)
-Dano, velocidade, munição e curva de cada arma, vida (100), turbo, tempos de renascimento, IA dos bots, colisão carro×carro, e o mapeamento visual dos objetos do `GLOBALS.BDD` (identificados por imagem): ícones de pickup = modelo 3D da arma — 15 Turbo, 16 Fire, 17 Full Health, 18 Health 30%, 19 Homing, 20 placa amarela (Environment Attack / Machine Gun / Mega Gun), 21 Power, 22 Remote Bomb, 23 Ricochet, 24 Swarmer, 25 Napalm, 26 Upgrade (`PICKUP_MODELS` em `src/game.ts`); aura = sprite aditivo na cor do modelo (cores escolhidas); 16 = míssil, 36 = bola de fogo, 29 = estouro.
+Vida (100), turbo, tempo da carcaça, colisão carro×carro, e no visual: aura dos pickups (sprite aditivo, cores escolhidas), brilho aditivo no lugar da luz dinâmica dos projéteis, prefabs 36 (bola de fogo) e 29 (estouro) no lugar das partículas de explosão. Armas, pickups e especiais: ver "Armas" abaixo (o que ainda é aproximação está marcado ⚠️ lá e em `docs/PENDENTES.md`).
 
 ## Montagem dos modelos (2026-10-11, revisão dos carros)
 Achado no próprio `.ngp` (sem ELF): estado do GS por grupo (camada de reflexo semitransparente), layout dos ossos `0x0D` (bits 7/6/5), filho de `+0x0C` dos `0x15`, seletores `0x05`. Detalhes em `docs/FORMATS.md`.
@@ -66,7 +66,7 @@ Escolhas do host: qual evento dispara qual nome (`src/game.ts`: `LAUNCH`, `EXPLO
 ## Próximos alvos
 1. Origem de `carro+0x848` (massa), `+0x854` (giro) e `+0x858` (vel. máx. mph): **não há gravação direta** (só cópias temporárias em `FUN_001ca240`/`FUN_001cb0d8` vindas de outro objeto) → provável cópia em bloco/arquivo. Física de direção: fora das 4 etapas do jogador.
 2. Tabela de atributos de jogo (velocidade/armadura/especial da tela de seleção) — strings "Armor", "Speed".
-3. Armas: strings de pickups (`PKP`), "Weapons Bay Full" (`0x2ba554`, dado sem xref direta → tabela).
+3. ~~Armas~~: feito em 2026-10-13 (seção "Armas").
 
 ## Desenho do scene graph — `FUN_0021b3c0` (2026-10-12, Mr. Grimm)
 Exportado em `artifacts/native/skin` (alvos `tools/native/skin-targets.txt`). É o percurso com callbacks de
@@ -151,3 +151,112 @@ Exportados em `artifacts/native/fx`, `fx2` (alvos `tools/native/fx*-targets.txt`
 
 ## Renascimento (parcial, 2026-10-12)
 `FUN_0011c6e0` (renasce o carro) é chamado pelos modos de jogo (`FUN_001b5478`, `FUN_001e8280`) quando o byte por jogador em `modo+0x244`/`+0x248` vale 2 (vira 3). Mensagem "PLAYER DEAD, RESPAWN IN %d" via tabela de textos `0x2c49a8`. Quem põe o 2 e o tempo ainda não achados.
+
+## Destrutíveis das arenas (2026-10-12)
+`FUN_00168aa8` (coleta dos níveis): cada `0x13` vira objeto `FUN_00170f98` com posição (`+0xB0`) e rotação (`+0xC0`) do percurso; categorias com gerente próprio: `0x21` (`FUN_0011b608`), `0x12d`/`0xeb..0xf2` (`FUN_001834e8`), `0x12e`/`0x12f`, `0x33fe..0x3404` (`DAT_0037c134`), `0x3f8` (`FUN_0019b8c0`) — 🟡 comportamento extra não implementado.
+`FUN_00171838` (golpe): `0x1194..0x119d` tombam ao morrer (`FUN_001e2000`: cópia como corpo rígido, pool de 15, velocidade do golpe × 0,05; `FUN_001e2348` som/efeito por categoria); `0x1196..0x1198` e `0x119a..0x119d` pegam fogo com golpe tipo 4/0x29 (`FUN_00172bb0`: emissores de fogo, vida volta a cheia) em vez de quebrar; `0x11a3` só aceita golpe a ≤ 10 pés; `0x11f8..0x12c0` avisam `FUN_00113b28` ao morrer (🟡 objetivo/placar).
+Levantamento: Arena 156 nós, Castelo DM 475 (378 árvores `0x1198`), Coliseu DM 149, Egito DM 13, Grécia DM 88, Paris DM 138 (66 postes `0x1194`), Tóquio DM 0; quase todos classe 1 (vida 1), Coliseu/Egito/Grécia com alguns classe 2 (20). As entradas destruídas costumam não ter malha: o objeto some, solta destroços e toca `D_*` do banco da arena (`snd/<nível>.bnk`; grafia do jogo `D_WOOD_HOLOW_*`, `D_METALHOLOW_*`).
+
+## HUD (2026-10-13)
+Exportados em `artifacts/native/hud*`, `screen` (alvos `tools/native/hud*-targets.txt`). Implementação: `tools/hud.py`, `tools/export_ui.py`, `src/hud.ts`, `src/font.ts`.
+
+| Endereço | Evidência |
+|---|---|
+| `FUN_0013b060` | objeto do HUD com 12 widgets (vtables 0x2d62a0..0x2d64b0; slot 7 = atualização) |
+| `FUN_0013b310` | coletor por categoria do GLOBALS: 0x206d radar (+0xC0), 0x206e painel (+0x24E0), 0x1ffe carga do especial (+0x14D0); 0x1fcb..0x1fce setas do radar, 0x1f48/0x1f52/0x1fd8/0x2076 seletores do painel; 0x2080..0x208a por `FUN_0013a610` (0x2080 modelo da arma, 0x2081/0x2082 ícones, 0x2085..0x2087 HC) |
+| `FUN_0019e458` / `FUN_0019e580` | posição na frente da câmera: (x·prof/1,5, prof, z·prof·0,5) com a rotação da câmera — radar (−0,68; 3,0; 0,575), painel (0,69; 3,5; −0,6), carga (0; 4,02; −0,43) |
+| `FUN_00139678` / `FUN_00139938` | clipe 0 do objeto 0x206e = vida/vidaMáx (pisca < 15 %), clipe 0x10 + seletor 0x1fd8 acima de 86,957 % com o bit 0x40 de carro+0x63f0 |
+| `FUN_00139cd8` / `FUN_00139de0` | clipe 2 = carro+0x6894 (turbo), clipe 1 = carro+0x6898 (energia) |
+| nó 0x18 | u16 em +0x12/+0x14/+0x16 = canal da escala x/y/z (turbo canal 2, energia 3, vida 4, excesso 8) |
+| `FUN_00137148` / `FUN_00137620` | radar: inimigos < 900 pés, (direita·0,054, frente·0,028)·12,5 em 1/16 px, quadrado ±0x16; cor 0x2ba6c8 + id·16 |
+| `FUN_00139780` | alvo do topo: o mais perto num cone cos(0,96); nome curto 0x2b39f0 + i·0x20, em (142, 9), tamanho 14 |
+| `FUN_0013aa88` | nome da arma (0x2ba680 / HC 0x2ba6a8) em (538, 152) e munição "%d" em (538, 186), tamanho 12 |
+| `FUN_0013a0b8` | mensagens (tabela 0x2ba4c0): 120 quadros cada, (320, 6), cor (0xdd, 0xdb, 0x0a) |
+| `FUN_00221e78` / `FUN_00223318` / `FUN_00223040` | fonte: glifo s×s, avanço 1,125·s × largura/32 da tabela 0x2c7ae8; espaço 0,625; sombra de 4 cópias alfa 0x40 (`FUN_002224a0`/`FUN_00222660`) |
+
+## Menu (2026-10-13)
+Arte do SHELL/UI.BDD: logo = raízes 0x2397..0x2399; ícones de seleção na ordem da tabela 0x2b39f0; cartões de piloto 0x49904..0x49d64 ligados pelas biografias "Car:/Driver:" do ELF; nomes das fases (0x2e6138..0x2e6240); dificuldades SUPER EASY/EASY/MEDIUM/HARD (0x2c45b8). Túnel do SWIRL.BDD ao fundo.
+
+## IA dos bots (2026-10-13)
+Exportados em `artifacts/native/ai`, `ai2` (alvos `tools/native/ai*-targets.txt`). Tabelas em `rules/ai.json` (`tools/native/export_rules.py`); implementação `src/game/ai.ts`.
+
+| Endereço | Evidência |
+|---|---|
+| `FUN_00102300` | perfil 0x2b2d10 + i·0x40 (i = carro+0x14); dificuldade multiplica +0x18 (×5/×4/×2) e +0x1c (×3/×2/÷2) |
+| `FUN_0013d800` / `FUN_001027f8` | habilidade = mín(0,72 / 0,85 / 1, base + (1 − base)·prog·k), k = 0,33/0,4/0,5/1 |
+| `FUN_00106f80` | máquina das armas +0x288: 1 escolhe, 2 troca, 3 espera, 4/5 alcance, 6 dispara, 7/8 especiais |
+| `FUN_00107500` / `FUN_00107600` / `FUN_001098b0` | escolha pela proporção de uso desejada (0x2b1d20 frente, 0x2b2518 ré) |
+| `FUN_00107148` → `FUN_00148638` | se não tem munição da arma escolhida, ganha 1 |
+| `FUN_0010ba08` | alcance máx./mín./alinhamento por tipo (0x2b35d0/0x2b3610/0x2b3650) |
+| `FUN_00105970` | cone da metralhadora (perfil +0x08, estreita até 500 pés, ajustado pela habilidade) |
+| `FUN_00105520` | visada na altura do perfil (+0x14), contadores +0x3e0/+0x3e4 |
+| `FUN_001034a0` | turbo (+0x12c) só com |esterço| < 10° e carga > 0,2; até esvaziar |
+| `FUN_001049a8` | recua (modo 2) com vida < +0x32c (perfil +0x30 · U(0,75; 1,25)) |
+
+## Direção (2026-10-13)
+`FUN_0012ece0` copia 0x2b8ab0 + id·0x34 para o controlador em carro+0x340 (campos [0x142..0x14e] = carro+0x848..+0x878): massa, arfagem/rolagem visuais (`FUN_0012f2c8`), giro (`FUN_00132aa8`: alvo = entrada·giro, taxa 0,02 virado / 0,25 solto, ×1,75 no freio de mão), vel. máx. mph, aceleração/rolagem/freio por quadro (`FUN_00133650`; turbo ×3 aceleração, ×1,25 vel. máx.), dano de batida (`FUN_001349f0`: campo·mín(v − 100, 100)/100, a cada 60 quadros), impulso de pulo 🟡 (`FUN_001306b8`), alinhamento da velocidade 0,03/quadro (`FUN_00133078`). Constantes em gp−0x7c58.. (`tools/native` + `rules/vehicles.json` → `drive`). `FUN_00253128` = passo exponencial com mínimo.
+
+## Som (2026-10-13)
+Os nomes não são strings: o código monta cada nome em registradores de 128 bits (ori/dsll/pcpyld) — `tools/native/sound_sites.py` acha 240 chamadas e ~190 nomes. Atenuação `FUN_001d32d8` → `FUN_00216b78`: cheio até a mínima, linear até 0 na máxima; ouvinte = carro do jogador.
+
+| Endereço | Som |
+|---|---|
+| `FUN_00141ca0` | batida: ≤ 5 V_TAP (vol. i·0,25), 5–15 V_CRASH, 15–25 V_MAJOR_COLL ((819 + 205·frac)/1024), > 25 cheio; faixa 10–200 |
+| `FUN_001446d0` | turbo: V_TURBO_LAUNCH (≥ 61 quadros), V_MAXRPM_L (sobe em 180), V_TURBINE_L; saída 60/120 quadros |
+| `FUN_00141770` / `FUN_001418b8` | V_TURBO_OUT; V_LOWHEALTH_L abaixo de 15 % (chamado pelo HUD) |
+| `FUN_00142648` / `FUN_00145720` / `FUN_001457b0` | morte: W_EXPLO_LRG, W_PLAYER_DEATH, V_SCREAM (10–2000) |
+| `FUN_00152b48` / `FUN_00150c98` / `FUN_001524a0` / `FUN_00154720` | W_EXPLO_MED 60–650, W_EXPLO_LRG 15–650, W_SWARM_LNCH 15–650, W_RICOCHET_BNCE 100–650 |
+| `FUN_001451a0` / `FUN_001452d8` | S_DEPLOY / S_RETRACT dos suportes (bancos *WP.BNK) |
+| `FUN_00141580` / `FUN_00153ff0` | WEAPON_CYCLE; W_BUL_DIRT/METAL/GLASS |
+
+## Armas (2026-10-13)
+Exportados em `artifacts/native/wtype`, `wtab`, `wfire`, `wclass`, `wball`, `pkr`, `hp`, `sw`, `appr`, `proj3` (alvos `tools/native/w*-targets.txt`, `pkr-`, `hp-`, `sw-`, `appr-`). A tabela de projéteis mora no BSS e é montada por código: `tools/native/mips.py` (emulador mínimo de R5900) roda `FUN_001fd4e0` e `tools/native/export_weapons.py` gera `src/game/weapon-tables.ts` (Head-On e Harbor City).
+
+| Endereço | Evidência |
+|---|---|
+| `FUN_00203b10` (fábrica, "Invalid weapon type.") | 150 slots de `0x130` em `0x37cbf0+0x710`; tipo < `0x39`; tipo 8 (ambiente) devolve −1 |
+| `FUN_00203c68` | instância: tabela `0x37cbf0+0xB930 + tipo·0x94`; vida = `+0x08`·60 tiques; velocidade `+0x0C` (mph; tipo 7 no HC soma a vel. máx. do carro); dano da instância `+0x1c` = `+0x00` (1000 com "Killer Weapons"; ×2 nas balas com munição de metralhadora > 1); luz `+0x5c` (RGB float `+0x60..+0x68`); partículas `+0x6c`/`+0x70`; modelo = `0x37cbf0+0xDA24 + 4·tipo`; escala 0,25 (`0x18`), 0,65 (`0x1d`); `0x24` sorteia ±100 mph |
+| `FUN_001fd4e0` / `FUN_001fd3f8` | monta os 57 registros (padrões: cone de trava 40/75°, oscilação 10–20 tiques, efeitos −1, escalas 1); `DAT_002f4b14` = 0 Head-On / 1 Harbor City (`FUN_001fca10`) |
+| `FUN_001fef00` | por tique: direção (`FUN_001ff0a8`), movimento (`FUN_001ffc98`), idade em tiques → fim da vida detona (`FUN_002024a8(p,0,1)`), senão colisão (`FUN_00200e28`) |
+| `FUN_001ff0a8` → `FUN_001ff238`/`FUN_001ff298` → `FUN_001ff3a8` | modo `+0x18`: 0 reto (giro amortece), 1 persegue o alvo, 2 antecipa (alvo + vel. do alvo × dist/(vel·1,4667) × `+0x20`); só depois de 2 tiques |
+| `FUN_001ff5a0` / `FUN_001ff800` | rumo/arfagem por `FUN_002537e8` (fração `+0x1c` por tique, mínimo 1e-4); fora de `+0x24`/`+0x28` graus perde a trava (sem oscilação); `+0x2c` limita o passo (`+0x34` longe, `+0x38` a menos de `+0x30` pés); tipo `0x12` acelera o giro 5 %/tique perto |
+| `FUN_001ffa18` | oscilação (`+0x3c`): troca a cada U(`+0x4c`,`+0x50`) tiques, desvio ±`+0x40`/±`+0x44` graus; a < 300 pés amortece (giro → 0,25), a < 30 pés solta a trava |
+| `FUN_001ffc98` | velocidade escalar rumo a mph·0,024444 pés/tique (fração `+0x10` abaixo dela, 1e-4 acima); despacha os movimentos especiais (`0xe` ricochete, `0x18`, `0x2c`, balísticos…) |
+| `FUN_001ffff8` | rente ao chão (`+0x14`): ≥ 5 pés; sem alvo afunda a −0,5 pé/tique entre 5 e 300 pés |
+| `FUN_002003f8` / `FUN_00201878` | Ricochete: rola a 5 pés do chão; parede (normal z ≤ 0,866) reflete (`FUN_002037d8`); depois do 1º quique o golpe vale ×3 no Head-On (30 fixo no HC) |
+| `FUN_00191880` / `FUN_00191be8` / `FUN_001916b8` | balísticos (4, 10, 13, 0x33): gravidade 0,02 pé/tique² (exceto com `+0x08`); Napalm sai a 2,5 pés/tique para cima, vive 300 tiques, pousa a 2 pés e espera contato (raio 5); Remote/mina caem quase parados (0,2445 mph) e só explodem com carro (o dono depois de 180 tiques) ou no 2º toque |
+| `FUN_002009d0` | 2º toque do Napalm: vertical −30 pés/tique, para de andar |
+| `FUN_00201178` | fantasma (`0x15`, `0x34`): com alvo travado só colide com ele |
+| `FUN_00200e28` | colisão: balas (0, 0x11, 0x12, 0x14) por raio, demais por varredura; golpe direto = dano da instância |
+| `FUN_002024a8` / `FUN_00202d08` | detonação: efeitos `+0x74..+0x80` (escala `+0x84..`); área se `+0x04` > 0: carros no raio levam dano·máx(0, 1 − d/raio), mínimo 0,33·dano; cheio para 4/10/13/0x2b/0x33; Napalm ×1,5 a ≥ 85 %; destrutíveis em raio/2; só o tipo `0x16` poupa o dono |
+| `FUN_00204778` (via `FUN_00168aa8`) | modelo por tipo = nó da categoria: Head-On 4000..4099 (0xfa0 bala, 0xfa1 Fire, 0xfa2 Homing, 0xfa4 Napalm — ausente no GLOBALS, 0xfa5 Ricochet, 0xfa6 Power, 0xfab Remote, 0xfac Swarmer…), Harbor City 0x1004.. |
+| `FUN_0011d340` | inventários: metralhadora (`+0x4dc4`), armas (`+0x4fbc`: especial, Fire, Homing, Napalm, Power, Ricochet, Env, Swarmer, Remote = nomes `0x2ba680`), energia (`+0x51b4`: tipos 0xd, 0x10, 0xe — não implementados) |
+| `FUN_0014b7d0` / `FUN_0014bc28` / `FUN_0014d7b0` / `FUN_00147420` | trava (cos do cone, alcance²): Fire 14,5°, Homing 30,5°, Napalm 5°, Swarmer 30°, 7000 pés; Power/Ricochet sem trava; munição inicial Fire 1, Homing 1; espera entre disparos 48 tiques (Swarmer 120) |
+| `FUN_0014ad00` / `FUN_0014ae38` / `FUN_0014b738` | metralhadora: 1 tiro a cada 10 tiques (6 melhorada/Mega Gun); calor 100, −0,2 por tique segurando, +0,4 por tique 60 tiques depois de soltar; < 0,1 trava 300 tiques |
+| `FUN_0014d970` / `FUN_0014dd00` | Swarmer: +1 míssil a cada 22 tiques segurando (máx. 6), solta sozinho em 132 + 78 tiques (`FUN_0014fe08` grava 22·6); arfagem U(1°, 20°), rumo ±20°; 1 munição por rajada |
+| `FUN_001bc6f8` / `FUN_00120ba0` | pickup: +2 (HC: 1 para Swarmer/Napalm/Power/Remote; metralhadora 30, máx. 60); soma do compartimento ≤ 30; vida +30 (`FUN_001bcbe0` grava 30 em `0x35b4d4`) ou +100 só se faltar; turbo só se < 1; recusado = mensagem a cada 120 tiques |
+| `0x2c3a70` (`FUN_001bcc20`, `FUN_001bc970`) | renascimento por tipo: U(mín, mín·3/2) s; colunas HO 1P/2P/2P, HC 1P/2P/2P; HO 1P: 30 s (Remote 60) |
+| `FUN_001bdad0` / `FUN_001bd680` | ícone do pickup = nó de categoria `0x13ba + tipo` (Head-On) ou `5000 + tipo` (Harbor City) → objetos 15 = Ambiente (raio), 20 = Napalm, 25 = Turbo (o host tinha 15/20/25 trocados); a metralhadora (0) e a Mega Gun (14) só existem no HC |
+| `FUN_0011ef10` | +1 carga do especial a cada `carro+0x62f0` tiques até 5 (1800; ATV-P 2160, Dark1-P 2400, HC Hearse/Grimm 2100, SUV 1620, Taxi 2160) |
+
+## Armas especiais (2026-10-13)
+Exportados em `artifacts/native/spec`, `spechc`, `cop` (alvos `tools/native/spec*-targets.txt`, `cop-targets.txt`). `FUN_0011d340` cria a classe por id de veículo; disparo = vtable `+0x44`. Tabela pronta em `src/game/specials.ts`.
+
+| Carro | Classe / disparo | Comportamento (não carregado) |
+|---|---|---|
+| Axel | `FUN_00116498` / `FUN_001165a8` → `FUN_00116940` | onda: carros a ≤ 100 pés levam 15 e sobem a 80 mph·massa; carregado: 15 + 3 por nível a cada 35 tiques |
+| Hearse | `FUN_00199170` / `FUN_00199350` | tipo `0x16` (raio 150); 2º toque detona |
+| Mr. Grimm | `FUN_001b00a8` / `FUN_001b0298` | tipo `0x1e` quando o clipe 0x1b passa de 0,75; dano 25; espera 25 |
+| Roadkill | `FUN_001c7f80` / `FUN_001c8070` | tipo `0x17` (trava 22,5°); carregado solta `0x18` |
+| Sweet Tooth | `FUN_001dbed0` / `FUN_001dc078` | tipo `0x1b`, trava 30,5°, dano 18 |
+| Thumper | `FUN_001e1360` / `FUN_001e1550` | 4 × `0x20` em 0/30/60/90 tiques (o lança-chamas `0x21` é a versão carregada; bots sorteiam 1/4) |
+| Spectre | `FUN_001d5c98` / `FUN_001d62e8` | tipo `0x15` (+4° de arfagem), fantasma |
+| Twister | `FUN_001e42d0` / `FUN_001e4670` | giro: preparo 25, giro 150 tiques a −0,6 rad/tique, dano 13 por toque, recuperação 45 (⚠️ host aproxima) |
+| Mr. Slam | `FUN_001b1058` / `FUN_001b1330` | agarra e bate (⚠️ host aproxima: 15 a ≤ 30 pés) |
+| Cop Car | `FUN_001b7a58` / `FUN_001b7c50` (`FUN_001b83f0`, `FUN_001b8220`, `FUN_001b88c0`) | choque no mais perto a ≤ 250 pés por 4 s (240 tiques), 0,025 por tique |
+| Crimson Fury | `FUN_00169890` / `FUN_00169ea0` | tipo `0x19` |
+| Hammerhead | `FUN_00196848` / `FUN_00196b60` | investida (⚠️ host aproxima: 15 por toque) |
+| Grasshopper | `FUN_00192498` / `FUN_001927a8` | pulo e queda em área (⚠️ host aproxima: 18 em 61 pés); carregado atira `0x25` |
+| Warthog | `FUN_001fcc10` / `FUN_001fcd00` | 3 × `0x28` (±5°), espera 70 |
+| ATV | `FUN_00115960` / `FUN_00115b78` | 2 rajadas de 10 chumbos `0x24` (dano 1) a 15 tiques; espera 6 (humano) / 120 (bot) |
+| HC | `FUN_001b0b40` (0x2c), `FUN_001dbbc0` (0x2e), `FUN_001dd878` (0x32), `FUN_001e3120` (0x33), `FUN_001d67f0` (0x34), `FUN_001c9a38` (0x35+), `FUN_001d88e8` (0xb) | só o tipo de projétil e a espera (`+0x5c`) foram lidos; Derby, HC Hearse, HC Grimm, HC Roadkill/Manslaughter e HC Spectre não atiram projéteis (não lidos); StockCar e Tank Car não têm classe |

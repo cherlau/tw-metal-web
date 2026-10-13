@@ -1,0 +1,3 @@
+# carro+0x834 -> FUN_001d7fc0
+at:11d8e8 carinit834
+at:1d7fc0 fill834

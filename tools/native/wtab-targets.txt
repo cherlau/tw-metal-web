@@ -1,0 +1,4 @@
+# Tabela de tipos de projétil/arma: 0x388520 + tipo·0x94 (57 tipos, FUN_00203c68) — BSS, preenchida em runtime
+refsrange:388520:38a5b4 wtab
+# Modelos/efeitos por tipo (0x38a614 + 4·tipo)
+refsrange:38a5b4:38a800 wtab_tail

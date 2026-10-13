@@ -70,7 +70,23 @@
      -3.3,
      3.3
     ]
-   ]
+   ],
+   "drive": {
+    "address": "0x2b8ab0",
+    "mass": 1.344,
+    "pitchDeg": 2.0,
+    "rollDeg": 5.0,
+    "turn": 0.05,
+    "maxMph": 121.0,
+    "accel": 0.02,
+    "coast": 0.005,
+    "brake": 0.075,
+    "w20": 0.038,
+    "w24": 0.027,
+    "ramDamage": 3.0,
+    "jump": 78.0,
+    "grip": 0.03
+   }
   },
   "hearse": {
    "id": 1,
@@ -138,7 +154,23 @@
      -7.0,
      3.0
     ]
-   ]
+   ],
+   "drive": {
+    "address": "0x2b8ae4",
+    "mass": 1.278,
+    "pitchDeg": 6.0,
+    "rollDeg": 8.0,
+    "turn": 0.035,
+    "maxMph": 124.0,
+    "accel": 0.02,
+    "coast": 0.005,
+    "brake": 0.075,
+    "w20": 0.038,
+    "w24": 0.027,
+    "ramDamage": 4.0,
+    "jump": 74.0,
+    "grip": 0.03
+   }
   },
   "mrgrim": {
    "id": 2,
@@ -206,7 +238,23 @@
      -3.5,
      1.0
     ]
-   ]
+   ],
+   "drive": {
+    "address": "0x2b8b18",
+    "mass": 0.75,
+    "pitchDeg": 0.0,
+    "rollDeg": 0.0,
+    "turn": 0.05,
+    "maxMph": 134.0,
+    "accel": 0.02,
+    "coast": 0.005,
+    "brake": 0.075,
+    "w20": 0.038,
+    "w24": 0.027,
+    "ramDamage": 3.0,
+    "jump": 42.0,
+    "grip": 0.03
+   }
   },
   "rkill": {
    "id": 3,
@@ -274,7 +322,23 @@
      -4.0,
      2.0
     ]
-   ]
+   ],
+   "drive": {
+    "address": "0x2b8b4c",
+    "mass": 1.146,
+    "pitchDeg": 7.0,
+    "rollDeg": 6.0,
+    "turn": 0.045,
+    "maxMph": 125.0,
+    "accel": 0.018,
+    "coast": 0.005,
+    "brake": 0.075,
+    "w20": 0.038,
+    "w24": 0.027,
+    "ramDamage": 4.0,
+    "jump": 66.0,
+    "grip": 0.03
+   }
   },
   "sweet": {
    "id": 4,
@@ -342,7 +406,23 @@
      -9.0,
      4.0
     ]
-   ]
+   ],
+   "drive": {
+    "address": "0x2b8b80",
+    "mass": 1.41,
+    "pitchDeg": 7.0,
+    "rollDeg": 6.0,
+    "turn": 0.035,
+    "maxMph": 125.0,
+    "accel": 0.015,
+    "coast": 0.005,
+    "brake": 0.075,
+    "w20": 0.038,
+    "w24": 0.027,
+    "ramDamage": 5.0,
+    "jump": 82.0,
+    "grip": 0.03
+   }
   },
   "thump": {
    "id": 5,
@@ -410,7 +490,23 @@
      -8.0,
      3.0
     ]
-   ]
+   ],
+   "drive": {
+    "address": "0x2b8bb4",
+    "mass": 1.212,
+    "pitchDeg": 6.0,
+    "rollDeg": 8.0,
+    "turn": 0.045,
+    "maxMph": 125.0,
+    "accel": 0.02,
+    "coast": 0.005,
+    "brake": 0.075,
+    "w20": 0.038,
+    "w24": 0.027,
+    "ramDamage": 4.0,
+    "jump": 70.0,
+    "grip": 0.03
+   }
   },
   "spectre": {
    "id": 6,
@@ -478,7 +574,23 @@
      -8.0,
      2.5
     ]
-   ]
+   ],
+   "drive": {
+    "address": "0x2b8be8",
+    "mass": 1.014,
+    "pitchDeg": 6.0,
+    "rollDeg": 7.0,
+    "turn": 0.045,
+    "maxMph": 132.0,
+    "accel": 0.022,
+    "coast": 0.005,
+    "brake": 0.075,
+    "w20": 0.038,
+    "w24": 0.027,
+    "ramDamage": 3.0,
+    "jump": 58.0,
+    "grip": 0.03
+   }
   },
   "twist": {
    "id": 7,
@@ -546,7 +658,23 @@
      -4.0,
      2.0
     ]
-   ]
+   ],
+   "drive": {
+    "address": "0x2b8c1c",
+    "mass": 0.816,
+    "pitchDeg": 3.0,
+    "rollDeg": 3.0,
+    "turn": 0.045,
+    "maxMph": 137.0,
+    "accel": 0.022,
+    "coast": 0.005,
+    "brake": 0.075,
+    "w20": 0.038,
+    "w24": 0.027,
+    "ramDamage": 3.0,
+    "jump": 46.0,
+    "grip": 0.03
+   }
   },
   "mrslam": {
    "id": 8,
@@ -614,7 +742,23 @@
      -1.0,
      6.5
     ]
-   ]
+   ],
+   "drive": {
+    "address": "0x2b8c50",
+    "mass": 1.608,
+    "pitchDeg": 6.0,
+    "rollDeg": 6.0,
+    "turn": 0.045,
+    "maxMph": 117.0,
+    "accel": 0.01,
+    "coast": 0.005,
+    "brake": 0.075,
+    "w20": 0.038,
+    "w24": 0.027,
+    "ramDamage": 6.0,
+    "jump": 94.0,
+    "grip": 0.03
+   }
   },
   "cop": {
    "id": 9,
@@ -682,7 +826,23 @@
      -4.0,
      2.0
     ]
-   ]
+   ],
+   "drive": {
+    "address": "0x2b8c84",
+    "mass": 1.08,
+    "pitchDeg": 6.0,
+    "rollDeg": 6.0,
+    "turn": 0.05,
+    "maxMph": 131.0,
+    "accel": 0.02,
+    "coast": 0.005,
+    "brake": 0.075,
+    "w20": 0.038,
+    "w24": 0.027,
+    "ramDamage": 4.0,
+    "jump": 62.0,
+    "grip": 0.03
+   }
   },
   "crim": {
    "id": 10,
@@ -750,7 +910,23 @@
      -4.0,
      1.8
     ]
-   ]
+   ],
+   "drive": {
+    "address": "0x2b8cb8",
+    "mass": 0.948,
+    "pitchDeg": 6.0,
+    "rollDeg": 4.0,
+    "turn": 0.05,
+    "maxMph": 131.0,
+    "accel": 0.022,
+    "coast": 0.005,
+    "brake": 0.075,
+    "w20": 0.038,
+    "w24": 0.027,
+    "ramDamage": 3.0,
+    "jump": 54.0,
+    "grip": 0.03
+   }
   },
   "hamr": {
    "id": 11,
@@ -818,7 +994,23 @@
      -4.0,
      5.5
     ]
-   ]
+   ],
+   "drive": {
+    "address": "0x2b8cec",
+    "mass": 1.542,
+    "pitchDeg": 3.0,
+    "rollDeg": 3.0,
+    "turn": 0.05,
+    "maxMph": 123.0,
+    "accel": 0.01,
+    "coast": 0.005,
+    "brake": 0.075,
+    "w20": 0.038,
+    "w24": 0.027,
+    "ramDamage": 5.0,
+    "jump": 90.0,
+    "grip": 0.03
+   }
   },
   "grass": {
    "id": 12,
@@ -886,7 +1078,23 @@
      -4.0,
      3.0
     ]
-   ]
+   ],
+   "drive": {
+    "address": "0x2b8d20",
+    "mass": 0.882,
+    "pitchDeg": 7.0,
+    "rollDeg": 8.0,
+    "turn": 0.05,
+    "maxMph": 127.0,
+    "accel": 0.022,
+    "coast": 0.005,
+    "brake": 0.075,
+    "w20": 0.038,
+    "w24": 0.027,
+    "ramDamage": 3.0,
+    "jump": 50.0,
+    "grip": 0.03
+   }
   },
   "wart": {
    "id": 13,
@@ -954,7 +1162,23 @@
      -4.0,
      3.0
     ]
-   ]
+   ],
+   "drive": {
+    "address": "0x2b8d54",
+    "mass": 1.476,
+    "pitchDeg": 4.0,
+    "rollDeg": 4.0,
+    "turn": 0.035,
+    "maxMph": 118.0,
+    "accel": 0.01,
+    "coast": 0.005,
+    "brake": 0.075,
+    "w20": 0.038,
+    "w24": 0.027,
+    "ramDamage": 6.0,
+    "jump": 86.0,
+    "grip": 0.03
+   }
   },
   "edatv": {
    "id": 14,
@@ -1022,7 +1246,23 @@
      -4.0,
      3.0
     ]
-   ]
+   ],
+   "drive": {
+    "address": "0x2b8d88",
+    "mass": 0.75,
+    "pitchDeg": 7.0,
+    "rollDeg": 6.0,
+    "turn": 0.05,
+    "maxMph": 134.0,
+    "accel": 0.02,
+    "coast": 0.005,
+    "brake": 0.075,
+    "w20": 0.038,
+    "w24": 0.027,
+    "ramDamage": 3.0,
+    "jump": 42.0,
+    "grip": 0.03
+   }
   },
   "edboss": {
    "id": 15,
@@ -1090,7 +1330,23 @@
      -20.0,
      8.0
     ]
-   ]
+   ],
+   "drive": {
+    "address": "0x2b8dbc",
+    "mass": 2.0,
+    "pitchDeg": 7.0,
+    "rollDeg": 7.0,
+    "turn": 0.035,
+    "maxMph": 119.0,
+    "accel": 0.01,
+    "coast": 0.005,
+    "brake": 0.075,
+    "w20": 0.038,
+    "w24": 0.027,
+    "ramDamage": 6.0,
+    "jump": 100.0,
+    "grip": 0.03
+   }
   },
   "dark1": {
    "id": 16,
@@ -1158,7 +1414,23 @@
      -20.0,
      13.0
     ]
-   ]
+   ],
+   "drive": {
+    "address": "0x2b8df0",
+    "mass": 2.25,
+    "pitchDeg": 3.0,
+    "rollDeg": 3.0,
+    "turn": 0.035,
+    "maxMph": 150.0,
+    "accel": 0.01,
+    "coast": 0.005,
+    "brake": 0.075,
+    "w20": 0.038,
+    "w24": 0.027,
+    "ramDamage": 6.0,
+    "jump": 100.0,
+    "grip": 0.03
+   }
   },
   "dark2": {
    "id": 17,
@@ -1226,7 +1498,23 @@
      -5.0,
      64.0
     ]
-   ]
+   ],
+   "drive": {
+    "address": "0x2b8e24",
+    "mass": 2.25,
+    "pitchDeg": 2.0,
+    "rollDeg": 2.0,
+    "turn": 0.035,
+    "maxMph": 150.0,
+    "accel": 0.01,
+    "coast": 0.005,
+    "brake": 0.075,
+    "w20": 0.038,
+    "w24": 0.027,
+    "ramDamage": 6.0,
+    "jump": 100.0,
+    "grip": 0.03
+   }
   },
   "edplayer": {
    "id": 18,
@@ -1294,7 +1582,23 @@
      -13.0,
      5.0
     ]
-   ]
+   ],
+   "drive": {
+    "address": "0x2b8e58",
+    "mass": 2.0,
+    "pitchDeg": 4.3,
+    "rollDeg": 7.0,
+    "turn": 0.035,
+    "maxMph": 119.0,
+    "accel": 0.01,
+    "coast": 0.005,
+    "brake": 0.075,
+    "w20": 0.038,
+    "w24": 0.027,
+    "ramDamage": 6.0,
+    "jump": 100.0,
+    "grip": 0.03
+   }
   },
   "darkpla1": {
    "id": 19,
@@ -1362,7 +1666,23 @@
      -10.0,
      8.0
     ]
-   ]
+   ],
+   "drive": {
+    "address": "0x2b8e8c",
+    "mass": 2.25,
+    "pitchDeg": 3.0,
+    "rollDeg": 3.0,
+    "turn": 0.035,
+    "maxMph": 150.0,
+    "accel": 0.01,
+    "coast": 0.005,
+    "brake": 0.075,
+    "w20": 0.038,
+    "w24": 0.027,
+    "ramDamage": 6.0,
+    "jump": 100.0,
+    "grip": 0.03
+   }
   },
   "darkpla2": {
    "id": 20,
@@ -1430,7 +1750,23 @@
      -5.0,
      64.0
     ]
-   ]
+   ],
+   "drive": {
+    "address": "0x2b8ec0",
+    "mass": 2.25,
+    "pitchDeg": 2.0,
+    "rollDeg": 2.0,
+    "turn": 0.035,
+    "maxMph": 150.0,
+    "accel": 0.01,
+    "coast": 0.005,
+    "brake": 0.075,
+    "w20": 0.038,
+    "w24": 0.027,
+    "ramDamage": 6.0,
+    "jump": 100.0,
+    "grip": 0.03
+   }
   },
   "hc_axel": {
    "id": 21,
@@ -1498,7 +1834,23 @@
      -3.3,
      3.3
     ]
-   ]
+   ],
+   "drive": {
+    "address": "0x2b8ef4",
+    "mass": 1.344,
+    "pitchDeg": 5.0,
+    "rollDeg": 6.0,
+    "turn": 0.07,
+    "maxMph": 121.0,
+    "accel": 0.02,
+    "coast": 0.005,
+    "brake": 0.075,
+    "w20": 0.038,
+    "w24": 0.02,
+    "ramDamage": 11.0,
+    "jump": 125.0,
+    "grip": 0.03
+   }
   },
   "hc_derby": {
    "id": 22,
@@ -1566,7 +1918,23 @@
      -4.0,
      3.0
     ]
-   ]
+   ],
+   "drive": {
+    "address": "0x2b8f28",
+    "mass": 1.0,
+    "pitchDeg": 5.0,
+    "rollDeg": 5.0,
+    "turn": 0.05,
+    "maxMph": 129.0,
+    "accel": 0.02,
+    "coast": 0.005,
+    "brake": 0.075,
+    "w20": 0.038,
+    "w24": 0.02,
+    "ramDamage": 11.0,
+    "jump": 105.0,
+    "grip": 0.03
+   }
   },
   "hc_hears": {
    "id": 23,
@@ -1634,7 +2002,23 @@
      -7.0,
      3.0
     ]
-   ]
+   ],
+   "drive": {
+    "address": "0x2b8f5c",
+    "mass": 1.278,
+    "pitchDeg": 3.0,
+    "rollDeg": 6.0,
+    "turn": 0.04,
+    "maxMph": 124.0,
+    "accel": 0.02,
+    "coast": 0.005,
+    "brake": 0.075,
+    "w20": 0.038,
+    "w24": 0.02,
+    "ramDamage": 11.0,
+    "jump": 127.0,
+    "grip": 0.03
+   }
   },
   "hc_grim": {
    "id": 24,
@@ -1702,7 +2086,23 @@
      -3.5,
      1.0
     ]
-   ]
+   ],
+   "drive": {
+    "address": "0x2b8f90",
+    "mass": 0.75,
+    "pitchDeg": 0.0,
+    "rollDeg": 0.0,
+    "turn": 0.05,
+    "maxMph": 134.0,
+    "accel": 0.02,
+    "coast": 0.005,
+    "brake": 0.075,
+    "w20": 0.038,
+    "w24": 0.02,
+    "ramDamage": 5.0,
+    "jump": 80.0,
+    "grip": 0.03
+   }
   },
   "hc_preac": {
    "id": 25,
@@ -1770,7 +2170,23 @@
      -4.0,
      3.0
     ]
-   ]
+   ],
+   "drive": {
+    "address": "0x2b8fc4",
+    "mass": 1.0,
+    "pitchDeg": 5.0,
+    "rollDeg": 6.0,
+    "turn": 0.05,
+    "maxMph": 125.0,
+    "accel": 0.02,
+    "coast": 0.005,
+    "brake": 0.075,
+    "w20": 0.038,
+    "w24": 0.02,
+    "ramDamage": 11.0,
+    "jump": 108.0,
+    "grip": 0.03
+   }
   },
   "hc_rkill": {
    "id": 26,
@@ -1838,7 +2254,23 @@
      -4.0,
      2.0
     ]
-   ]
+   ],
+   "drive": {
+    "address": "0x2b8ff8",
+    "mass": 1.146,
+    "pitchDeg": 6.0,
+    "rollDeg": 6.0,
+    "turn": 0.05,
+    "maxMph": 125.0,
+    "accel": 0.018,
+    "coast": 0.005,
+    "brake": 0.075,
+    "w20": 0.038,
+    "w24": 0.02,
+    "ramDamage": 11.0,
+    "jump": 112.0,
+    "grip": 0.03
+   }
   },
   "hc_semi": {
    "id": 27,
@@ -1906,7 +2338,23 @@
      -4.0,
      3.0
     ]
-   ]
+   ],
+   "drive": {
+    "address": "0x2b902c",
+    "mass": 2.0,
+    "pitchDeg": 2.0,
+    "rollDeg": 6.0,
+    "turn": 0.035,
+    "maxMph": 118.0,
+    "accel": 0.01,
+    "coast": 0.005,
+    "brake": 0.075,
+    "w20": 0.038,
+    "w24": 0.02,
+    "ramDamage": 16.0,
+    "jump": 195.0,
+    "grip": 0.03
+   }
   },
   "hc_suv": {
    "id": 28,
@@ -1974,7 +2422,23 @@
      -4.0,
      3.0
     ]
-   ]
+   ],
+   "drive": {
+    "address": "0x2b9060",
+    "mass": 1.25,
+    "pitchDeg": 6.0,
+    "rollDeg": 6.0,
+    "turn": 0.045,
+    "maxMph": 120.0,
+    "accel": 0.015,
+    "coast": 0.005,
+    "brake": 0.075,
+    "w20": 0.038,
+    "w24": 0.02,
+    "ramDamage": 11.0,
+    "jump": 117.0,
+    "grip": 0.03
+   }
   },
   "hc_sweet": {
    "id": 29,
@@ -2042,7 +2506,23 @@
      -9.0,
      4.0
     ]
-   ]
+   ],
+   "drive": {
+    "address": "0x2b9094",
+    "mass": 1.41,
+    "pitchDeg": 5.0,
+    "rollDeg": 6.0,
+    "turn": 0.045,
+    "maxMph": 125.0,
+    "accel": 0.015,
+    "coast": 0.005,
+    "brake": 0.075,
+    "w20": 0.038,
+    "w24": 0.02,
+    "ramDamage": 16.0,
+    "jump": 138.0,
+    "grip": 0.03
+   }
   },
   "hc_taxi": {
    "id": 30,
@@ -2110,7 +2590,23 @@
      -4.0,
      3.0
     ]
-   ]
+   ],
+   "drive": {
+    "address": "0x2b90c8",
+    "mass": 1.0,
+    "pitchDeg": 4.0,
+    "rollDeg": 6.0,
+    "turn": 0.05,
+    "maxMph": 124.0,
+    "accel": 0.02,
+    "coast": 0.005,
+    "brake": 0.075,
+    "w20": 0.038,
+    "w24": 0.02,
+    "ramDamage": 11.0,
+    "jump": 100.0,
+    "grip": 0.03
+   }
   },
   "hc_tow": {
    "id": 31,
@@ -2178,7 +2674,23 @@
      -4.0,
      3.0
     ]
-   ]
+   ],
+   "drive": {
+    "address": "0x2b90fc",
+    "mass": 2.0,
+    "pitchDeg": 5.0,
+    "rollDeg": 6.0,
+    "turn": 0.035,
+    "maxMph": 118.0,
+    "accel": 0.01,
+    "coast": 0.005,
+    "brake": 0.075,
+    "w20": 0.038,
+    "w24": 0.02,
+    "ramDamage": 16.0,
+    "jump": 195.0,
+    "grip": 0.03
+   }
   },
   "hc_vette": {
    "id": 32,
@@ -2246,7 +2758,23 @@
      -8.0,
      2.5
     ]
-   ]
+   ],
+   "drive": {
+    "address": "0x2b9130",
+    "mass": 1.014,
+    "pitchDeg": 6.0,
+    "rollDeg": 6.0,
+    "turn": 0.055,
+    "maxMph": 132.0,
+    "accel": 0.022,
+    "coast": 0.005,
+    "brake": 0.075,
+    "w20": 0.038,
+    "w24": 0.02,
+    "ramDamage": 5.0,
+    "jump": 105.0,
+    "grip": 0.03
+   }
   },
   "hc_rock": {
    "id": 33,
@@ -2314,7 +2842,23 @@
      -4.0,
      3.0
     ]
-   ]
+   ],
+   "drive": {
+    "address": "0x2b9164",
+    "mass": 2.0,
+    "pitchDeg": 6.0,
+    "rollDeg": 6.0,
+    "turn": 0.035,
+    "maxMph": 118.0,
+    "accel": 0.01,
+    "coast": 0.005,
+    "brake": 0.075,
+    "w20": 0.038,
+    "w24": 0.02,
+    "ramDamage": 16.0,
+    "jump": 195.0,
+    "grip": 0.03
+   }
   },
   "hc_stock": {
    "id": 34,
@@ -2382,7 +2926,23 @@
      -4.0,
      2.0
     ]
-   ]
+   ],
+   "drive": {
+    "address": "0x2b9198",
+    "mass": 1.146,
+    "pitchDeg": 6.0,
+    "rollDeg": 6.0,
+    "turn": 0.05,
+    "maxMph": 125.0,
+    "accel": 0.018,
+    "coast": 0.005,
+    "brake": 0.075,
+    "w20": 0.038,
+    "w24": 0.02,
+    "ramDamage": 11.0,
+    "jump": 110.0,
+    "grip": 0.03
+   }
   },
   "hc_tank": {
    "id": 35,
@@ -2450,7 +3010,23 @@
      -4.0,
      3.0
     ]
-   ]
+   ],
+   "drive": {
+    "address": "0x2b91cc",
+    "mass": 2.0,
+    "pitchDeg": 3.0,
+    "rollDeg": 3.0,
+    "turn": 0.035,
+    "maxMph": 118.0,
+    "accel": 0.01,
+    "coast": 0.005,
+    "brake": 0.075,
+    "w20": 0.038,
+    "w24": 0.02,
+    "ramDamage": 16.0,
+    "jump": 195.0,
+    "grip": 0.03
+   }
   }
  }
 }

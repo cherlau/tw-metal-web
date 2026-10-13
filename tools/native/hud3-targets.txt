@@ -1,0 +1,25 @@
+# Coletores (vtable +0x0C) dos widgets do HUD e desenho/fonte/projeção
+at:139660 col_2210_vida
+at:139ec8 col_2330_msg
+at:13b048 col_24e0_armas
+at:137088 col_c0_radar
+at:13b758 col_13d0
+at:13c038 col_14d0
+at:19e478 hud_draw
+at:138f00 alvo_vida
+at:137968 radar_extra1
+at:138000 radar_extra2
+at:137028 w80
+at:2663f0 proj_tela
+at:2663c0 tela_tam
+at:222de0 fonte_desenha
+at:222020 fonte_largura
+at:221e78 fonte_tamanho
+at:221b50 fonte_cor
+at:225618 prim_2d
+at:225800 prim_cor
+at:2257e0 prim_xy
+at:13b8e0 upd_13d0
+at:13bb20 upd_1430
+at:13bca8 upd_1480
+at:139780 nome_carro

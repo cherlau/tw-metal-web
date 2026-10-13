@@ -30,13 +30,15 @@ export const VEHICLE_RULES = {
 export interface Hit {
   distance: number;
   normal: V3;
+  /** Dono do triângulo atingido (índice da instância na colisão; objetos destrutíveis). */
+  tag?: number;
 }
 
 export interface CollisionWorld {
   /** Primeiro triângulo ao longo de dir (normalizado) até maxDist. */
   raycast(origin: V3, dir: V3, maxDist: number): Hit | null;
   /** Ponto mais próximo da geometria dentro de maxDist. */
-  closestPoint(p: V3, maxDist: number): { point: V3; distance: number } | null;
+  closestPoint(p: V3, maxDist: number): { point: V3; distance: number; tag?: number } | null;
 }
 
 export interface Controls {
@@ -44,6 +46,23 @@ export interface Controls {
   brake: number; // 0..1 (freio; com o carro parado vira ré)
   steer: number; // -1 (esquerda) .. 1 (direita)
   handbrake: boolean;
+  /** Turbo ligado (com tabela nativa: aceleração ×3 e vel. máx. ×1,25 — gp−0x7c48 / gp−0x7c44). */
+  turbo?: boolean;
+}
+
+/**
+ * NATIVO: registro de direção por carro (0x2b8ab0 + id·0x34, copiado por FUN_0012ece0 para carro+0x848..+0x878;
+ * rules/vehicles.json → drive). Frações "por quadro" valem para o tique de 1/60 s.
+ */
+export interface DriveParams {
+  mass: number; // carro+0x848
+  turn: number; // +0x854: alvo do esterço por quadro (FUN_00132aa8)
+  maxMph: number; // +0x858
+  accel: number; // +0x85c: Δ(vel. da roda) = vmáx·accel·acelerador por quadro (FUN_00133650)
+  coast: number; // +0x860: rolagem sem pedal
+  brake: number; // +0x864: freio
+  grip: number; // +0x878: alinhamento da velocidade à frente por quadro (FUN_00133078)
+  ramDamage: number; // +0x870: dano de batida (FUN_001349f0)
 }
 
 export const NO_CONTROLS: Controls = { throttle: 0, brake: 0, steer: 0, handbrake: false };
@@ -56,6 +75,8 @@ export interface VehicleShape {
   top: number;
   /** Pontos das 4 rodas no espaço do carro (Three), da tabela nativa 0x2ba990 (rules/vehicles.json). */
   wheels?: V3[];
+  /** Registro de direção nativo (sem ele: modelo arcade do host, VEHICLE_RULES). */
+  drive?: DriveParams;
 }
 
 export interface VehicleState {
@@ -65,6 +86,12 @@ export interface VehicleState {
   up: V3; // normal do chão suavizada (para a orientação visual)
   grounded: boolean;
   wheelsOnGround: number;
+  /** Batidas em paredes neste passo (dono do triângulo e velocidade normal, pés/s) — golpes de batida. */
+  contacts?: { tag: number; speed: number; point: V3 }[];
+  /** Velocidade da roda em mph (controlador carro+0x340, campo [0x152]; FUN_00133650). */
+  wheelMph?: number;
+  /** Esterço suavizado (campo [0x128]; FUN_00132aa8 → FUN_00253128). */
+  steerAngle?: number;
 }
 
 export function createVehicle(pos: V3, yaw = 0): VehicleState {
@@ -85,7 +112,26 @@ export function wheelOffsets(shape: VehicleShape): V3[] {
 
 const R = VEHICLE_RULES;
 
+/** NATIVO: mph → pés/s (FUN_0016b828) e constantes do controlador (gp−0x7c58.., ver docs/NATIVE.md "Direção"). */
+const MPH = 1.4666667;
+const TURBO_ACCEL = 3.0; // gp−0x7c48
+const TURBO_TOP = 1.25; // gp−0x7c44 / gp−0x7c40
+const STEER_RATE_HELD = 0.02; // gp−0x7c58: volante virado
+const STEER_RATE_FREE = 0.25; // gp−0x7c54: volante solto
+const HANDBRAKE_TURN = 1.75; // gp−0x7c50
+/** Passo exponencial com mínimo (FUN_00253128): (alvo − v)·taxa, |passo| ≥ mín, sem passar do alvo. */
+export function approach(v: number, target: number, rate: number, min: number): number {
+  if (v === target) return v;
+  let step = (target - v) * rate;
+  if (Math.abs(step) < min) step = step < 0 ? -min : min;
+  const n = v + step;
+  return v < target ? Math.min(n, target) : Math.max(n, target);
+}
+/** ⚠️ ESCOLHA DO HOST: atrito do pneu que limita quanto o corpo segue a roda (corpo+0x10 = 0,8 em FUN_00175a58). */
+const TIRE_MU = 0.8;
+
 export function stepVehicle(s: VehicleState, shape: VehicleShape, c: Controls, world: CollisionWorld, dt: number): void {
+  s.contacts = undefined;
   const fwd = forwardOf(s.yaw);
   const right = rightOf(s.yaw);
 
@@ -115,6 +161,40 @@ export function stepVehicle(s: VehicleState, shape: VehicleShape, c: Controls, w
 
     let vf = dot(s.vel, fwd);
     let vs = dot(s.vel, right);
+    const d = shape.drive;
+    if (d) {
+      // Controlador nativo (FUN_00133650): a roda muda vmáx·fração por quadro; o corpo a segue até o atrito do pneu.
+      const frames = dt * 60;
+      const top = d.maxMph * (c.turbo ? TURBO_TOP : 1);
+      let ws = s.wheelMph ?? vf / MPH;
+      if (c.throttle > 0) ws = Math.min(top, ws + top * d.accel * c.throttle * (c.turbo ? TURBO_ACCEL : 1) * frames);
+      else if (c.brake > 0) ws = ws > 0.5 ? Math.max(0, ws - top * d.brake * c.brake * frames) : Math.max(-R.maxReverse / MPH, ws - top * d.accel * c.brake * frames);
+      else ws = ws > 0 ? Math.max(0, ws - top * d.coast * frames) : Math.min(0, ws + top * d.coast * frames);
+      if (ws > top) ws = Math.max(top, ws - top * d.coast * frames); // turbo acabou: volta à vel. máx.
+      s.wheelMph = ws;
+      const maxDv = TIRE_MU * R.gravity * dt;
+      vf += Math.max(-maxDv, Math.min(maxDv, ws * MPH - vf));
+      // Alinhamento à frente (FUN_00133078): acelerando para a frente, v ← v·(1−k) + frente·|v|·k por quadro.
+      const k = 1 - Math.pow(1 - d.grip, frames);
+      if (c.throttle > 0 && vf >= 0 && !c.handbrake) {
+        const sp = Math.hypot(vf, vs);
+        vf = vf * (1 - k) + sp * k;
+        vs *= 1 - k;
+      } else vs *= Math.exp(-(c.handbrake ? R.handbrakeGrip : R.grip) * dt);
+      // Esterço (FUN_00132aa8): alvo = entrada·giro (×1,75 no freio de mão), taxa 0,02 virado / 0,25 solto.
+      const hb = c.handbrake ? HANDBRAKE_TURN : 1;
+      let a = s.steerAngle ?? 0;
+      for (let f = 0; f < Math.max(1, Math.round(frames)); f++)
+        a = approach(a, c.steer * d.turn * hb, (c.steer !== 0 ? STEER_RATE_HELD : STEER_RATE_FREE) * hb, 0.001);
+      s.steerAngle = a;
+      // ⚠️ host: giro do corpo = ângulo por quadro × 60, proporcional à velocidade até turnSpeedRef (o jogo usa o pneu).
+      const speedFactor = Math.min(1, Math.abs(vf) / R.turnSpeedRef) * Math.sign(vf);
+      s.yaw -= a * 60 * speedFactor * dt;
+      const nf = forwardOf(s.yaw);
+      const nr = rightOf(s.yaw);
+      s.vel = v3(nf.x * vf + nr.x * vs, s.vel.y, nf.z * vf + nr.z * vs);
+      s.up = norm(add(scale(s.up, 0.85), scale(n, 0.15)));
+    } else {
     // Motor, freio e ré.
     if (c.throttle > 0) vf += R.accel * c.throttle * dt;
     if (c.brake > 0) {
@@ -136,6 +216,7 @@ export function stepVehicle(s: VehicleState, shape: VehicleShape, c: Controls, w
     const nr = rightOf(s.yaw);
     s.vel = v3(nf.x * vf + nr.x * vs, s.vel.y, nf.z * vf + nr.z * vs);
     s.up = norm(add(scale(s.up, 0.85), scale(n, 0.15)));
+    }
   } else {
     s.vel.y -= R.gravity * dt;
     s.yaw -= c.steer * R.turnRate * R.airControl * dt;
@@ -157,7 +238,10 @@ export function stepVehicle(s: VehicleState, shape: VehicleShape, c: Controls, w
     const push = radius - cp.distance;
     s.pos = add(s.pos, scale(n, push));
     const vn = dot(s.vel, n);
-    if (vn < 0) s.vel = sub(s.vel, scale(n, vn * (1 + R.restitution)));
+    if (vn < 0) {
+      if (cp.tag !== undefined) (s.contacts ??= []).push({ tag: cp.tag, speed: -vn, point: cp.point });
+      s.vel = sub(s.vel, scale(n, vn * (1 + R.restitution)));
+    }
   }
 
   // 4) Anti-túnel: se o fundo afundou no chão (queda rápida), sobe de volta.

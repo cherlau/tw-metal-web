@@ -1,0 +1,12 @@
+at:148638 inv_set
+at:1098b0 ai_arma_ok
+at:109920 ai_arma_tras_ok
+at:10ba08 ai_alcance
+at:107ad8 ai_dispara
+at:1049a8 ai_ataque
+at:1045f8 ai_modo3
+at:1044d8 ai_modo2
+at:104b08 ai_modo1
+at:13d800 ai_skill
+at:1c0398 ai_caminho
+at:105520 ai_modo

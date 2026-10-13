@@ -1,5 +1,9 @@
 // Áudio com WebAudio (SPEC §9.10: barramentos, mixagem, espacialização). Música em streaming, efeitos
 // decodificados sob demanda. O contexto só nasce no primeiro gesto do usuário (política de autoplay).
+//
+// NATIVO (docs/NATIVE.md "Som"): cada som posicional tem distância mínima e máxima (FUN_001d32d8 → FUN_00216b78):
+// volume cheio até a mínima, cai em linha reta até zero na máxima (= PannerNode "linear"); o ouvinte é o CARRO do
+// jogador (FUN_001d32d8 mede a distância ao carro), só o pan vem da câmera.
 import { assetURL } from './assets';
 
 interface SfxEntry {
@@ -10,6 +14,17 @@ interface SfxEntry {
 interface SfxIndex {
   banks: Record<string, Record<string, SfxEntry[]>>;
   cars: Record<string, string>;
+  /** carro -> banco de armas (*WP.BNK: S_DEPLOY/S_RETRACT dos suportes) */
+  carWeapons?: Record<string, string>;
+}
+
+export interface PlayOptions {
+  pos?: Vec;
+  volume?: number;
+  rate?: number;
+  /** distâncias mínima/máxima da atenuação linear (pés; FUN_001d32d8). Padrão 10/200. */
+  min?: number;
+  max?: number;
 }
 interface MusicIndex {
   tracks: Record<string, { url: string; duration: number }>;
@@ -31,7 +46,8 @@ class EngineVoice {
   readonly panner: PannerNode;
 
   constructor(private ctx: AudioContext, buffers: (AudioBuffer | null)[], dest: AudioNode, siren: AudioBuffer | null) {
-    this.panner = new PannerNode(ctx, { panningModel: 'equalpower', distanceModel: 'inverse', refDistance: 25, rolloffFactor: 1.2 });
+    // ⚠️ host: faixa do motor (o jogo usa a mínima/máxima do objeto de som do carro, campos [0x2b]/[0x2c]).
+    this.panner = new PannerNode(ctx, { panningModel: 'equalpower', distanceModel: 'linear', refDistance: 20, maxDistance: 600, rolloffFactor: 1 });
     this.out = new GainNode(ctx, { gain: 0.5 });
     this.out.connect(this.panner).connect(dest);
     for (const b of [...buffers, siren]) {
@@ -159,8 +175,8 @@ export class AudioEngine {
     return this.sfx?.banks[bank]?.[name] ?? [];
   }
 
-  /** Toca um efeito (variação sorteada); `pos` posiciona no espaço 3D. */
-  play(bank: string, name: string, opt: { pos?: Vec; volume?: number; rate?: number } = {}) {
+  /** Toca um efeito (variação sorteada); `pos` posiciona no espaço 3D com a atenuação linear do jogo. */
+  play(bank: string, name: string, opt: PlayOptions = {}) {
     if (!this.ctx || this.muted) return;
     const list = this.entries(bank, name);
     if (!list.length) return;
@@ -169,17 +185,63 @@ export class AudioEngine {
       if (!buf || !this.ctx) return;
       const src = new AudioBufferSourceNode(this.ctx, { buffer: buf, playbackRate: opt.rate ?? 1 });
       const g = new GainNode(this.ctx, { gain: opt.volume ?? 1 });
-      let node: AudioNode = src.connect(g);
-      if (opt.pos) {
-        const p = new PannerNode(this.ctx, { panningModel: 'equalpower', distanceModel: 'inverse', refDistance: 30, rolloffFactor: 1, positionX: opt.pos.x, positionY: opt.pos.y, positionZ: opt.pos.z });
-        node = node.connect(p);
-      }
-      node.connect(this.sfxBus);
+      src.connect(g).connect(this.spatial(opt)).connect(this.sfxBus);
       src.start();
     });
   }
 
-  /** Ouvinte = câmera. */
+  /** Nó de posição (FUN_00216b78: linear entre mínima e máxima) ou passagem direta sem `pos`. */
+  private spatial(opt: PlayOptions): AudioNode {
+    if (!opt.pos) return new GainNode(this.ctx!, { gain: 1 });
+    return new PannerNode(this.ctx!, {
+      panningModel: 'equalpower', distanceModel: 'linear', refDistance: opt.min ?? 10, maxDistance: opt.max ?? 200, rolloffFactor: 1,
+      positionX: opt.pos.x, positionY: opt.pos.y, positionZ: opt.pos.z,
+    });
+  }
+
+  private loops = new Map<string, { src: AudioBufferSourceNode | null; gain: GainNode; pan: AudioNode; want: number }>();
+
+  /**
+   * Laço nomeado (turbo, vida baixa, ambiente do menu…): começa no primeiro pedido, depois só acompanha volume e
+   * posição; `fade` em segundos (o jogo sobe/desce volume por quadros, FUN_00257338).
+   */
+  loop(key: string, bank: string, name: string, volume: number, opt: PlayOptions & { fade?: number } = {}) {
+    if (!this.ctx || !this.sfx) return;
+    let l = this.loops.get(key);
+    const t = this.ctx.currentTime;
+    if (!l) {
+      if (volume <= 0) return;
+      const list = this.entries(bank, name);
+      if (!list.length) return;
+      const gain = new GainNode(this.ctx, { gain: 0 });
+      const pan = this.spatial(opt);
+      gain.connect(pan).connect(this.sfxBus);
+      l = { src: null, gain, pan, want: volume };
+      this.loops.set(key, l);
+      const entry = l;
+      void this.buffer(list[0].url).then((buf) => {
+        if (!buf || !this.ctx || this.loops.get(key) !== entry) return;
+        entry.src = new AudioBufferSourceNode(this.ctx, { buffer: buf, loop: true });
+        entry.src.connect(entry.gain);
+        entry.src.start();
+      });
+    }
+    l.want = volume;
+    l.gain.gain.setTargetAtTime(this.muted ? 0 : volume, t, Math.max(0.01, (opt.fade ?? 0.05) / 3));
+    if (opt.pos && l.pan instanceof PannerNode) {
+      l.pan.positionX.setTargetAtTime(opt.pos.x, t, 0.03);
+      l.pan.positionY.setTargetAtTime(opt.pos.y, t, 0.03);
+      l.pan.positionZ.setTargetAtTime(opt.pos.z, t, 0.03);
+    }
+    if (volume <= 0 && l.src) {
+      const src = l.src;
+      const fade = opt.fade ?? 0.05;
+      src.stop(t + fade + 0.05);
+      this.loops.delete(key);
+    }
+  }
+
+  /** Ouvinte: posição do carro do jogador (FUN_001d32d8), orientação da câmera (pan). */
   listener(pos: Vec, forward: Vec) {
     if (!this.ctx) return;
     const l = this.ctx.listener;
@@ -190,6 +252,11 @@ export class AudioEngine {
     l.forwardX.setTargetAtTime(forward.x, t, 0.02);
     l.forwardY.setTargetAtTime(forward.y, t, 0.02);
     l.forwardZ.setTargetAtTime(forward.z, t, 0.02);
+  }
+
+  /** Banco de armas do carro (S_DEPLOY/S_RETRACT). */
+  weaponBank(car: string): string | null {
+    return this.sfx?.carWeapons?.[car] ?? null;
   }
 
   /** Motor de um carro (cria na primeira chamada; banco pelo nome do modelo). */

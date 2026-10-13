@@ -103,7 +103,7 @@ def decode(t: bytes) -> list[Texture]:
                 rgba = _apply_clut(pal, gs.unswizzle(img, w, h, bpp))
         else:
             w, h = gw, gh
-            bpp = {0x13: 8, 0x14: 4, 0x00: 32}.get(psm)
+            bpp = {0x13: 8, 0x14: 4, 0x1B: 8, 0x24: 4, 0x2C: 4, 0x00: 32}.get(psm)
             if bpp is None or pal is None and bpp != 32:
                 raise TexFormatError(f"0x{p:x}: PSM 0x{psm:x} não suportado (ou sem CLUT)")
             if w * h * bpp // 8 != len(img):

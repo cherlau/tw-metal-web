@@ -1,0 +1,5 @@
+# Ataque de ambiente (arma tipo 8): classe vtable 0x2d67c8, disparo +0x44 = FUN_0014d040
+at:14d040 fire_env
+at:14d400 upd_env
+at:14cf70 env_a
+str:Env\sWeapon.* env_msg

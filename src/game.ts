@@ -5,19 +5,24 @@ import { AudioEngine } from './audio';
 import { LevelCollision } from './collision';
 import { PS2_TO_THREE, VEHICLE_TO_THREE } from './coords';
 import { Input } from './input';
-import { Match, MATCH_RULES, type CarActions, type MatchEvent } from './game/match';
-import { PICKUP_RULES, pickupEffect, WEAPON_RULES, type WeaponId } from './game/weapons';
-import { basisOf, speedOf, type VehicleShape, type VehicleState } from './physics/vehicle';
+import { INVENTORY_INDEX, Match, MATCH_RULES, type CarActions, type MatchEvent } from './game/match';
+import { Hud, SHORT_NAMES, type HudBlip } from './hud';
+import { isBullet, pickupEffect, PROJECTILES, type Projectile, type WeaponId } from './game/weapons';
+import { basisOf, forwardOf, rightOf, speedOf, type DriveParams, type VehicleShape, type VehicleState } from './physics/vehicle';
 import { v3, type V3 } from './physics/vec';
 import { buildBatched, isAdditive, solidBox } from './render';
 import { buildLevelLights, buildSky } from './levelfx';
 import { CarRig, type RigDoc } from './rig';
 import { DebrisSystem } from './debris';
+import { LevelDestructibles, RAM_DAMAGE } from './destructibles';
 
 const params = new URLSearchParams(location.search);
 const levelName = params.get('lvl') ?? 'arena';
 const carName = params.get('car') ?? 'axel';
 const botCount = Math.max(0, Math.min(7, Number(params.get('bots') ?? 3)));
+const debug = params.get('debug') === '1';
+/** Dificuldade da IA 0..3 (FUN_00190448(0x2f4b24); opções 0x2c45b8: SUPER EASY, EASY, MEDIUM, HARD). */
+const difficulty = Math.max(0, Math.min(3, Number(params.get('diff') ?? 2)));
 const BOT_POOL = ['cop', 'sweet', 'twist', 'spectre', 'thump', 'grass', 'crim', 'wart', 'hamr', 'rkill'];
 
 const STEP = 1 / 60; // tick fixo (SPEC §9.2)
@@ -34,7 +39,12 @@ document.getElementById('game')!.appendChild(renderer.domElement);
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x1a1d24);
 const camera = new THREE.PerspectiveCamera(60, 1, 0.5, 20000);
-const hud = document.getElementById('hud')!;
+const hudEl = document.getElementById('hud')!;
+/** Mensagens 17..34 da tabela 0x2ba4c0 ("Destroyed <carro>", índice 17 + id do veículo). */
+const DESTROYED = [
+  'Axel', 'Shadow', 'Mr. Grimm', 'Roadkill', 'Sweet Tooth', 'Thumper', 'Spectre', 'Twister', 'Mr. Slam', 'Outlaw',
+  'Crimson Fury', 'HammerHead', 'Grasshopper', 'Warthog', 'ATV', 'Cousin Eddy', 'Dark Tooth', 'Tower Tooth',
+];
 const loading = document.getElementById('loading')!;
 
 function resize() {
@@ -56,7 +66,8 @@ let skyUpdate: ((camera: THREE.Camera) => void) | null = null; // céu segue a c
 async function loadLevel() {
   loading.textContent = `carregando arena ${levelName}…`;
   const { doc, bin } = await loadModel(`lvl/${levelName}`);
-  const { group, drawCalls } = await buildBatched(doc, bin, doc.scene);
+  // Objetos destrutíveis (nós 0x13) ficam fora do lote estático: LevelDestructibles troca a geometria pelo estado.
+  const { group, drawCalls } = await buildBatched(doc, bin, doc.scene.filter((i) => !i.dmg?.length));
   group.add(await buildLevelLights(doc, doc.scene)); // sprites e fachos de luz
   group.matrixAutoUpdate = false;
   group.matrix.copy(PS2_TO_THREE);
@@ -69,20 +80,20 @@ async function loadLevel() {
   loading.textContent = 'montando colisão…';
   await new Promise((r) => setTimeout(r));
   const t0 = performance.now();
-  const collision = new LevelCollision(doc, bin, PS2_TO_THREE);
+  const collision = new LevelCollision(doc, bin, PS2_TO_THREE, [...doc.scene, ...(doc.damageScene ?? [])]);
   console.info(`[colisão] ${collision.triangleCount} triângulos, BVH em ${Math.round(performance.now() - t0)} ms`);
-  return { doc, collision, drawCalls };
+  return { doc, bin, collision, drawCalls };
 }
 
 /** Regras recuperadas do executável (tools/native/export_rules.py). */
-async function loadVehicleRules(): Promise<Record<string, { wheels: number[][] }>> {
+async function loadVehicleRules(): Promise<Record<string, { wheels: number[][]; id?: number; drive?: DriveParams }>> {
   const r = await fetch(assetURL('rules/vehicles.json'));
   return r.ok ? (await r.json()).vehicles : {};
 }
 
 type CarAsset = { template: THREE.Group; shape: VehicleShape; doc: ModelDoc; bin: ArrayBuffer };
 const carCache = new Map<string, Promise<CarAsset>>();
-function loadCarModel(name: string, rules: Record<string, { wheels: number[][] }>) {
+function loadCarModel(name: string, rules: Record<string, { wheels: number[][]; drive?: DriveParams }>) {
   let p = carCache.get(name);
   if (!p) {
     p = (async () => {
@@ -126,6 +137,8 @@ function loadCarModel(name: string, rules: Record<string, { wheels: number[][] }
       // Rodas da tabela nativa (coords do PS2, frente +Y) -> espaço do carro no Three: (x, y, z) -> (-x, z, y).
       const w = rules[name]?.wheels;
       if (w?.length === 4) shape.wheels = w.map(([x, y, z]) => v3(-x, z, y));
+      // Direção nativa por carro (0x2b8ab0: massa, vel. máx., giro, aceleração…; ver vehicle.ts).
+      if (rules[name]?.drive) shape.drive = rules[name].drive;
       return { template, shape, doc, bin };
     })();
     carCache.set(name, p);
@@ -140,37 +153,46 @@ function shapeOf(doc: ModelDoc, bin: ArrayBuffer): VehicleShape {
 }
 
 /**
- * Objetos do GLOBALS.BDD usados como peças de jogo (prefabs centrados na origem).
- * ⚠️ ESCOLHA DO HOST: o índice → significado foi identificado visualmente (docs/NATIVE.md).
+ * Objetos do GLOBALS.BDD usados como efeito de explosão (prefabs centrados na origem).
+ * ⚠️ ESCOLHA DO HOST: identificados visualmente (36 = bola de fogo, nó de categoria 0xfa8; 29 = estouro, 0xfbd).
+ * As explosões nativas são sistemas de partículas por id (+0x74 da tabela de projéteis), ainda não decodificados.
  */
-const GLOBAL_OBJECTS = { missile: 16, fireball: 36, burst: 29 } as const;
+const GLOBAL_OBJECTS = { fireball: 36, burst: 29 } as const;
 
 /**
- * Pickup (id do PKP / tabela 0x2c3a00) -> objeto do GLOBALS com o modelo 3D da arma + cor da aura.
- * ⚠️ ESCOLHA DO HOST: modelos identificados visualmente (16 míssil laranja, 19 roxo, 21 prateado com
- * brilho vermelho, 22 dinamite com antena, 23 arco, 24 três foguetes, 25 tanques…); cores da aura pela
- * cor do próprio modelo. 20 (placa amarela) = Environment Attack e armas sem modelo próprio.
+ * Ícone do pickup = nó de categoria 0x13ba + tipo do PKP (FUN_00168aa8 → FUN_001bdad0 guarda o nó em 0x35a710 +
+ * 4 + 4·tipo; FUN_001bd680 o pendura no pickup). Só no Head-On: o Harbor City usa 5000 + tipo, e é lá que existem
+ * os ícones da metralhadora (5000) — por isso o tipo 0 cai nele. A Mega Gun (14) não tem ícone no GLOBALS.
  */
-const PICKUP_MODELS: Record<number, { obj: number; aura: number }> = {
-  0: { obj: 20, aura: 0xffd040 }, // Machine Gun
-  1: { obj: 16, aura: 0xff7a1a }, // Fire Missile
-  2: { obj: 19, aura: 0xc040ff }, // Homing
-  3: { obj: 24, aura: 0xffc020 }, // Swarmer
-  4: { obj: 25, aura: 0xff5010 }, // Napalm
-  5: { obj: 23, aura: 0x60e0ff }, // Ricochet
-  6: { obj: 21, aura: 0xff2020 }, // Power Missile
-  7: { obj: 15, aura: 0x40a0ff }, // Turbo
-  8: { obj: 18, aura: 0x40ff60 }, // Health 30%
-  9: { obj: 20, aura: 0xffd040 }, // Environment Attack
-  10: { obj: 26, aura: 0x40ff40 }, // Upgrade
-  11: { obj: 22, aura: 0xff8040 }, // Remote Bomb
-  12: { obj: 17, aura: 0x40ff60 }, // Full Health
-  14: { obj: 20, aura: 0xffd040 }, // Mega Gun
+const pickupCategory = (id: number) => (id === 0 ? 5000 : 0x13ba + id);
+/** Cor da aura por pickup. ⚠️ ESCOLHA DO HOST: o brilho do ícone no jogo não foi achado. */
+const PICKUP_AURA: Record<number, number> = {
+  0: 0xffd040, 1: 0xff7a1a, 2: 0xc040ff, 3: 0xffc020, 4: 0xff5010, 5: 0x60e0ff, 6: 0xff2020,
+  7: 0x40a0ff, 8: 0x40ff60, 9: 0xffd040, 10: 0x40ff40, 11: 0xff8040, 12: 0x40ff60,
+};
+
+/**
+ * Tipo de projétil → categoria do modelo no GLOBALS (FUN_00204778 grava o nó em 0x37cbf0 + 0xda24 + 4·tipo; no
+ * Head-On só as categorias 4000..4099, no Harbor City as 0x1004..). Sem nó registrado o jogo não desenha malha
+ * (ex.: Napalm 0xfa4 não existe no GLOBALS — só partículas e luz). Para os especiais do Harbor City, que no
+ * Head-On ficariam invisíveis, o runtime usa o nó do Harbor City (⚠️ host).
+ */
+const PROJECTILE_CATEGORY_HO: Record<number, number> = {
+  0: 0xfa0, 0x2f: 0xfa0, 2: 0xfa1, 3: 0xfa2, 5: 0xfa3, 0x30: 0xfa3, 0x31: 0xfa3, 4: 0xfa4, 7: 0xfa5, 6: 0xfa6,
+  0xf: 0xfa8, 0xe: 0xfa9, 0xd: 0xfaa, 0xa: 0xfab, 9: 0xfac, 0x14: 0xfb0, 0x11: 0xfb3, 0x12: 0xfb3, 0x13: 0xfb3,
+  0x26: 0xfb5, 0x27: 0xfb5, 0x28: 0xfb5, 0x1e: 0xfb6, 0x1f: 0xfb8, 0x17: 0xfbc, 0x18: 0xfbc, 0x19: 0xfbd,
+  0x1a: 0xfbd, 0x1b: 0xfbe, 0x1c: 0xfbe, 0x1d: 0xfbe, 0x16: 0xfbf, 0x15: 0xfc1, 0x22: 0xfcb, 0x23: 0xfcb,
+  0x24: 0xfcc, 0x25: 0xfcd, 0x20: 0xfd2, 0x21: 0xfd2, 0x2a: 0xfda,
+};
+const PROJECTILE_CATEGORY_HC: Record<number, number> = {
+  0: 0x1004, 2: 0x1005, 3: 0x1006, 0xb: 0x1007, 4: 0x1008, 7: 0x1009, 6: 0x100a, 0xf: 0x100c, 0xd: 0x100e,
+  0x32: 0x1010, 0x2d: 0x1011, 0x2b: 0x1012, 0x2f: 0x1013, 0x33: 0x1015, 0x11: 0x1017, 0x12: 0x1017, 0x13: 0x1017,
+  0x35: 0x1018, 0x36: 0x1019, 0x37: 0x101a, 0x2e: 0x101f, 0x34: 0x1020, 0x2c: 0x1026,
 };
 
 /** Brilho radial para a aura dos pickups (textura gerada; o PS2 usa um sprite aditivo). */
 let auraTexture: THREE.Texture | null = null;
-function auraSprite(color: number): THREE.Sprite {
+function auraSprite(color: number, size = 3.2): THREE.Sprite {
   if (!auraTexture) {
     const c = document.createElement('canvas');
     c.width = c.height = 64;
@@ -186,12 +208,12 @@ function auraSprite(color: number): THREE.Sprite {
   const sp = new THREE.Sprite(
     new THREE.SpriteMaterial({ map: auraTexture, color, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true }),
   );
-  sp.scale.setScalar(3.2); // no espaço normalizado do ícone (raio 1)
+  sp.scale.setScalar(size); // no espaço normalizado do ícone (raio 1)
   return sp;
 }
 
-async function loadGlobalObject(doc: ModelDoc, bin: ArrayBuffer, index: number): Promise<THREE.Group> {
-  const { group } = await buildBatched(doc, bin, doc.objects?.[index]?.instances ?? []);
+async function loadGlobalObject(doc: ModelDoc, bin: ArrayBuffer, instances: ModelDoc['scene']): Promise<THREE.Group> {
+  const { group } = await buildBatched(doc, bin, instances);
   // Ícones são anéis de painéis semitransparentes: o PS2 desenha só a face de fora. Com os dois lados,
   // o painel de trás aparecia através do da frente (ícone "duplicado").
   group.traverse((o) => {
@@ -217,19 +239,15 @@ const DRIVER_VARIANT: Record<string, 'a' | 'b'> = { mrgrim: 'a', hc_axel: 'a', e
 
 /** Arma -> tipo de arma do jogo (FUN_00120ba0; índice dos marcadores 0x00F0 e dos seletores de projétil). */
 const WEAPON_TYPE: Record<WeaponId, number> = {
-  machinegun: 0, fire: 2, homing: 3, napalm: 4, power: 6, ricochet: 7, swarmer: 9, remote: 10,
-};
-const WEAPON_PICKUP: Record<WeaponId, number> = {
-  machinegun: 0, fire: 1, homing: 2, swarmer: 3, napalm: 4, ricochet: 5, power: 6, remote: 11,
+  machinegun: 0, special: 1, fire: 2, homing: 3, napalm: 4, power: 6, ricochet: 7, env: 8, swarmer: 9, remote: 10,
 };
 
 /**
- * Modelo do projétil pendurado no marcador 0x00F0 do lançador (FUN_00147568), em escala nativa e no quadro do
- * marcador (coordenadas do PS2). O jogo pega o modelo numa tabela por tipo (0x37cbf0+0xda24, preenchida em
- * runtime); ⚠️ ESCOLHA DO HOST: o objeto do GLOBALS é o do ícone do pickup da arma (identificação visual).
+ * Modelo de um projétil em escala nativa e coordenadas do PS2 (frente = +Y). É o mesmo nó usado no voo
+ * (FUN_00203c68 → FUN_0022ff38) e pendurado no marcador 0x00F0 do lançador (FUN_00147568), pela tabela por tipo.
  */
-async function loadProjectileModel(doc: ModelDoc, bin: ArrayBuffer, index: number): Promise<THREE.Group> {
-  const { group } = await buildBatched(doc, bin, doc.objects?.[index]?.instances ?? []);
+async function loadProjectileModel(doc: ModelDoc, bin: ArrayBuffer, instances: ModelDoc['scene']): Promise<THREE.Group> {
+  const { group } = await buildBatched(doc, bin, instances);
   group.traverse((o) => {
     const mesh = o as THREE.Mesh;
     if (mesh.isMesh) (mesh.material = (mesh.material as THREE.Material).clone()).side = THREE.FrontSide;
@@ -241,21 +259,23 @@ async function loadGlobals() {
   const { doc, bin } = await loadModel('globals/globals');
   const out: Record<keyof typeof GLOBAL_OBJECTS, THREE.Group> = {} as never;
   for (const [key, index] of Object.entries(GLOBAL_OBJECTS) as [keyof typeof GLOBAL_OBJECTS, number][]) {
-    out[key] = await loadGlobalObject(doc, bin, index);
+    out[key] = await loadGlobalObject(doc, bin, doc.objects?.[index]?.instances ?? []);
   }
+  const cat = (c: number) => doc.categories?.[c.toString(16)];
   const pickups = new Map<number, THREE.Group>();
-  for (const [id, { obj, aura }] of Object.entries(PICKUP_MODELS)) {
-    const icon = await loadGlobalObject(doc, bin, obj);
+  for (const [id, aura] of Object.entries(PICKUP_AURA)) {
+    const insts = cat(pickupCategory(Number(id)));
+    if (!insts) continue;
     const holder = new THREE.Group();
-    holder.add(icon, auraSprite(aura));
+    holder.add(await loadGlobalObject(doc, bin, insts), auraSprite(aura));
     pickups.set(Number(id), holder);
   }
-  const projectiles = new Map<WeaponId, THREE.Group>();
-  for (const [w, id] of Object.entries(WEAPON_PICKUP) as [WeaponId, number][]) {
-    const obj = PICKUP_MODELS[id]?.obj;
-    if (obj !== undefined && obj !== 20) projectiles.set(w, await loadProjectileModel(doc, bin, obj));
+  const projectiles = new Map<number, THREE.Group>();
+  for (let t = 0; t < PROJECTILES.length; t++) {
+    const insts = cat(t in PROJECTILE_CATEGORY_HO ? PROJECTILE_CATEGORY_HO[t] : PROJECTILE_CATEGORY_HC[t] ?? -1);
+    if (insts) projectiles.set(t, await loadProjectileModel(doc, bin, insts));
   }
-  return { ...out, pickups, projectiles };
+  return { ...out, pickups, projectiles, doc, bin };
 }
 
 function spawnPoints(doc: ModelDoc, collision: LevelCollision): V3[] {
@@ -287,16 +307,30 @@ interface Fx {
 async function main() {
   const rules = await loadVehicleRules();
   const bots = BOT_POOL.filter((n) => n !== carName).slice(0, botCount);
-  const [{ doc: lvl, collision, drawCalls }, globals, ...cars] = await Promise.all([
+  const [{ doc: lvl, bin: lvlBin, collision, drawCalls }, globals, ...cars] = await Promise.all([
     loadLevel(),
     loadGlobals(),
     loadCarModel(carName, rules),
     ...bots.map((b) => loadCarModel(b, rules)),
   ]);
   const spawns = spawnPoints(lvl, collision);
+  // HUD do jogo: peças 3D do GLOBALS presas à câmera + fonte do RESIDENT (src/hud.ts).
+  const hud = await Hud.build(globals.doc as never, globals.bin);
+  document.body.appendChild(hud.canvas);
+  const hudResize = () => hud.resize(innerWidth, innerHeight, Math.min(devicePixelRatio, 2));
+  addEventListener('resize', hudResize, { signal: abort.signal });
+  hudResize();
   const match = new Match(collision, spawns, (p, s) => placeOnGround(p, s, collision));
+  // Índice do veículo nas tabelas indexadas por carro+0x14 (nomes 0x2b39f0, cores do radar, perfis da IA): os
+  // Head-On seguem o id da tabela de física (0..17); os Harbor City vêm depois (id 21.. → 18..).
+  const vehicleId = (model: string) => {
+    const id = rules[model]?.id ?? -1;
+    return id >= 21 ? id - 3 : id < 18 ? id : -1;
+  };
+  const aiTables = await fetch(assetURL('rules/ai.json')).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+  if (aiTables) match.ai = { tables: aiTables, difficulty };
   const player = match.addCar('Você', carName, cars[0].shape, false);
-  bots.forEach((b, i) => match.addCar(b, b, cars[i + 1].shape, true));
+  bots.forEach((b, i) => match.addCar(b, b, cars[i + 1].shape, true, vehicleId(b)));
   match.addPickups((lvl.points?.pkp ?? []).map((p) => ({ id: parseInt(p.raw[8], 16), pos: ps2(p.pos) })));
 
   // Modelos dos carros (um por carro da partida).
@@ -329,11 +363,11 @@ async function main() {
     (r?.clipsWithRole('weapon') ?? []).flatMap((clip) => (clip.weapons ?? []).map((w) => ({ clip, weapon: w as WeaponId, state: 0, t: 0 }))),
   );
   // Modelo do projétil de cada carro no marcador do lançador (um clone por carro e arma).
-  const projModels = match.cars.map(() => new Map<WeaponId, THREE.Object3D>());
-  const projectileFor = (i: number, w: WeaponId) => {
-    let o = projModels[i].get(w);
-    const src = globals.projectiles.get(w);
-    if (!o && src) projModels[i].set(w, (o = src.clone()));
+  const projModels = match.cars.map(() => new Map<number, THREE.Object3D>());
+  const projectileFor = (i: number, type: number) => {
+    let o = projModels[i].get(type);
+    const src = globals.projectiles.get(type);
+    if (!o && src) projModels[i].set(type, (o = src.clone()));
     return o ?? null;
   };
   // Sombra (seletor de categoria 0 com malha plana; ⚠️ host: projetada no chão sob o carro).
@@ -366,6 +400,11 @@ async function main() {
   // Destroços e ações soltas pelos nós 0x13 ao piorar de estado (actionDispatch.cpp).
   const debris = new DebrisSystem(scene, collision);
   const carFrame = new THREE.Matrix4();
+  const destructibles = await LevelDestructibles.build(lvl, lvlBin, collision, debris, PS2_TO_THREE);
+  destructibles.group.matrixAutoUpdate = false;
+  destructibles.group.matrix.copy(PS2_TO_THREE);
+  scene.add(destructibles.group);
+  const V = (p: V3) => new THREE.Vector3(p.x, p.y, p.z);
   const muzzleUntil = match.cars.map(() => 0);
   // Pickups: ícone girando por cima do ponto do PKP.
   const pickupObjs = match.pickups.map((p) => {
@@ -376,16 +415,32 @@ async function main() {
     scene.add(o);
     return o;
   });
-  // Projéteis: pool de mísseis.
-  const missiles: THREE.Object3D[] = [];
-  const missileFor = (i: number) => {
-    while (missiles.length <= i) {
-      const m = globals.missile.clone();
-      m.scale.multiplyScalar(2.5);
-      scene.add(m);
-      missiles.push(m);
+  // Projéteis: o modelo do tipo (nó do GLOBALS em escala nativa, frente +Y do PS2) e, com luz na tabela
+  // (+0x5c, cor +0x60..+0x68), um brilho aditivo na cor nativa. ⚠️ host: brilho no lugar da luz dinâmica
+  // (FUN_0024c350) e bola de fogo pequena no lugar das partículas presas (+0x6c) dos tipos sem malha (Napalm).
+  const projObjs = new Map<Projectile, THREE.Object3D>();
+  const projectileObj = (p: Projectile) => {
+    let o = projObjs.get(p);
+    if (o) return o;
+    const r = PROJECTILES[p.type];
+    o = new THREE.Group();
+    const src = globals.projectiles.get(p.type);
+    if (src) {
+      const m = src.clone();
+      m.matrixAutoUpdate = false;
+      // FUN_00203c68: escala da instância 0,25 no tipo 0x18 e 0,65 no 0x1d; os demais em 1.
+      const k = p.type === 0x18 ? 0.25 : p.type === 0x1d ? 0.65 : 1;
+      m.matrix.copy(PS2_TO_THREE).multiply(new THREE.Matrix4().makeScale(k, k, k));
+      o.add(m);
+    } else if (!isBullet(p.type)) {
+      const f = globals.fireball.clone();
+      f.scale.multiplyScalar(2);
+      o.add(f);
     }
-    return missiles[i];
+    if (r?.light) o.add(auraSprite((Math.round(r.lightR) << 16) | (Math.round(r.lightG) << 8) | Math.round(r.lightB), 6));
+    scene.add(o);
+    projObjs.set(p, o);
+    return o;
   };
   // Traçantes da metralhadora.
   const tracerGeo = new THREE.BufferGeometry();
@@ -396,8 +451,11 @@ async function main() {
   scene.add(tracers);
   let tracerList: { from: V3; to: V3; age: number }[] = [];
   const fx: Fx[] = [];
-  const explode = (pos: V3, big: boolean) => {
-    for (const [src, life, grow] of [[globals.fireball, 0.6, big ? 30 : 14], [globals.burst, 0.35, big ? 40 : 18]] as const) {
+  /** Explosão do tipo: tamanho pelo raio (+0x04) e escala do 1º efeito (+0x84). ⚠️ host: prefabs no lugar das partículas. */
+  const explode = (pos: V3, type: number) => {
+    const r = PROJECTILES[type];
+    const k = (r?.explosionScale[0] ?? 1) * (r && r.blastRadius > 0 ? Math.min(3, r.blastRadius / 45) : 1);
+    for (const [src, life, grow] of [[globals.fireball, 0.6, 14 * k], [globals.burst, 0.35, 18 * k]] as const) {
       const o = src.clone();
       o.position.set(pos.x, pos.y, pos.z);
       o.scale.setScalar(1);
@@ -408,48 +466,115 @@ async function main() {
 
   const input = new Input(abort.signal);
   const audio = new AudioEngine(levelName, abort.signal);
+  // Ação 4 dos nós 0x13 (FUN_001a0db8): som de destruição do banco da arena (D_WOOD_*, D_GLASS_*…).
+  debris.onSound = (name, pos) => audio.play(levelName, name, { pos: v3(pos.x, pos.y, pos.z) });
   // Nomes dos sons do GLOBAL.BNK (nativos) para cada evento.
-  const LAUNCH: Record<WeaponId, string> = {
+  const LAUNCH: Partial<Record<WeaponId, string>> = {
     machinegun: 'W_MGUN', fire: 'W_FIREMISS_LNCH', homing: 'W_HOMMISS_LNCH', swarmer: 'W_SWARM_LNCH',
     napalm: 'W_NAP_LAUNCH', ricochet: 'W_RICO_LNCH', power: 'W_PWRMISS_LNCH', remote: 'W_REMOTE_DROP',
   };
-  const EXPLO: Record<WeaponId, string> = {
+  const EXPLO: Partial<Record<WeaponId, string>> = {
     machinegun: 'W_EXPLO_SML', fire: 'W_EXPLO_MED', homing: 'W_EXPLO_MED', swarmer: 'W_EXPLO_SML',
     napalm: 'W_EXPLO_LRG', ricochet: 'W_EXPLO_MED', power: 'W_EXPLO_LRG', remote: 'W_EXPLO_LRG',
   };
+  /**
+   * Som do especial no banco de armas do carro (*WP.BNK): nomes nativos do banco; ⚠️ host: qual nome cada
+   * especial toca (o código monta os nomes em registradores, tools/native/sound_sites.py não cobre os WSP_*).
+   */
+  const SPECIAL_SOUND: Record<string, string> = { axel: 'WSP_ENERGYBURST', cop: 'WSP_ARC_L', mrslam: 'WSP_SLAM_UP', grass: 'WSP_JUMP', edatv: 'WSP_SHOTGUN', mrgrim: 'WSP_LAUNCH' };
+  const playSpecial = (model: string, pos: V3) => {
+    const wb = audio.weaponBank(model);
+    if (wb) audio.play(wb, SPECIAL_SOUND[model] ?? 'WSP_LAUNCH', { pos, min: 20, max: 650 });
+  };
   let lastGunSound = 0;
-  const toasts: { text: string; t: number }[] = [];
-  const toast = (text: string) => toasts.push({ text, t: 2.5 });
+  let lastBulletSound = 0;
+  const clock = () => performance.now() / 1000;
+  const lastRam: number[] = [];
+  /** Faixa das armas (W_SWARM_LNCH em FUN_001524a0: 15–650 pés). */
+  const WEAPON_RANGE = { min: 15, max: 650 };
+  /**
+   * Som de batida (FUN_00141ca0), faixa 10–200 pés: intensidade ≤ 5 V_TAP (volume i·0,25), 5–15 V_CRASH e 15–25
+   * V_MAJOR_COLL (volume (819 + 205·fração)/1024), acima disso V_MAJOR_COLL cheio. ⚠️ unidade da intensidade (mph).
+   */
+  const collisionSound = (speed: number, pos: V3) => {
+    const i = speed * 0.6818182;
+    if (i < 1) return;
+    const base = { pos, min: 10, max: 200 };
+    if (i > 25) audio.play('global', 'V_MAJOR_COLL', base);
+    else if (i > 15) audio.play('global', 'V_MAJOR_COLL', { ...base, volume: (((i - 15) / 10) * 205 + 819) / 1024 });
+    else if (i > 5) audio.play('global', 'V_CRASH', { ...base, volume: (((i - 5) / 10) * 205 + 819) / 1024 });
+    else audio.play('global', 'V_TAP', { ...base, volume: i * 0.25 });
+  };
+  // Nome curto de cada carro (0x2b39f0) e cor no radar (0x2ba6c8), pelo índice do veículo.
+  const shortName = (model: string) => SHORT_NAMES[vehicleId(model)] ?? model;
   const handle = (e: MatchEvent) => {
     if (e.kind === 'shot') {
-      tracerList.push({ from: e.from, to: e.to, age: 0 });
       muzzleUntil[e.car] = performance.now() + 60;
-      // Metralhadora: um som a cada ~3 tiros por carro para não saturar.
+      // Metralhadora: um som a cada ~3 tiros por carro para não saturar. ⚠️ host: faixa 15–650 (a das armas).
       if (performance.now() - lastGunSound > 90 || e.car === player.id) {
-        audio.play('global', 'W_MGUN', { pos: e.from, volume: e.car === player.id ? 0.7 : 0.5 });
+        audio.play('global', 'W_MGUN', { pos: e.from, volume: e.car === player.id ? 0.7 : 0.5, ...WEAPON_RANGE });
         lastGunSound = performance.now();
       }
+    } else if (e.kind === 'bulletHit') {
+      // Impacto da bala (FUN_00153ff0): metal no carro, terra no cenário (⚠️ superfície do chão não lida).
+      if (performance.now() - lastBulletSound > 60) {
+        audio.play('global', e.car ? 'W_BUL_METAL' : 'W_BUL_DIRT', { pos: e.pos, volume: 0.6 });
+        lastBulletSound = performance.now();
+      }
     } else if (e.kind === 'launch') {
-      audio.play('global', LAUNCH[e.weapon], { pos: e.pos });
+      if (e.weapon === 'special') playSpecial(match.cars[e.car].model, e.pos);
+      else if (LAUNCH[e.weapon]) audio.play('global', LAUNCH[e.weapon]!, { pos: e.pos, ...WEAPON_RANGE });
+    } else if (e.kind === 'special') {
+      playSpecial(e.model, e.pos);
+      explode(e.pos, 1);
+    } else if (e.kind === 'message') {
+      if (e.car === player.id) hud.message(e.text);
+    } else if (e.kind === 'bounce') {
+      audio.play('global', 'W_RICOCHET_BNCE', { pos: e.pos, min: 100, max: 650 }); // FUN_00154720
+    } else if (e.kind === 'impact') collisionSound(e.speed, e.pos);
+    else if (e.kind === 'ram') {
+      // Batida no cenário: o mesmo som das colisões (FUN_00142290 → FUN_00141ca0), no máximo 4 por segundo por carro.
+      destructibles.hitTag(e.tag, e.speed * RAM_DAMAGE, { kind: 'ram', pos: V(e.pos) }, performance.now() / 1000);
+      if (clock() - (lastRam[e.car] ?? 0) > 0.25) {
+        lastRam[e.car] = clock();
+        collisionSound(e.speed, e.pos);
+      }
     }
-    else if (e.kind === 'impact') audio.play('global', e.speed > 60 ? 'V_MAJOR_COLL' : 'V_CRASH', { pos: e.pos, volume: Math.min(1, e.speed / 60) });
-    else if (e.kind === 'hit') {
+    else if (e.kind === 'worldHit') {
+      // Golpe direto no cenário (FUN_00171838): o dono do triângulo atingido.
+      destructibles.hitTag(e.tag, e.amount, { kind: 'weapon', weapon: e.weapon, pos: V(e.pos), vel: V(e.vel) }, performance.now() / 1000);
+    } else if (e.kind === 'hit') {
       // Golpe direto nas peças destrutíveis do carro (categoria ≠ 0x46; FUN_00171838). ⚠️ host: peça mais perto.
       const r = rigs[e.car];
       if (r) r.hitPart(r.group.worldToLocal(new THREE.Vector3(e.pos.x, e.pos.y, e.pos.z)), e.amount, performance.now() / 1000, 4);
     } else if (e.kind === 'explosion') {
-      explode(e.pos, e.weapon === 'power' || e.weapon === 'napalm' || e.weapon === 'remote');
-      audio.play('global', EXPLO[e.weapon], { pos: e.pos });
+      explode(e.pos, e.type);
+      // Área nos destrutíveis: metade do raio (FUN_00202d08 → FUN_0022c5a8(raio·0,5)).
+      const w = PROJECTILES[e.type];
+      if (w) destructibles.blast(V(e.pos), w.blastRadius * 0.5, w.damage, e.weapon, performance.now() / 1000);
+      // FUN_00152b48: W_EXPLO_MED 60–650; FUN_00150c98: W_EXPLO_LRG 15–650. ⚠️ host: qual arma usa qual.
+      const name = EXPLO[e.weapon] ?? (w && w.blastRadius > 0 ? 'W_EXPLO_LRG' : 'W_EXPLO_MED');
+      const big = name === 'W_EXPLO_LRG';
+      audio.play('global', name, { pos: e.pos, min: big ? 15 : 60, max: 650 });
     } else if (e.kind === 'pickup') {
       const eff = pickupEffect(e.pickupId);
-      audio.play('global', eff.kind === 'health' ? 'P_PARTIALHEALTH' : eff.kind === 'turbo' ? 'P_TURBO' : 'P_WEAPON', { pos: match.center(match.cars[e.car]) });
-      if (e.car === player.id) toast(e.name);
+      const pickupSound = eff.kind === 'health' ? (eff.amount >= 100 ? 'P_100_HEALTH' : 'P_PARTIALHEALTH') : eff.kind === 'turbo' ? 'P_TURBO' : 'P_WEAPON';
+      audio.play('global', pickupSound, { pos: match.center(match.cars[e.car]) });
+      // "%s Pickup" (tabela 0x2ba4c0, mensagem 1). ⚠️ host: o texto do %s.
+      if (e.car === player.id) hud.message(`${e.name} Pickup`);
     } else if (e.kind === 'killed') {
-      audio.play('global', 'W_EXPLO_HUGE1', { pos: e.pos });
-      if (e.victim === player.id) audio.play('global', 'W_PLAYER_DEATH');
+      // Morte do carro: FUN_00142648 W_EXPLO_LRG, FUN_00145720 W_PLAYER_DEATH e FUN_001457b0 V_SCREAM, todos 10–2000.
+      audio.play('global', 'W_EXPLO_LRG', { pos: e.pos, min: 10, max: 2000 });
+      audio.play('global', 'V_SCREAM', { pos: e.pos, min: 10, max: 2000 });
+      if (e.victim === player.id) audio.play('global', 'W_PLAYER_DEATH', { pos: e.pos, min: 10, max: 2000 });
       const v = match.cars[e.victim];
       const k = e.killer !== null ? match.cars[e.killer] : null;
-      toast(k && k !== v ? `${k.name} destruiu ${v.name}` : `${v.name} foi destruído`);
+      // Mensagens 17..34 "Destroyed <carro>" (17 + id) e 16 "%s killed by %s". ⚠️ host: quando cada uma aparece.
+      const vid = vehicleId(v.model);
+      if (k === player && v !== player) hud.message(`Destroyed ${DESTROYED[vid] ?? shortName(v.model)}`);
+      else if (v === player && k && k !== v) hud.message(`${shortName(v.model)} killed by ${shortName(k.model)}`);
+    } else if (e.kind === 'bayFull' && e.car === player.id) {
+      hud.message(e.bay === 'weapon' ? 'Weapons Bay Full' : e.bay === 'health' ? 'Health Bay Full' : 'Turbo Bay Full');
     }
   };
 
@@ -492,7 +617,9 @@ async function main() {
   let prevStates: VehicleState[] = match.cars.map((c) => structuredClone(c.state));
   const killY = collision.bounds.min.y - 300;
   let pendingSpecial = false;
-  let turboWas = false;
+  const turboState: { on: boolean; launch: number; out: number }[] = [];
+  const airBefore: number[] = [];
+  let lastSelected: WeaponId | null = null;
   let pendingNext = false;
 
   renderer.setAnimationLoop((now) => {
@@ -518,6 +645,7 @@ async function main() {
       match.step(STEP, new Map([[player.id, act]]));
       for (const c of match.cars) if (c.deadFor === 0 && c.state.pos.y < killY) match.respawn(c);
       for (const e of match.drain()) handle(e);
+      hud.tick();
       acc -= STEP;
     }
     const alpha = acc / STEP;
@@ -539,6 +667,7 @@ async function main() {
       basisM.makeBasis(new THREE.Vector3(b.x.x, b.x.y, b.x.z), new THREE.Vector3(b.y.x, b.y.y, b.y.z), new THREE.Vector3(b.z.x, b.z.y, b.z.z));
       m.position.set(pos.x, pos.y, pos.z);
       m.quaternion.setFromRotationMatrix(basisM);
+      if (c.spin) m.rotateY(c.spin); // especial do Twister (giro visual)
       const shadow = shadows[i];
       if (shadow) placeShadow(shadow, c.state, dead);
       if (r) {
@@ -584,12 +713,17 @@ async function main() {
             // Abre (FUN_00148978): seletores de projétil 0x1b1 (2→1, 3→2) e 0x1b2 (6→1, 9→2) e o modelo do
             // projétil no marcador 0x00F0 do tipo (FUN_00147568).
             mt.state = 1;
+            // Suporte abrindo (FUN_001451a0): S_DEPLOY do banco de armas do carro. ⚠️ faixa do objeto de som do carro.
+            const wb = audio.weaponBank(c.model);
+            if (wb) audio.play(wb, 'S_DEPLOY', { pos: match.center(c), min: 20, max: 600 });
             const t = WEAPON_TYPE[mt.weapon];
             r.setSelector(0x1b1, t === 2 ? 1 : t === 3 ? 2 : 0);
             r.setSelector(0x1b2, t === 6 ? 1 : t === 9 ? 2 : 0);
-            r.setProjectile(t, projectileFor(i, mt.weapon));
+            r.setProjectile(t, projectileFor(i, t));
           } else if (!mine && mt.state === 1) {
             mt.state = 2; // fecha: seletores voltam a 0; o modelo sai quando o clipe termina (FUN_001474f0)
+            const wb = audio.weaponBank(c.model);
+            if (wb) audio.play(wb, 'S_RETRACT', { pos: match.center(c), min: 20, max: 600 }); // FUN_001452d8
             r.setSelector(0x1b1, 0);
             r.setSelector(0x1b2, 0);
           }
@@ -616,14 +750,21 @@ async function main() {
       o.rotation.y = t * 1.5;
       o.position.y = p.pos.y + 5 + Math.sin(t * 2 + i) * 0.8;
     });
-    // Projéteis.
-    match.projectiles.forEach((p, i) => {
-      const m = missileFor(i);
-      m.visible = true;
-      m.position.set(p.pos.x, p.pos.y, p.pos.z);
-      m.lookAt(p.pos.x + p.vel.x, p.pos.y + p.vel.y, p.pos.z + p.vel.z);
-    });
-    for (let i = match.projectiles.length; i < missiles.length; i++) missiles[i].visible = false;
+    // Projéteis: posição interpolada e orientação pelo rumo/arfagem (frente +Z do Three = +Y do PS2).
+    const live = new Set(match.projectiles);
+    for (const [p, o] of projObjs) {
+      if (live.has(p)) continue;
+      scene.remove(o);
+      projObjs.delete(p);
+    }
+    for (const p of match.projectiles) {
+      const o = projectileObj(p);
+      const at = lerp(p.prev, p.pos, alpha);
+      o.position.set(at.x, at.y, at.z);
+      o.rotation.set(-p.pitch, p.yaw, 0, 'YXZ');
+      // Balas: traçante do trecho percorrido no tique (o modelo 0xfa0 é minúsculo).
+      if (isBullet(p.type)) tracerList.push({ from: p.prev, to: p.pos, age: 0.035 });
+    }
     // Traçantes (70 ms).
     tracerList = tracerList.filter((tr) => (tr.age += dt) < 0.07).slice(-64);
     tracerPos.fill(0);
@@ -631,6 +772,7 @@ async function main() {
     tracerGeo.attributes.position.needsUpdate = true;
     tracerGeo.setDrawRange(0, tracerList.length * 2);
     debris.update(dt, t);
+    destructibles.update(t);
     // Explosões: crescem e somem.
     for (let i = fx.length - 1; i >= 0; i--) {
       const f = fx[i];
@@ -674,41 +816,110 @@ async function main() {
       camera.lookAt(new THREE.Vector3(ov.look[0], ov.look[1], ov.look[2]).applyMatrix4(m0.matrixWorld));
     }
 
-    // Áudio: ouvinte na câmera; motores do jogador e dos bots.
+    // QA: câmera fixa no mundo (window.__camWorld = { pos: [x,y,z], look: [x,y,z] })
+    const cw = (window as any).__camWorld as { pos: number[]; look: number[] } | undefined;
+    if (cw) {
+      camera.position.set(cw.pos[0], cw.pos[1], cw.pos[2]);
+      camera.lookAt(cw.look[0], cw.look[1], cw.look[2]);
+    }
+
+    // Áudio: ouvinte no carro do jogador (FUN_001d32d8), orientação da câmera; motores do jogador e dos bots.
     const camDir = new THREE.Vector3();
     camera.getWorldDirection(camDir);
-    audio.listener(camera.position, camDir);
+    audio.listener(match.center(player), camDir);
+    const tNow = clock();
     for (const c of match.cars) {
-      const sp = speedOf(c.state) / 150;
-      audio.engine(c.id, c.model, sp, c.id === player.id ? a.throttle : 0.7, match.center(c), c.deadFor === 0);
+      const alive = c.deadFor === 0;
+      // FUN_00144250: altura do motor = vel. (mph) / vel. máx. da tabela (carro+0x858).
+      const top = (c.shape.drive?.maxMph ?? 100) * 1.4666667;
+      audio.engine(c.id, c.model, speedOf(c.state) / top, c.id === player.id ? a.throttle : 0.7, match.center(c), alive);
+      // Turbo (FUN_001446d0): V_TURBO_LAUNCH ao ligar (≥ 61 quadros entre um e outro), laços V_MAXRPM_L (sobe em 180
+      // quadros) e V_TURBINE_L; ao soltar, descem em 60 e 120 quadros. V_TURBO_OUT ao soltar (FUN_00141770, ≥ 15).
+      const boost = alive && c.boosting;
+      const ts = (turboState[c.id] ??= { on: false, launch: -9, out: -9 });
+      const pos = match.center(c);
+      const range = { pos, min: 20, max: 600 }; // ⚠️ host: faixa do objeto de som do carro
+      if (boost && !ts.on && tNow - ts.launch > 61 / 60) {
+        audio.play('global', 'V_TURBO_LAUNCH', range);
+        ts.launch = tNow;
+      }
+      if (!boost && ts.on && c.id === player.id && tNow - ts.out > 15 / 60) {
+        audio.play('global', 'V_TURBO_OUT');
+        ts.out = tNow;
+      }
+      audio.loop(`maxrpm${c.id}`, 'global', 'V_MAXRPM_L', boost ? 1 : 0, { ...range, fade: boost ? 3 : 1 });
+      audio.loop(`turbine${c.id}`, 'global', 'V_TURBINE_L', boost ? 1 : 0, { ...range, fade: boost ? 0.05 : 2 });
+      ts.on = boost;
+      // Pouso depois de um pulo (FUN_00143740). ⚠️ host: superfície (sempre terra) e o mínimo de quadros no ar.
+      if (alive && c.state.grounded && (airBefore[c.id] ?? 0) > 20) audio.play('global', 'V_LAND_DIRT', { pos, min: 10, max: 200 });
+      airBefore[c.id] = c.airFrames;
     }
-    if (a.turbo && a.throttle > 0 && player.turbo > 1 && !turboWas) audio.play('global', 'V_TURBO_LAUNCH', { volume: 0.8 });
-    turboWas = a.turbo && a.throttle > 0;
+    // Vida baixa (FUN_00139938 → FUN_001418b8): laço abaixo de 15 % da vida, só do jogador. ⚠️ o V_LOWHEALTH_L não
+    // aparece nos nomes convertidos do GLOBAL.BNK; o host usa o HEALTHBEEP.
+    const low = player.deadFor === 0 && player.health / MATCH_RULES.maxHealth < 0.15;
+    audio.loop('lowhealth', 'global', 'HEALTHBEEP', low ? 0.8 : 0);
+    // Troca de arma (FUN_00141580): WEAPON_CYCLE, só do jogador.
+    if (player.selected !== lastSelected && player.selected && lastSelected) audio.play('global', 'WEAPON_CYCLE');
+    lastSelected = player.selected;
 
     skyUpdate?.(camera);
     renderer.render(scene, camera);
-    renderHud(fps, drawCalls, collision.triangleCount, dt);
+    hud.render(renderer, hudState(), dt);
+    renderHud(fps, drawCalls, collision.triangleCount);
   });
 
-  function renderHud(fps: number, drawCalls: number, tri: number, dt: number) {
-    for (const tt of toasts) tt.t -= dt;
-    while (toasts.length && toasts[0].t <= 0) toasts.shift();
-    const hp = Math.round((player.health / MATCH_RULES.maxHealth) * 100);
-    const turbo = Math.round((player.turbo / MATCH_RULES.turboMax) * 100);
-    const weapons = (Object.entries(player.ammo) as [WeaponId, number][])
-      .filter(([, n]) => n > 0)
-      .map(([w, n]) => `<span class="${w === player.selected ? 'sel' : ''}">${WEAPON_RULES[w].name} ×${n}</span>`)
-      .join(' ');
+  /** Estado do HUD a partir do jogador (carro+0x4dc0 vida, +0x6894 turbo, +0x6898 energia, inventário +0x4fbc). */
+  function hudState() {
+    const ammo = new Array<number>(9).fill(0);
+    for (const [w, n] of Object.entries(player.ammo)) {
+      const i = INVENTORY_INDEX[w as WeaponId];
+      if (i !== undefined) ammo[i] = n ?? 0;
+    }
+    const fwd = forwardOf(player.state.yaw);
+    const right = rightOf(player.state.yaw);
+    const blips: HudBlip[] = [];
+    let target: string | null = null;
+    let best = Infinity;
+    for (const c of match.cars) {
+      if (c === player || c.deadFor > 0) continue;
+      const dx = c.state.pos.x - player.state.pos.x;
+      const dy = c.state.pos.y - player.state.pos.y;
+      const dz = c.state.pos.z - player.state.pos.z;
+      // FUN_00137148: fora de ±50 pés de altura o ponto pisca ((rand & 0x1f) < 0xf).
+      if (Math.abs(dy) < 50 || Math.random() < 15 / 32)
+        blips.push({ right: dx * right.x + dz * right.z, forward: dx * fwd.x + dz * fwd.z, color: vehicleId(c.model) });
+      // FUN_00139780: alvo = o mais perto num cone de cos(0,96) à frente.
+      const d2 = dx * dx + dy * dy + dz * dz;
+      const L = Math.sqrt(d2) || 1;
+      if ((dx * fwd.x + dz * fwd.z) / L > Math.cos(0.96) && d2 < best) {
+        best = d2;
+        target = shortName(c.model);
+      }
+    }
+    return {
+      health: player.health / MATCH_RULES.maxHealth,
+      turbo: player.turbo / MATCH_RULES.turboMax,
+      energy: 1, // ⚠️ host: ataques de energia não implementados (carro+0x6898 começa em 1,0 — FUN_00123cd0)
+      dead: player.deadFor > 0,
+      respawnIn: MATCH_RULES.respawnDelay - player.deadFor,
+      ammo,
+      selected: player.selected ? INVENTORY_INDEX[player.selected] ?? 0 : 0,
+      target,
+      blips,
+      hc: false,
+    };
+  }
+
+  /** Linha de depuração (só com ?debug=1) e aviso de som — o HUD do jogo é o de src/hud.ts. */
+  function renderHud(fps: number, drawCalls: number, tri: number) {
     const board = [...match.cars].sort((x, y) => y.kills - x.kills).map((c) => `${c.name} ${c.kills}/${c.deaths}`).join(' · ');
-    hud.innerHTML = `
-      <div class="bars"><div class="bar hp"><i style="width:${hp}%"></i><b>VIDA ${hp}</b></div>
-      <div class="bar turbo"><i style="width:${turbo}%"></i><b>TURBO</b></div></div>
-      <div>${Math.round(speedOf(player.state) * 0.6818)} mph · ${weapons || 'sem armas especiais (pegue os ícones)'}</div>
-      <div class="small">${board}</div>
-      ${player.deadFor > 0 ? `<div class="dead">DESTRUÍDO — renascendo…</div>` : ''}
-      ${!audio.started ? `<div class="small">🔇 aperte qualquer tecla para ligar o som</div>` : audio.isMuted ? `<div class="small">🔇 mudo (M)</div>` : ''}
-      ${toasts.map((tt) => `<div class="toast">${tt.text}</div>`).join('')}
-      <div class="small">${levelName} · ${fps} fps · ${drawCalls} draw calls · ${tri} tri de colisão · pickups ${match.pickups.length} (renascem em ${PICKUP_RULES.respawn}s)</div>`;
+    const sound = !audio.started ? '🔇 aperte qualquer tecla para ligar o som' : audio.isMuted ? '🔇 mudo (M)' : '';
+    hudEl.hidden = !debug && !sound;
+    hudEl.innerHTML = debug
+      ? `<div class="small">${Math.round(speedOf(player.state) * 0.6818)} mph · ${board}</div>
+      ${sound ? `<div class="small">${sound}</div>` : ''}
+      <div class="small">${levelName} · ${fps} fps · ${drawCalls} draw calls · ${tri} tri de colisão · pickups ${match.pickups.length}</div>`
+      : `<div class="small">${sound}</div>`;
   }
 
   // Ganchos para QA (tools/web).
@@ -719,6 +930,8 @@ async function main() {
   });
   (window as any).__game = {
     audio,
+    hud,
+    hudState: () => hudState(),
     pickupObjs,
     state: () => player.state,
     setState: (s: VehicleState) => (player.state = s),
@@ -727,6 +940,7 @@ async function main() {
     selectors: () => rigs.map((r) => r?.selectorStates() ?? null),
     debris: () => debris.count,
     debrisSys: debris,
+    destructibles,
     rigs,
     spawns,
     collision,

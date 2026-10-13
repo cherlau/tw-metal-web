@@ -1,0 +1,27 @@
+# Balístico (Napalm 4, Remote 10, mina 0xd, 0x33) e inicialização/disparo das classes de arma
+at:191880 ball_init
+at:191be8 ball_upd
+at:1916b8 ball_spawn
+at:14ad00 mg_init
+at:14b7d0 msl_init
+at:14bc28 napalm_init
+at:14c0d0 c5740_init
+at:14c4e8 c57c0_init
+at:14d478 c5860_init
+at:14d7b0 swarm_init
+at:14de98 remote_init
+at:14e2a8 c5a10_init
+at:14e700 c5a88_init
+at:14f3a8 c5b14_init
+at:14a8b8 inv_frame
+at:14a4e0 inv_sel
+at:1474f0 after_fire
+at:148300 fire_inv2
+at:14b738 mg_upd
+at:14bac0 msl_upd
+at:14bf88 napalm_upd
+at:14dca0 swarm_upd
+at:14e220 remote_upd
+at:14c430 c5740_upd
+at:14cf00 c57c0_upd
+at:14d740 c5860_upd

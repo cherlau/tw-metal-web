@@ -1,0 +1,2 @@
+# Módulo do HUD (widgets com FUN_0013a7b8 lista de armas / FUN_0013aa88 arma atual)
+range:136000:13c400 hud_mod

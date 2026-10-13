@@ -1,0 +1,25 @@
+# Gravações em +0x848 (0x286xxx-0x287xxx): construtores por carro?
+at:2867f8
+w1
+at:286a38
+w2
+at:286cc4
+w3
+at:286df8
+w4
+at:286e88
+w5
+at:286fe4
+w6
+at:2872b4
+w7
+at:2877cc
+w8
+at:287c04
+w9
+at:287c78
+w10
+at:287cf4
+w11
+at:287d9c
+w12

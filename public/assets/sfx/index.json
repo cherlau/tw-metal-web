@@ -2801,6 +2801,6551 @@
      "loop": true
     }
    ]
+  },
+  "arena": {
+   "D_CONCRETE_SM": [
+    {
+     "url": "sfx/arena/001.m4a",
+     "duration": 2.267,
+     "loop": false
+    }
+   ],
+   "D_CONCRETE_LG": [
+    {
+     "url": "sfx/arena/002.m4a",
+     "duration": 1.328,
+     "loop": false
+    }
+   ],
+   "D_GLASS_SM": [
+    {
+     "url": "sfx/arena/003.m4a",
+     "duration": 2.267,
+     "loop": false
+    }
+   ],
+   "D_METALHOLOW_SM": [
+    {
+     "url": "sfx/arena/004.m4a",
+     "duration": 0.633,
+     "loop": false
+    }
+   ],
+   "D_METALHOLOW_LG": [
+    {
+     "url": "sfx/arena/005.m4a",
+     "duration": 1.167,
+     "loop": false
+    },
+    {
+     "url": "sfx/arena/006.m4a",
+     "duration": 1.896,
+     "loop": false
+    },
+    {
+     "url": "sfx/arena/007.m4a",
+     "duration": 1.591,
+     "loop": false
+    }
+   ],
+   "D_METAL_SHT_LG": [
+    {
+     "url": "sfx/arena/008.m4a",
+     "duration": 0.957,
+     "loop": false
+    },
+    {
+     "url": "sfx/arena/009.m4a",
+     "duration": 0.986,
+     "loop": false
+    }
+   ],
+   "D_METAL_MXD_SM": [
+    {
+     "url": "sfx/arena/010.m4a",
+     "duration": 0.671,
+     "loop": false
+    },
+    {
+     "url": "sfx/arena/011.m4a",
+     "duration": 2.545,
+     "loop": false
+    }
+   ],
+   "D_TREE_LG": [
+    {
+     "url": "sfx/arena/012.m4a",
+     "duration": 1.666,
+     "loop": false
+    }
+   ],
+   "D_WOOD_HOLOW_LG": [
+    {
+     "url": "sfx/arena/013.m4a",
+     "duration": 1.789,
+     "loop": false
+    },
+    {
+     "url": "sfx/arena/014.m4a",
+     "duration": 0.526,
+     "loop": false
+    },
+    {
+     "url": "sfx/arena/015.m4a",
+     "duration": 0.933,
+     "loop": false
+    },
+    {
+     "url": "sfx/arena/016.m4a",
+     "duration": 1.26,
+     "loop": false
+    },
+    {
+     "url": "sfx/arena/017.m4a",
+     "duration": 1.027,
+     "loop": false
+    },
+    {
+     "url": "sfx/arena/018.m4a",
+     "duration": 1.364,
+     "loop": false
+    },
+    {
+     "url": "sfx/arena/019.m4a",
+     "duration": 1.01,
+     "loop": false
+    },
+    {
+     "url": "sfx/arena/020.m4a",
+     "duration": 0.457,
+     "loop": false
+    },
+    {
+     "url": "sfx/arena/021.m4a",
+     "duration": 0.9,
+     "loop": false
+    },
+    {
+     "url": "sfx/arena/022.m4a",
+     "duration": 0.725,
+     "loop": false
+    }
+   ],
+   "D_WOOD_MXD_LG": [
+    {
+     "url": "sfx/arena/023.m4a",
+     "duration": 1.328,
+     "loop": false
+    }
+   ],
+   "D_FENCE_BAR": [
+    {
+     "url": "sfx/arena/024.m4a",
+     "duration": 0.702,
+     "loop": false
+    },
+    {
+     "url": "sfx/arena/025.m4a",
+     "duration": 0.485,
+     "loop": false
+    },
+    {
+     "url": "sfx/arena/026.m4a",
+     "duration": 0.855,
+     "loop": false
+    }
+   ],
+   "D_FENCE_CHAIN": [
+    {
+     "url": "sfx/arena/027.m4a",
+     "duration": 0.965,
+     "loop": false
+    },
+    {
+     "url": "sfx/arena/028.m4a",
+     "duration": 1.107,
+     "loop": false
+    },
+    {
+     "url": "sfx/arena/029.m4a",
+     "duration": 0.987,
+     "loop": false
+    },
+    {
+     "url": "sfx/arena/030.m4a",
+     "duration": 0.879,
+     "loop": false
+    },
+    {
+     "url": "sfx/arena/031.m4a",
+     "duration": 0.658,
+     "loop": false
+    }
+   ],
+   "D_GLASS_LG": [
+    {
+     "url": "sfx/arena/032.m4a",
+     "duration": 1.049,
+     "loop": false
+    },
+    {
+     "url": "sfx/arena/033.m4a",
+     "duration": 3.027,
+     "loop": false
+    }
+   ],
+   "D_WOOD_HOLOW_SM": [
+    {
+     "url": "sfx/arena/034.m4a",
+     "duration": 0.623,
+     "loop": false
+    },
+    {
+     "url": "sfx/arena/035.m4a",
+     "duration": 1.364,
+     "loop": false
+    },
+    {
+     "url": "sfx/arena/036.m4a",
+     "duration": 0.535,
+     "loop": false
+    },
+    {
+     "url": "sfx/arena/037.m4a",
+     "duration": 0.323,
+     "loop": false
+    },
+    {
+     "url": "sfx/arena/038.m4a",
+     "duration": 0.567,
+     "loop": false
+    },
+    {
+     "url": "sfx/arena/039.m4a",
+     "duration": 0.342,
+     "loop": false
+    }
+   ],
+   "D_WOOD_SLD_SM": [
+    {
+     "url": "sfx/arena/040.m4a",
+     "duration": 0.513,
+     "loop": false
+    },
+    {
+     "url": "sfx/arena/041.m4a",
+     "duration": 1.364,
+     "loop": false
+    },
+    {
+     "url": "sfx/arena/042.m4a",
+     "duration": 0.714,
+     "loop": false
+    },
+    {
+     "url": "sfx/arena/043.m4a",
+     "duration": 0.407,
+     "loop": false
+    },
+    {
+     "url": "sfx/arena/044.m4a",
+     "duration": 0.9,
+     "loop": false
+    },
+    {
+     "url": "sfx/arena/045.m4a",
+     "duration": 0.513,
+     "loop": false
+    }
+   ],
+   "D_METAL_MXD_LG": [
+    {
+     "url": "sfx/arena/046.m4a",
+     "duration": 0.586,
+     "loop": false
+    }
+   ],
+   "D_WOOD_MXD_SM": [
+    {
+     "url": "sfx/arena/047.m4a",
+     "duration": 0.625,
+     "loop": false
+    }
+   ],
+   "L_ENV_PYRO": [
+    {
+     "url": "sfx/arena/048.m4a",
+     "duration": 2.999,
+     "loop": false
+    },
+    {
+     "url": "sfx/arena/049.m4a",
+     "duration": 2.832,
+     "loop": false
+    },
+    {
+     "url": "sfx/arena/050.m4a",
+     "duration": 2.672,
+     "loop": false
+    },
+    {
+     "url": "sfx/arena/051.m4a",
+     "duration": 2.523,
+     "loop": false
+    },
+    {
+     "url": "sfx/arena/052.m4a",
+     "duration": 2.381,
+     "loop": false
+    },
+    {
+     "url": "sfx/arena/053.m4a",
+     "duration": 2.247,
+     "loop": false
+    }
+   ],
+   "L_ENV_ZAP": [
+    {
+     "url": "sfx/arena/054.m4a",
+     "duration": 0.314,
+     "loop": false
+    },
+    {
+     "url": "sfx/arena/055.m4a",
+     "duration": 1.066,
+     "loop": false
+    }
+   ],
+   "L_HELI_L": [
+    {
+     "url": "sfx/arena/056.m4a",
+     "duration": 0.002,
+     "loop": true
+    }
+   ]
+  },
+  "castledm": {
+   "L_DUMMY_L": [
+    {
+     "url": "sfx/castledm/001.m4a",
+     "duration": 0.013,
+     "loop": true
+    }
+   ],
+   "L_HELI_L": [
+    {
+     "url": "sfx/castledm/002.m4a",
+     "duration": 0.002,
+     "loop": true
+    }
+   ],
+   "L_WIND_HVY_L": [
+    {
+     "url": "sfx/castledm/003.m4a",
+     "duration": 0.003,
+     "loop": true
+    },
+    {
+     "url": "sfx/castledm/004.m4a",
+     "duration": 0.002,
+     "loop": true
+    }
+   ],
+   "D_CONCRETE_SM": [
+    {
+     "url": "sfx/castledm/005.m4a",
+     "duration": 0.97,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/006.m4a",
+     "duration": 0.43,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/007.m4a",
+     "duration": 1.425,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/008.m4a",
+     "duration": 1.695,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/009.m4a",
+     "duration": 1.518,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/010.m4a",
+     "duration": 0.859,
+     "loop": false
+    }
+   ],
+   "D_CONCRETE_LG": [
+    {
+     "url": "sfx/castledm/011.m4a",
+     "duration": 3.049,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/012.m4a",
+     "duration": 2.879,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/013.m4a",
+     "duration": 1.97,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/014.m4a",
+     "duration": 1.754,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/015.m4a",
+     "duration": 1.296,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/016.m4a",
+     "duration": 1.154,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/017.m4a",
+     "duration": 0.574,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/018.m4a",
+     "duration": 0.511,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/019.m4a",
+     "duration": 1.089,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/020.m4a",
+     "duration": 0.482,
+     "loop": false
+    }
+   ],
+   "D_GLASS_SM": [
+    {
+     "url": "sfx/castledm/021.m4a",
+     "duration": 1.316,
+     "loop": false
+    }
+   ],
+   "D_GLASS_LG": [
+    {
+     "url": "sfx/castledm/022.m4a",
+     "duration": 0.989,
+     "loop": false
+    }
+   ],
+   "D_METALHOLOW_SM": [
+    {
+     "url": "sfx/castledm/023.m4a",
+     "duration": 0.633,
+     "loop": false
+    }
+   ],
+   "D_METALHOLOW_LG": [
+    {
+     "url": "sfx/castledm/024.m4a",
+     "duration": 1.167,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/025.m4a",
+     "duration": 1.896,
+     "loop": false
+    }
+   ],
+   "D_METAL_DUMP": [
+    {
+     "url": "sfx/castledm/026.m4a",
+     "duration": 1.102,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/027.m4a",
+     "duration": 1.102,
+     "loop": false
+    }
+   ],
+   "D_METAL_SLD_SM": [
+    {
+     "url": "sfx/castledm/028.m4a",
+     "duration": 0.62,
+     "loop": false
+    }
+   ],
+   "D_METAL_MXD_SM": [
+    {
+     "url": "sfx/castledm/029.m4a",
+     "duration": 0.671,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/030.m4a",
+     "duration": 1.478,
+     "loop": false
+    }
+   ],
+   "D_METAL_MXD_LG": [
+    {
+     "url": "sfx/castledm/031.m4a",
+     "duration": 1.445,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/032.m4a",
+     "duration": 1.82,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/033.m4a",
+     "duration": 2.295,
+     "loop": false
+    }
+   ],
+   "D_TREE_HIT_SM": [
+    {
+     "url": "sfx/castledm/034.m4a",
+     "duration": 0.802,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/035.m4a",
+     "duration": 0.637,
+     "loop": false
+    }
+   ],
+   "D_TREE_HIT_LG": [
+    {
+     "url": "sfx/castledm/036.m4a",
+     "duration": 0.84,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/037.m4a",
+     "duration": 0.757,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/038.m4a",
+     "duration": 0.85,
+     "loop": false
+    }
+   ],
+   "D_TREE_FALL_SM": [
+    {
+     "url": "sfx/castledm/039.m4a",
+     "duration": 0.668,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/040.m4a",
+     "duration": 0.944,
+     "loop": false
+    }
+   ],
+   "D_TREE_FALL_LG": [
+    {
+     "url": "sfx/castledm/041.m4a",
+     "duration": 1.169,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/042.m4a",
+     "duration": 1.06,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/043.m4a",
+     "duration": 1.06,
+     "loop": false
+    }
+   ],
+   "D_WOOD_HOLOW_SM": [
+    {
+     "url": "sfx/castledm/044.m4a",
+     "duration": 0.622,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/045.m4a",
+     "duration": 1.364,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/046.m4a",
+     "duration": 0.535,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/047.m4a",
+     "duration": 0.323,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/048.m4a",
+     "duration": 0.567,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/049.m4a",
+     "duration": 0.342,
+     "loop": false
+    }
+   ],
+   "D_WOOD_HOLOW_LG": [
+    {
+     "url": "sfx/castledm/050.m4a",
+     "duration": 1.743,
+     "loop": false
+    }
+   ],
+   "D_WOOD_SLD_SM": [
+    {
+     "url": "sfx/castledm/051.m4a",
+     "duration": 0.561,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/052.m4a",
+     "duration": 0.487,
+     "loop": false
+    }
+   ],
+   "D_WOOD_SLD_LG": [
+    {
+     "url": "sfx/castledm/053.m4a",
+     "duration": 0.514,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/054.m4a",
+     "duration": 1.364,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/055.m4a",
+     "duration": 0.714,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/056.m4a",
+     "duration": 0.407,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/057.m4a",
+     "duration": 0.9,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/058.m4a",
+     "duration": 0.513,
+     "loop": false
+    }
+   ],
+   "D_WOOD_MXD_LG": [
+    {
+     "url": "sfx/castledm/059.m4a",
+     "duration": 1.328,
+     "loop": false
+    }
+   ],
+   "D_FENCE_CHAIN": [
+    {
+     "url": "sfx/castledm/060.m4a",
+     "duration": 1.317,
+     "loop": false
+    }
+   ],
+   "D_WOOD_CRATE_SM": [
+    {
+     "url": "sfx/castledm/061.m4a",
+     "duration": 0.623,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/062.m4a",
+     "duration": 0.561,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/063.m4a",
+     "duration": 0.487,
+     "loop": false
+    }
+   ],
+   "D_WOOD_CRATE_LG": [
+    {
+     "url": "sfx/castledm/064.m4a",
+     "duration": 0.764,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/065.m4a",
+     "duration": 0.478,
+     "loop": false
+    }
+   ],
+   "D_WOOD_POLE": [
+    {
+     "url": "sfx/castledm/066.m4a",
+     "duration": 0.338,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/067.m4a",
+     "duration": 0.344,
+     "loop": false
+    }
+   ],
+   "B_PLAT_MOV_LP": [
+    {
+     "url": "sfx/castledm/068.m4a",
+     "duration": 0.002,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/069.m4a",
+     "duration": 0.002,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/070.m4a",
+     "duration": 0.001,
+     "loop": false
+    }
+   ],
+   "B_PLATFORM_OS": [
+    {
+     "url": "sfx/castledm/071.m4a",
+     "duration": 0.002,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/072.m4a",
+     "duration": 0.002,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/073.m4a",
+     "duration": 0.002,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/074.m4a",
+     "duration": 0.002,
+     "loop": false
+    }
+   ],
+   "L_SMASHER_IN": [
+    {
+     "url": "sfx/castledm/075.m4a",
+     "duration": 3.034,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/076.m4a",
+     "duration": 0.859,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/077.m4a",
+     "duration": 0.682,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/078.m4a",
+     "duration": 0.608,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/079.m4a",
+     "duration": 4.293,
+     "loop": false
+    }
+   ],
+   "L_SMASHER_OUT": [
+    {
+     "url": "sfx/castledm/080.m4a",
+     "duration": 2.169,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/081.m4a",
+     "duration": 2.219,
+     "loop": false
+    }
+   ],
+   "B_FIRE_PIT_L": [
+    {
+     "url": "sfx/castledm/082.m4a",
+     "duration": 0.539,
+     "loop": true
+    },
+    {
+     "url": "sfx/castledm/083.m4a",
+     "duration": 0.539,
+     "loop": true
+    },
+    {
+     "url": "sfx/castledm/084.m4a",
+     "duration": 0.539,
+     "loop": true
+    }
+   ],
+   "L_ENV_WEAP_FLAS": [
+    {
+     "url": "sfx/castledm/085.m4a",
+     "duration": 0.47,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/086.m4a",
+     "duration": 0.444,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/087.m4a",
+     "duration": 0.419,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/088.m4a",
+     "duration": 0.396,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/089.m4a",
+     "duration": 0.373,
+     "loop": false
+    }
+   ],
+   "L_ENV_ARC": [
+    {
+     "url": "sfx/castledm/090.m4a",
+     "duration": 1.857,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/091.m4a",
+     "duration": 1.753,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/092.m4a",
+     "duration": 0.001,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/093.m4a",
+     "duration": 0.001,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/094.m4a",
+     "duration": 0.409,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/095.m4a",
+     "duration": 0.436,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/096.m4a",
+     "duration": 0.416,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/097.m4a",
+     "duration": 0.497,
+     "loop": false
+    }
+   ],
+   "L_ENV_WEAP_RUMB": [
+    {
+     "url": "sfx/castledm/098.m4a",
+     "duration": 0.003,
+     "loop": false
+    },
+    {
+     "url": "sfx/castledm/099.m4a",
+     "duration": 0.002,
+     "loop": false
+    }
+   ],
+   "L_RAVENS_L": [
+    {
+     "url": "sfx/castledm/100.m4a",
+     "duration": 0.004,
+     "loop": true
+    },
+    {
+     "url": "sfx/castledm/101.m4a",
+     "duration": 0.003,
+     "loop": true
+    },
+    {
+     "url": "sfx/castledm/102.m4a",
+     "duration": 0.004,
+     "loop": true
+    },
+    {
+     "url": "sfx/castledm/103.m4a",
+     "duration": 0.003,
+     "loop": true
+    },
+    {
+     "url": "sfx/castledm/104.m4a",
+     "duration": 0.004,
+     "loop": true
+    }
+   ]
+  },
+  "colisdm": {
+   "L_FIRE_PIT_L": [
+    {
+     "url": "sfx/colisdm/001.m4a",
+     "duration": 0.001,
+     "loop": true
+    },
+    {
+     "url": "sfx/colisdm/002.m4a",
+     "duration": 0.001,
+     "loop": true
+    },
+    {
+     "url": "sfx/colisdm/003.m4a",
+     "duration": 0.006,
+     "loop": true
+    },
+    {
+     "url": "sfx/colisdm/004.m4a",
+     "duration": 0.006,
+     "loop": true
+    }
+   ],
+   "L_WIND_HVY_L": [
+    {
+     "url": "sfx/colisdm/005.m4a",
+     "duration": 0.002,
+     "loop": true
+    },
+    {
+     "url": "sfx/colisdm/006.m4a",
+     "duration": 0.003,
+     "loop": true
+    }
+   ],
+   "L_BIRD1_L": [
+    {
+     "url": "sfx/colisdm/007.m4a",
+     "duration": 0.361,
+     "loop": true
+    },
+    {
+     "url": "sfx/colisdm/008.m4a",
+     "duration": 0.361,
+     "loop": true
+    },
+    {
+     "url": "sfx/colisdm/009.m4a",
+     "duration": 0.361,
+     "loop": true
+    },
+    {
+     "url": "sfx/colisdm/010.m4a",
+     "duration": 0.896,
+     "loop": true
+    },
+    {
+     "url": "sfx/colisdm/011.m4a",
+     "duration": 0.896,
+     "loop": true
+    }
+   ],
+   "L_BIRD2_L": [
+    {
+     "url": "sfx/colisdm/012.m4a",
+     "duration": 0.439,
+     "loop": true
+    },
+    {
+     "url": "sfx/colisdm/013.m4a",
+     "duration": 0.414,
+     "loop": true
+    },
+    {
+     "url": "sfx/colisdm/014.m4a",
+     "duration": 0.439,
+     "loop": true
+    },
+    {
+     "url": "sfx/colisdm/015.m4a",
+     "duration": 0.414,
+     "loop": true
+    },
+    {
+     "url": "sfx/colisdm/016.m4a",
+     "duration": 0.439,
+     "loop": true
+    },
+    {
+     "url": "sfx/colisdm/017.m4a",
+     "duration": 0.439,
+     "loop": true
+    },
+    {
+     "url": "sfx/colisdm/018.m4a",
+     "duration": 0.414,
+     "loop": true
+    },
+    {
+     "url": "sfx/colisdm/019.m4a",
+     "duration": 0.414,
+     "loop": true
+    },
+    {
+     "url": "sfx/colisdm/020.m4a",
+     "duration": 0.439,
+     "loop": true
+    },
+    {
+     "url": "sfx/colisdm/021.m4a",
+     "duration": 0.414,
+     "loop": true
+    },
+    {
+     "url": "sfx/colisdm/022.m4a",
+     "duration": 0.439,
+     "loop": true
+    },
+    {
+     "url": "sfx/colisdm/023.m4a",
+     "duration": 0.439,
+     "loop": true
+    },
+    {
+     "url": "sfx/colisdm/024.m4a",
+     "duration": 0.391,
+     "loop": true
+    },
+    {
+     "url": "sfx/colisdm/025.m4a",
+     "duration": 0.391,
+     "loop": true
+    },
+    {
+     "url": "sfx/colisdm/026.m4a",
+     "duration": 0.414,
+     "loop": true
+    },
+    {
+     "url": "sfx/colisdm/027.m4a",
+     "duration": 0.439,
+     "loop": true
+    },
+    {
+     "url": "sfx/colisdm/028.m4a",
+     "duration": 0.439,
+     "loop": true
+    },
+    {
+     "url": "sfx/colisdm/029.m4a",
+     "duration": 0.439,
+     "loop": true
+    }
+   ],
+   "L_BIRD3_L": [
+    {
+     "url": "sfx/colisdm/030.m4a",
+     "duration": 0.131,
+     "loop": true
+    }
+   ],
+   "L_BIRD4_L": [
+    {
+     "url": "sfx/colisdm/031.m4a",
+     "duration": 1.158,
+     "loop": true
+    }
+   ],
+   "D_CONCRETE_SM": [
+    {
+     "url": "sfx/colisdm/032.m4a",
+     "duration": 0.97,
+     "loop": false
+    },
+    {
+     "url": "sfx/colisdm/033.m4a",
+     "duration": 0.43,
+     "loop": false
+    },
+    {
+     "url": "sfx/colisdm/034.m4a",
+     "duration": 1.406,
+     "loop": false
+    },
+    {
+     "url": "sfx/colisdm/035.m4a",
+     "duration": 1.425,
+     "loop": false
+    },
+    {
+     "url": "sfx/colisdm/036.m4a",
+     "duration": 1.518,
+     "loop": false
+    },
+    {
+     "url": "sfx/colisdm/037.m4a",
+     "duration": 0.859,
+     "loop": false
+    }
+   ],
+   "D_CONCRETE_LG": [
+    {
+     "url": "sfx/colisdm/038.m4a",
+     "duration": 3.049,
+     "loop": false
+    },
+    {
+     "url": "sfx/colisdm/039.m4a",
+     "duration": 2.879,
+     "loop": false
+    },
+    {
+     "url": "sfx/colisdm/040.m4a",
+     "duration": 1.97,
+     "loop": false
+    },
+    {
+     "url": "sfx/colisdm/041.m4a",
+     "duration": 1.754,
+     "loop": false
+    },
+    {
+     "url": "sfx/colisdm/042.m4a",
+     "duration": 1.296,
+     "loop": false
+    },
+    {
+     "url": "sfx/colisdm/043.m4a",
+     "duration": 1.154,
+     "loop": false
+    },
+    {
+     "url": "sfx/colisdm/044.m4a",
+     "duration": 0.574,
+     "loop": false
+    },
+    {
+     "url": "sfx/colisdm/045.m4a",
+     "duration": 0.511,
+     "loop": false
+    },
+    {
+     "url": "sfx/colisdm/046.m4a",
+     "duration": 1.089,
+     "loop": false
+    },
+    {
+     "url": "sfx/colisdm/047.m4a",
+     "duration": 0.482,
+     "loop": false
+    }
+   ],
+   "D_GLASS_SM": [
+    {
+     "url": "sfx/colisdm/048.m4a",
+     "duration": 1.316,
+     "loop": false
+    }
+   ],
+   "D_METALHOLOW_SM": [
+    {
+     "url": "sfx/colisdm/049.m4a",
+     "duration": 0.633,
+     "loop": false
+    }
+   ],
+   "D_METALHOLOW_LG": [
+    {
+     "url": "sfx/colisdm/050.m4a",
+     "duration": 1.167,
+     "loop": false
+    },
+    {
+     "url": "sfx/colisdm/051.m4a",
+     "duration": 1.896,
+     "loop": false
+    },
+    {
+     "url": "sfx/colisdm/052.m4a",
+     "duration": 1.591,
+     "loop": false
+    }
+   ],
+   "D_METAL_SLD_SM": [
+    {
+     "url": "sfx/colisdm/053.m4a",
+     "duration": 0.62,
+     "loop": false
+    }
+   ],
+   "D_METAL_MXD_SM": [
+    {
+     "url": "sfx/colisdm/054.m4a",
+     "duration": 0.671,
+     "loop": false
+    },
+    {
+     "url": "sfx/colisdm/055.m4a",
+     "duration": 1.478,
+     "loop": false
+    }
+   ],
+   "D_METAL_MXD_LG": [
+    {
+     "url": "sfx/colisdm/056.m4a",
+     "duration": 2.139,
+     "loop": false
+    },
+    {
+     "url": "sfx/colisdm/057.m4a",
+     "duration": 1.445,
+     "loop": false
+    }
+   ],
+   "D_WOOD_HOLOW_LG": [
+    {
+     "url": "sfx/colisdm/058.m4a",
+     "duration": 1.743,
+     "loop": false
+    }
+   ],
+   "D_WOOD_SLD_SM": [
+    {
+     "url": "sfx/colisdm/059.m4a",
+     "duration": 0.561,
+     "loop": false
+    },
+    {
+     "url": "sfx/colisdm/060.m4a",
+     "duration": 0.555,
+     "loop": false
+    }
+   ],
+   "D_WOOD_MXD_LG": [
+    {
+     "url": "sfx/colisdm/061.m4a",
+     "duration": 1.328,
+     "loop": false
+    }
+   ],
+   "D_FENCE_CHAIN": [
+    {
+     "url": "sfx/colisdm/062.m4a",
+     "duration": 1.317,
+     "loop": false
+    }
+   ],
+   "D_TREE_HIT_LG": [
+    {
+     "url": "sfx/colisdm/063.m4a",
+     "duration": 0.84,
+     "loop": false
+    },
+    {
+     "url": "sfx/colisdm/064.m4a",
+     "duration": 0.757,
+     "loop": false
+    },
+    {
+     "url": "sfx/colisdm/065.m4a",
+     "duration": 0.934,
+     "loop": false
+    },
+    {
+     "url": "sfx/colisdm/066.m4a",
+     "duration": 0.757,
+     "loop": false
+    },
+    {
+     "url": "sfx/colisdm/067.m4a",
+     "duration": 0.934,
+     "loop": false
+    },
+    {
+     "url": "sfx/colisdm/068.m4a",
+     "duration": 1.049,
+     "loop": false
+    },
+    {
+     "url": "sfx/colisdm/069.m4a",
+     "duration": 0.85,
+     "loop": false
+    },
+    {
+     "url": "sfx/colisdm/070.m4a",
+     "duration": 0.882,
+     "loop": false
+    },
+    {
+     "url": "sfx/colisdm/071.m4a",
+     "duration": 0.715,
+     "loop": false
+    }
+   ],
+   "D_TREE_FALL_LG": [
+    {
+     "url": "sfx/colisdm/072.m4a",
+     "duration": 1.041,
+     "loop": false
+    },
+    {
+     "url": "sfx/colisdm/073.m4a",
+     "duration": 0.842,
+     "loop": false
+    },
+    {
+     "url": "sfx/colisdm/074.m4a",
+     "duration": 1.152,
+     "loop": false
+    },
+    {
+     "url": "sfx/colisdm/075.m4a",
+     "duration": 1.22,
+     "loop": false
+    }
+   ],
+   "D_TREE_HIT_SM": [
+    {
+     "url": "sfx/colisdm/076.m4a",
+     "duration": 0.802,
+     "loop": false
+    },
+    {
+     "url": "sfx/colisdm/077.m4a",
+     "duration": 0.637,
+     "loop": false
+    },
+    {
+     "url": "sfx/colisdm/078.m4a",
+     "duration": 0.785,
+     "loop": false
+    },
+    {
+     "url": "sfx/colisdm/079.m4a",
+     "duration": 0.637,
+     "loop": false
+    },
+    {
+     "url": "sfx/colisdm/080.m4a",
+     "duration": 0.785,
+     "loop": false
+    }
+   ],
+   "D_TREE_FALL_SM": [
+    {
+     "url": "sfx/colisdm/081.m4a",
+     "duration": 0.75,
+     "loop": false
+    },
+    {
+     "url": "sfx/colisdm/082.m4a",
+     "duration": 1.026,
+     "loop": false
+    },
+    {
+     "url": "sfx/colisdm/083.m4a",
+     "duration": 0.969,
+     "loop": false
+    }
+   ]
+  },
+  "egyptdm": {
+   "L_WIND_HVY_L": [
+    {
+     "url": "sfx/egyptdm/001.m4a",
+     "duration": 0.002,
+     "loop": true
+    },
+    {
+     "url": "sfx/egyptdm/002.m4a",
+     "duration": 0.002,
+     "loop": true
+    }
+   ],
+   "L_ENV_DUST_L": [
+    {
+     "url": "sfx/egyptdm/003.m4a",
+     "duration": 0.002,
+     "loop": true
+    },
+    {
+     "url": "sfx/egyptdm/004.m4a",
+     "duration": 0.004,
+     "loop": true
+    },
+    {
+     "url": "sfx/egyptdm/005.m4a",
+     "duration": 0.004,
+     "loop": true
+    },
+    {
+     "url": "sfx/egyptdm/006.m4a",
+     "duration": 0.004,
+     "loop": true
+    }
+   ],
+   "L_RUMBLE_SHORT": [
+    {
+     "url": "sfx/egyptdm/007.m4a",
+     "duration": 0.006,
+     "loop": false
+    }
+   ],
+   "L_DEBRIS_SHORT": [
+    {
+     "url": "sfx/egyptdm/008.m4a",
+     "duration": 1.425,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/009.m4a",
+     "duration": 1.406,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/010.m4a",
+     "duration": 1.815,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/011.m4a",
+     "duration": 1.999,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/012.m4a",
+     "duration": 1.128,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/013.m4a",
+     "duration": 1.291,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/014.m4a",
+     "duration": 1.485,
+     "loop": false
+    }
+   ],
+   "D_ROCK_SMALL": [
+    {
+     "url": "sfx/egyptdm/015.m4a",
+     "duration": 1.425,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/016.m4a",
+     "duration": 1.406,
+     "loop": false
+    }
+   ],
+   "D_ROCK_LARGE": [
+    {
+     "url": "sfx/egyptdm/017.m4a",
+     "duration": 1.485,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/018.m4a",
+     "duration": 1.291,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/019.m4a",
+     "duration": 1.128,
+     "loop": false
+    }
+   ],
+   "L_BIRD1_L": [
+    {
+     "url": "sfx/egyptdm/020.m4a",
+     "duration": 0.415,
+     "loop": true
+    },
+    {
+     "url": "sfx/egyptdm/021.m4a",
+     "duration": 0.868,
+     "loop": true
+    },
+    {
+     "url": "sfx/egyptdm/022.m4a",
+     "duration": 0.868,
+     "loop": true
+    }
+   ],
+   "L_BIRD2_L": [
+    {
+     "url": "sfx/egyptdm/023.m4a",
+     "duration": 0.112,
+     "loop": true
+    },
+    {
+     "url": "sfx/egyptdm/024.m4a",
+     "duration": 0.113,
+     "loop": true
+    },
+    {
+     "url": "sfx/egyptdm/025.m4a",
+     "duration": 0.115,
+     "loop": true
+    },
+    {
+     "url": "sfx/egyptdm/026.m4a",
+     "duration": 0.115,
+     "loop": true
+    }
+   ],
+   "L_BIRD3_L": [
+    {
+     "url": "sfx/egyptdm/027.m4a",
+     "duration": 0.384,
+     "loop": true
+    },
+    {
+     "url": "sfx/egyptdm/028.m4a",
+     "duration": 0.384,
+     "loop": true
+    },
+    {
+     "url": "sfx/egyptdm/029.m4a",
+     "duration": 0.384,
+     "loop": true
+    },
+    {
+     "url": "sfx/egyptdm/030.m4a",
+     "duration": 0.384,
+     "loop": true
+    },
+    {
+     "url": "sfx/egyptdm/031.m4a",
+     "duration": 0.384,
+     "loop": true
+    },
+    {
+     "url": "sfx/egyptdm/032.m4a",
+     "duration": 0.384,
+     "loop": true
+    },
+    {
+     "url": "sfx/egyptdm/033.m4a",
+     "duration": 0.384,
+     "loop": true
+    }
+   ],
+   "L_BIRD4_L": [
+    {
+     "url": "sfx/egyptdm/034.m4a",
+     "duration": 1.921,
+     "loop": true
+    }
+   ],
+   "D_CONCRETE_SM": [
+    {
+     "url": "sfx/egyptdm/035.m4a",
+     "duration": 1.224,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/036.m4a",
+     "duration": 0.839,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/037.m4a",
+     "duration": 1.331,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/038.m4a",
+     "duration": 1.521,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/039.m4a",
+     "duration": 1.518,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/040.m4a",
+     "duration": 0.859,
+     "loop": false
+    }
+   ],
+   "D_CONCRETE_LG": [
+    {
+     "url": "sfx/egyptdm/041.m4a",
+     "duration": 1.266,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/042.m4a",
+     "duration": 1.195,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/043.m4a",
+     "duration": 1.535,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/044.m4a",
+     "duration": 1.367,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/045.m4a",
+     "duration": 1.767,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/046.m4a",
+     "duration": 1.573,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/047.m4a",
+     "duration": 2.286,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/048.m4a",
+     "duration": 2.158,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/049.m4a",
+     "duration": 2.377,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/050.m4a",
+     "duration": 2.117,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/051.m4a",
+     "duration": 1.128,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/052.m4a",
+     "duration": 1.291,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/053.m4a",
+     "duration": 1.485,
+     "loop": false
+    }
+   ],
+   "D_METALHOLOW_SM": [
+    {
+     "url": "sfx/egyptdm/054.m4a",
+     "duration": 1.707,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/055.m4a",
+     "duration": 1.269,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/056.m4a",
+     "duration": 0.944,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/057.m4a",
+     "duration": 1.344,
+     "loop": false
+    }
+   ],
+   "D_METALHOLOW_LG": [
+    {
+     "url": "sfx/egyptdm/058.m4a",
+     "duration": 1.102,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/059.m4a",
+     "duration": 1.789,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/060.m4a",
+     "duration": 2.709,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/061.m4a",
+     "duration": 2.014,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/062.m4a",
+     "duration": 1.19,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/063.m4a",
+     "duration": 1.396,
+     "loop": false
+    }
+   ],
+   "D_METAL_SLD_SM": [
+    {
+     "url": "sfx/egyptdm/064.m4a",
+     "duration": 1.499,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/065.m4a",
+     "duration": 1.051,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/066.m4a",
+     "duration": 1.198,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/067.m4a",
+     "duration": 0.944,
+     "loop": false
+    }
+   ],
+   "D_METAL_SLD_LG": [
+    {
+     "url": "sfx/egyptdm/068.m4a",
+     "duration": 1.42,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/069.m4a",
+     "duration": 1.499,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/070.m4a",
+     "duration": 1.051,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/071.m4a",
+     "duration": 1.198,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/072.m4a",
+     "duration": 0.944,
+     "loop": false
+    }
+   ],
+   "D_TREE_HIT_LG": [
+    {
+     "url": "sfx/egyptdm/073.m4a",
+     "duration": 0.84,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/074.m4a",
+     "duration": 0.757,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/075.m4a",
+     "duration": 0.934,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/076.m4a",
+     "duration": 0.757,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/077.m4a",
+     "duration": 0.934,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/078.m4a",
+     "duration": 1.049,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/079.m4a",
+     "duration": 0.85,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/080.m4a",
+     "duration": 0.882,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/081.m4a",
+     "duration": 0.715,
+     "loop": false
+    }
+   ],
+   "D_TREE_FALL_LG": [
+    {
+     "url": "sfx/egyptdm/082.m4a",
+     "duration": 1.041,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/083.m4a",
+     "duration": 0.842,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/084.m4a",
+     "duration": 1.152,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/085.m4a",
+     "duration": 1.22,
+     "loop": false
+    }
+   ],
+   "D_TREE_HIT_SM": [
+    {
+     "url": "sfx/egyptdm/086.m4a",
+     "duration": 0.802,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/087.m4a",
+     "duration": 0.637,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/088.m4a",
+     "duration": 0.785,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/089.m4a",
+     "duration": 0.637,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/090.m4a",
+     "duration": 0.785,
+     "loop": false
+    }
+   ],
+   "D_TREE_FALL_SM": [
+    {
+     "url": "sfx/egyptdm/091.m4a",
+     "duration": 0.75,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/092.m4a",
+     "duration": 1.026,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/093.m4a",
+     "duration": 0.969,
+     "loop": false
+    }
+   ],
+   "D_ROCK_DEBRIS_L": [
+    {
+     "url": "sfx/egyptdm/094.m4a",
+     "duration": 0.405,
+     "loop": true
+    },
+    {
+     "url": "sfx/egyptdm/095.m4a",
+     "duration": 0.405,
+     "loop": true
+    },
+    {
+     "url": "sfx/egyptdm/096.m4a",
+     "duration": 0.405,
+     "loop": true
+    },
+    {
+     "url": "sfx/egyptdm/097.m4a",
+     "duration": 0.389,
+     "loop": true
+    },
+    {
+     "url": "sfx/egyptdm/098.m4a",
+     "duration": 0.387,
+     "loop": true
+    },
+    {
+     "url": "sfx/egyptdm/099.m4a",
+     "duration": 0.405,
+     "loop": true
+    }
+   ],
+   "D_ROCK_DEBRIS2_": [
+    {
+     "url": "sfx/egyptdm/100.m4a",
+     "duration": 0.454,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/101.m4a",
+     "duration": 0.454,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/102.m4a",
+     "duration": 0.454,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/103.m4a",
+     "duration": 0.454,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/104.m4a",
+     "duration": 0.454,
+     "loop": false
+    },
+    {
+     "url": "sfx/egyptdm/105.m4a",
+     "duration": 0.454,
+     "loop": false
+    }
+   ]
+  },
+  "greecedm": {
+   "L_ELEVATORLOOP": [
+    {
+     "url": "sfx/greecedm/001.m4a",
+     "duration": 1.003,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/002.m4a",
+     "duration": 0.003,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/003.m4a",
+     "duration": 0.002,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/004.m4a",
+     "duration": 0.677,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/005.m4a",
+     "duration": 0.904,
+     "loop": false
+    }
+   ],
+   "L_WIND_HVY_L": [
+    {
+     "url": "sfx/greecedm/006.m4a",
+     "duration": 0.003,
+     "loop": true
+    },
+    {
+     "url": "sfx/greecedm/007.m4a",
+     "duration": 0.002,
+     "loop": true
+    }
+   ],
+   "L_BELL": [
+    {
+     "url": "sfx/greecedm/008.m4a",
+     "duration": 1.689,
+     "loop": false
+    }
+   ],
+   "L_FOGHORN": [
+    {
+     "url": "sfx/greecedm/009.m4a",
+     "duration": 2.48,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/010.m4a",
+     "duration": 2.48,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/011.m4a",
+     "duration": 2.48,
+     "loop": false
+    }
+   ],
+   "L_COAST_L": [
+    {
+     "url": "sfx/greecedm/012.m4a",
+     "duration": 2.892,
+     "loop": true
+    },
+    {
+     "url": "sfx/greecedm/013.m4a",
+     "duration": 2.166,
+     "loop": true
+    },
+    {
+     "url": "sfx/greecedm/014.m4a",
+     "duration": 2.177,
+     "loop": true
+    },
+    {
+     "url": "sfx/greecedm/015.m4a",
+     "duration": 1.631,
+     "loop": true
+    },
+    {
+     "url": "sfx/greecedm/016.m4a",
+     "duration": 2.647,
+     "loop": true
+    },
+    {
+     "url": "sfx/greecedm/017.m4a",
+     "duration": 1.983,
+     "loop": true
+    }
+   ],
+   "L_SEAGULL1_L": [
+    {
+     "url": "sfx/greecedm/018.m4a",
+     "duration": 0.317,
+     "loop": true
+    },
+    {
+     "url": "sfx/greecedm/019.m4a",
+     "duration": 0.317,
+     "loop": true
+    },
+    {
+     "url": "sfx/greecedm/020.m4a",
+     "duration": 0.317,
+     "loop": true
+    },
+    {
+     "url": "sfx/greecedm/021.m4a",
+     "duration": 0.317,
+     "loop": true
+    },
+    {
+     "url": "sfx/greecedm/022.m4a",
+     "duration": 0.317,
+     "loop": true
+    },
+    {
+     "url": "sfx/greecedm/023.m4a",
+     "duration": 0.317,
+     "loop": true
+    },
+    {
+     "url": "sfx/greecedm/024.m4a",
+     "duration": 0.317,
+     "loop": true
+    }
+   ],
+   "L_SEAGULL2_L": [
+    {
+     "url": "sfx/greecedm/025.m4a",
+     "duration": 0.24,
+     "loop": true
+    },
+    {
+     "url": "sfx/greecedm/026.m4a",
+     "duration": 0.243,
+     "loop": true
+    },
+    {
+     "url": "sfx/greecedm/027.m4a",
+     "duration": 0.246,
+     "loop": true
+    },
+    {
+     "url": "sfx/greecedm/028.m4a",
+     "duration": 0.246,
+     "loop": true
+    }
+   ],
+   "D_CONCRETE_SM": [
+    {
+     "url": "sfx/greecedm/029.m4a",
+     "duration": 0.97,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/030.m4a",
+     "duration": 0.43,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/031.m4a",
+     "duration": 1.406,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/032.m4a",
+     "duration": 1.425,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/033.m4a",
+     "duration": 1.518,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/034.m4a",
+     "duration": 0.859,
+     "loop": false
+    }
+   ],
+   "D_CONCRETE_LG": [
+    {
+     "url": "sfx/greecedm/035.m4a",
+     "duration": 3.049,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/036.m4a",
+     "duration": 2.879,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/037.m4a",
+     "duration": 1.97,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/038.m4a",
+     "duration": 1.754,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/039.m4a",
+     "duration": 1.296,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/040.m4a",
+     "duration": 1.154,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/041.m4a",
+     "duration": 0.574,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/042.m4a",
+     "duration": 0.511,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/043.m4a",
+     "duration": 1.089,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/044.m4a",
+     "duration": 0.482,
+     "loop": false
+    }
+   ],
+   "D_GLASS_SM": [
+    {
+     "url": "sfx/greecedm/045.m4a",
+     "duration": 1.316,
+     "loop": false
+    }
+   ],
+   "D_METALHOLOW_SM": [
+    {
+     "url": "sfx/greecedm/046.m4a",
+     "duration": 0.633,
+     "loop": false
+    }
+   ],
+   "D_METALHOLOW_LG": [
+    {
+     "url": "sfx/greecedm/047.m4a",
+     "duration": 1.167,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/048.m4a",
+     "duration": 1.897,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/049.m4a",
+     "duration": 1.591,
+     "loop": false
+    }
+   ],
+   "D_METAL_SLD_SM": [
+    {
+     "url": "sfx/greecedm/050.m4a",
+     "duration": 0.62,
+     "loop": false
+    }
+   ],
+   "D_METAL_MXD_SM": [
+    {
+     "url": "sfx/greecedm/051.m4a",
+     "duration": 0.564,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/052.m4a",
+     "duration": 1.478,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/053.m4a",
+     "duration": 0.695,
+     "loop": false
+    }
+   ],
+   "D_METAL_MXD_LG": [
+    {
+     "url": "sfx/greecedm/054.m4a",
+     "duration": 1.972,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/055.m4a",
+     "duration": 1.445,
+     "loop": false
+    }
+   ],
+   "D_WOOD_HOLOW_LG": [
+    {
+     "url": "sfx/greecedm/056.m4a",
+     "duration": 1.743,
+     "loop": false
+    }
+   ],
+   "D_WOOD_SLD_SM": [
+    {
+     "url": "sfx/greecedm/057.m4a",
+     "duration": 0.561,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/058.m4a",
+     "duration": 0.555,
+     "loop": false
+    }
+   ],
+   "D_WOOD_MXD_LG": [
+    {
+     "url": "sfx/greecedm/059.m4a",
+     "duration": 1.328,
+     "loop": false
+    }
+   ],
+   "D_FENCE_CHAIN": [
+    {
+     "url": "sfx/greecedm/060.m4a",
+     "duration": 1.317,
+     "loop": false
+    }
+   ],
+   "D_TREE_HIT_LG": [
+    {
+     "url": "sfx/greecedm/061.m4a",
+     "duration": 0.84,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/062.m4a",
+     "duration": 0.757,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/063.m4a",
+     "duration": 0.934,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/064.m4a",
+     "duration": 0.757,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/065.m4a",
+     "duration": 0.934,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/066.m4a",
+     "duration": 1.049,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/067.m4a",
+     "duration": 0.85,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/068.m4a",
+     "duration": 0.882,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/069.m4a",
+     "duration": 0.715,
+     "loop": false
+    }
+   ],
+   "D_TREE_FALL_LG": [
+    {
+     "url": "sfx/greecedm/070.m4a",
+     "duration": 1.041,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/071.m4a",
+     "duration": 0.842,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/072.m4a",
+     "duration": 1.152,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/073.m4a",
+     "duration": 1.22,
+     "loop": false
+    }
+   ],
+   "D_TREE_HIT_SM": [
+    {
+     "url": "sfx/greecedm/074.m4a",
+     "duration": 0.594,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/075.m4a",
+     "duration": 0.802,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/076.m4a",
+     "duration": 0.637,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/077.m4a",
+     "duration": 0.785,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/078.m4a",
+     "duration": 0.637,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/079.m4a",
+     "duration": 0.785,
+     "loop": false
+    }
+   ],
+   "D_TREE_FALL_SM": [
+    {
+     "url": "sfx/greecedm/080.m4a",
+     "duration": 0.75,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/081.m4a",
+     "duration": 1.026,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/082.m4a",
+     "duration": 0.969,
+     "loop": false
+    }
+   ],
+   "D_LPOST_FALL": [
+    {
+     "url": "sfx/greecedm/083.m4a",
+     "duration": 0.529,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/084.m4a",
+     "duration": 0.492,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/085.m4a",
+     "duration": 0.584,
+     "loop": false
+    },
+    {
+     "url": "sfx/greecedm/086.m4a",
+     "duration": 0.529,
+     "loop": false
+    }
+   ]
+  },
+  "parisdm": {
+   "L_WIND_HVY_L": [
+    {
+     "url": "sfx/parisdm/001.m4a",
+     "duration": 0.007,
+     "loop": true
+    },
+    {
+     "url": "sfx/parisdm/002.m4a",
+     "duration": 0.007,
+     "loop": true
+    }
+   ],
+   "L_TRAFFIC_L": [
+    {
+     "url": "sfx/parisdm/003.m4a",
+     "duration": 0.004,
+     "loop": true
+    }
+   ],
+   "L_PLANES_L": [
+    {
+     "url": "sfx/parisdm/004.m4a",
+     "duration": 2.856,
+     "loop": true
+    },
+    {
+     "url": "sfx/parisdm/005.m4a",
+     "duration": 3.066,
+     "loop": true
+    }
+   ],
+   "L_DOGS_L": [
+    {
+     "url": "sfx/parisdm/006.m4a",
+     "duration": 1.052,
+     "loop": true
+    },
+    {
+     "url": "sfx/parisdm/007.m4a",
+     "duration": 0.639,
+     "loop": true
+    }
+   ],
+   "L_SIREN_2": [
+    {
+     "url": "sfx/parisdm/008.m4a",
+     "duration": 1.164,
+     "loop": false
+    },
+    {
+     "url": "sfx/parisdm/009.m4a",
+     "duration": 0.719,
+     "loop": false
+    }
+   ],
+   "L_SIREN_2_5": [
+    {
+     "url": "sfx/parisdm/010.m4a",
+     "duration": 1.164,
+     "loop": false
+    },
+    {
+     "url": "sfx/parisdm/011.m4a",
+     "duration": 0.719,
+     "loop": false
+    }
+   ],
+   "L_SIREN_3": [
+    {
+     "url": "sfx/parisdm/012.m4a",
+     "duration": 2.91,
+     "loop": false
+    }
+   ],
+   "L_FOUNTAIN_L": [
+    {
+     "url": "sfx/parisdm/013.m4a",
+     "duration": 0.002,
+     "loop": true
+    },
+    {
+     "url": "sfx/parisdm/014.m4a",
+     "duration": 0.001,
+     "loop": true
+    }
+   ],
+   "L_SML_RIVER_L": [
+    {
+     "url": "sfx/parisdm/015.m4a",
+     "duration": 0.002,
+     "loop": true
+    },
+    {
+     "url": "sfx/parisdm/016.m4a",
+     "duration": 0.003,
+     "loop": true
+    }
+   ],
+   "L_BIRD1_L": [
+    {
+     "url": "sfx/parisdm/017.m4a",
+     "duration": 0.233,
+     "loop": true
+    },
+    {
+     "url": "sfx/parisdm/018.m4a",
+     "duration": 0.233,
+     "loop": true
+    },
+    {
+     "url": "sfx/parisdm/019.m4a",
+     "duration": 0.233,
+     "loop": true
+    },
+    {
+     "url": "sfx/parisdm/020.m4a",
+     "duration": 0.233,
+     "loop": true
+    },
+    {
+     "url": "sfx/parisdm/021.m4a",
+     "duration": 0.233,
+     "loop": true
+    },
+    {
+     "url": "sfx/parisdm/022.m4a",
+     "duration": 0.233,
+     "loop": true
+    },
+    {
+     "url": "sfx/parisdm/023.m4a",
+     "duration": 0.233,
+     "loop": true
+    }
+   ],
+   "L_BIRD2_L": [
+    {
+     "url": "sfx/parisdm/024.m4a",
+     "duration": 0.301,
+     "loop": true
+    }
+   ],
+   "L_BIRD3_L": [
+    {
+     "url": "sfx/parisdm/025.m4a",
+     "duration": 0.331,
+     "loop": true
+    }
+   ],
+   "L_BIRD4_L": [
+    {
+     "url": "sfx/parisdm/026.m4a",
+     "duration": 0.063,
+     "loop": true
+    },
+    {
+     "url": "sfx/parisdm/027.m4a",
+     "duration": 0.063,
+     "loop": true
+    },
+    {
+     "url": "sfx/parisdm/028.m4a",
+     "duration": 0.063,
+     "loop": true
+    },
+    {
+     "url": "sfx/parisdm/029.m4a",
+     "duration": 0.063,
+     "loop": true
+    },
+    {
+     "url": "sfx/parisdm/030.m4a",
+     "duration": 0.063,
+     "loop": true
+    },
+    {
+     "url": "sfx/parisdm/031.m4a",
+     "duration": 0.063,
+     "loop": true
+    },
+    {
+     "url": "sfx/parisdm/032.m4a",
+     "duration": 0.063,
+     "loop": true
+    }
+   ],
+   "L_BIRD5_L": [
+    {
+     "url": "sfx/parisdm/033.m4a",
+     "duration": 0.735,
+     "loop": true
+    }
+   ],
+   "D_CONCRETE_SM": [
+    {
+     "url": "sfx/parisdm/034.m4a",
+     "duration": 0.97,
+     "loop": false
+    },
+    {
+     "url": "sfx/parisdm/035.m4a",
+     "duration": 0.43,
+     "loop": false
+    },
+    {
+     "url": "sfx/parisdm/036.m4a",
+     "duration": 1.406,
+     "loop": false
+    },
+    {
+     "url": "sfx/parisdm/037.m4a",
+     "duration": 1.425,
+     "loop": false
+    },
+    {
+     "url": "sfx/parisdm/038.m4a",
+     "duration": 1.518,
+     "loop": false
+    },
+    {
+     "url": "sfx/parisdm/039.m4a",
+     "duration": 0.859,
+     "loop": false
+    }
+   ],
+   "D_CONCRETE_LG": [
+    {
+     "url": "sfx/parisdm/040.m4a",
+     "duration": 3.049,
+     "loop": false
+    },
+    {
+     "url": "sfx/parisdm/041.m4a",
+     "duration": 2.879,
+     "loop": false
+    },
+    {
+     "url": "sfx/parisdm/042.m4a",
+     "duration": 1.97,
+     "loop": false
+    },
+    {
+     "url": "sfx/parisdm/043.m4a",
+     "duration": 1.754,
+     "loop": false
+    },
+    {
+     "url": "sfx/parisdm/044.m4a",
+     "duration": 1.296,
+     "loop": false
+    },
+    {
+     "url": "sfx/parisdm/045.m4a",
+     "duration": 1.154,
+     "loop": false
+    },
+    {
+     "url": "sfx/parisdm/046.m4a",
+     "duration": 0.574,
+     "loop": false
+    },
+    {
+     "url": "sfx/parisdm/047.m4a",
+     "duration": 0.511,
+     "loop": false
+    },
+    {
+     "url": "sfx/parisdm/048.m4a",
+     "duration": 1.089,
+     "loop": false
+    },
+    {
+     "url": "sfx/parisdm/049.m4a",
+     "duration": 0.482,
+     "loop": false
+    }
+   ],
+   "D_METALHOLOW_SM": [
+    {
+     "url": "sfx/parisdm/050.m4a",
+     "duration": 0.633,
+     "loop": false
+    }
+   ],
+   "D_METALHOLOW_LG": [
+    {
+     "url": "sfx/parisdm/051.m4a",
+     "duration": 1.167,
+     "loop": false
+    },
+    {
+     "url": "sfx/parisdm/052.m4a",
+     "duration": 1.896,
+     "loop": false
+    },
+    {
+     "url": "sfx/parisdm/053.m4a",
+     "duration": 1.591,
+     "loop": false
+    }
+   ],
+   "D_METAL_SLD_SM": [
+    {
+     "url": "sfx/parisdm/054.m4a",
+     "duration": 0.62,
+     "loop": false
+    }
+   ],
+   "D_METAL_MXD_SM": [
+    {
+     "url": "sfx/parisdm/055.m4a",
+     "duration": 0.564,
+     "loop": false
+    },
+    {
+     "url": "sfx/parisdm/056.m4a",
+     "duration": 1.478,
+     "loop": false
+    },
+    {
+     "url": "sfx/parisdm/057.m4a",
+     "duration": 0.695,
+     "loop": false
+    }
+   ],
+   "D_WOOD_HOLOW_LG": [
+    {
+     "url": "sfx/parisdm/058.m4a",
+     "duration": 1.743,
+     "loop": false
+    }
+   ],
+   "D_WOOD_SLD_SM": [
+    {
+     "url": "sfx/parisdm/059.m4a",
+     "duration": 0.561,
+     "loop": false
+    },
+    {
+     "url": "sfx/parisdm/060.m4a",
+     "duration": 0.555,
+     "loop": false
+    }
+   ],
+   "D_WOOD_MXD_LG": [
+    {
+     "url": "sfx/parisdm/061.m4a",
+     "duration": 1.328,
+     "loop": false
+    }
+   ],
+   "D_TREE_HIT_LG": [
+    {
+     "url": "sfx/parisdm/062.m4a",
+     "duration": 0.84,
+     "loop": false
+    },
+    {
+     "url": "sfx/parisdm/063.m4a",
+     "duration": 0.757,
+     "loop": false
+    },
+    {
+     "url": "sfx/parisdm/064.m4a",
+     "duration": 0.934,
+     "loop": false
+    },
+    {
+     "url": "sfx/parisdm/065.m4a",
+     "duration": 0.757,
+     "loop": false
+    },
+    {
+     "url": "sfx/parisdm/066.m4a",
+     "duration": 0.934,
+     "loop": false
+    },
+    {
+     "url": "sfx/parisdm/067.m4a",
+     "duration": 1.049,
+     "loop": false
+    },
+    {
+     "url": "sfx/parisdm/068.m4a",
+     "duration": 0.85,
+     "loop": false
+    },
+    {
+     "url": "sfx/parisdm/069.m4a",
+     "duration": 0.882,
+     "loop": false
+    },
+    {
+     "url": "sfx/parisdm/070.m4a",
+     "duration": 0.715,
+     "loop": false
+    }
+   ],
+   "D_TREE_FALL_LG": [
+    {
+     "url": "sfx/parisdm/071.m4a",
+     "duration": 1.041,
+     "loop": false
+    },
+    {
+     "url": "sfx/parisdm/072.m4a",
+     "duration": 0.842,
+     "loop": false
+    }
+   ],
+   "D_TREE_HIT_SM": [
+    {
+     "url": "sfx/parisdm/073.m4a",
+     "duration": 0.802,
+     "loop": false
+    },
+    {
+     "url": "sfx/parisdm/074.m4a",
+     "duration": 0.637,
+     "loop": false
+    },
+    {
+     "url": "sfx/parisdm/075.m4a",
+     "duration": 0.785,
+     "loop": false
+    },
+    {
+     "url": "sfx/parisdm/076.m4a",
+     "duration": 0.637,
+     "loop": false
+    },
+    {
+     "url": "sfx/parisdm/077.m4a",
+     "duration": 0.785,
+     "loop": false
+    }
+   ],
+   "D_TREE_FALL_SM": [
+    {
+     "url": "sfx/parisdm/078.m4a",
+     "duration": 0.75,
+     "loop": false
+    }
+   ],
+   "D_CONST_BARREL": [
+    {
+     "url": "sfx/parisdm/079.m4a",
+     "duration": 0.723,
+     "loop": false
+    }
+   ],
+   "D_LPOST_SIM_HIT": [
+    {
+     "url": "sfx/parisdm/080.m4a",
+     "duration": 0.564,
+     "loop": false
+    }
+   ],
+   "D_LPOST_SIM_FAL": [
+    {
+     "url": "sfx/parisdm/081.m4a",
+     "duration": 0.715,
+     "loop": false
+    },
+    {
+     "url": "sfx/parisdm/082.m4a",
+     "duration": 0.529,
+     "loop": false
+    }
+   ],
+   "D_LPOST_DET_HIT": [
+    {
+     "url": "sfx/parisdm/083.m4a",
+     "duration": 0.695,
+     "loop": false
+    }
+   ],
+   "D_LPOST_DET_FAL": [
+    {
+     "url": "sfx/parisdm/084.m4a",
+     "duration": 0.84,
+     "loop": false
+    }
+   ],
+   "D_LPOST_FALL": [
+    {
+     "url": "sfx/parisdm/085.m4a",
+     "duration": 0.529,
+     "loop": false
+    },
+    {
+     "url": "sfx/parisdm/086.m4a",
+     "duration": 0.492,
+     "loop": false
+    },
+    {
+     "url": "sfx/parisdm/087.m4a",
+     "duration": 0.584,
+     "loop": false
+    },
+    {
+     "url": "sfx/parisdm/088.m4a",
+     "duration": 0.529,
+     "loop": false
+    }
+   ],
+   "V_DRIVEBRIDGE_L": [
+    {
+     "url": "sfx/parisdm/089.m4a",
+     "duration": 0.002,
+     "loop": true
+    },
+    {
+     "url": "sfx/parisdm/090.m4a",
+     "duration": 0.002,
+     "loop": true
+    },
+    {
+     "url": "sfx/parisdm/091.m4a",
+     "duration": 0.002,
+     "loop": true
+    }
+   ]
+  },
+  "tokyodm": {
+   "D_CONCRETE_SM": [
+    {
+     "url": "sfx/tokyodm/001.m4a",
+     "duration": 1.989,
+     "loop": false
+    },
+    {
+     "url": "sfx/tokyodm/002.m4a",
+     "duration": 1.425,
+     "loop": false
+    },
+    {
+     "url": "sfx/tokyodm/003.m4a",
+     "duration": 1.518,
+     "loop": false
+    },
+    {
+     "url": "sfx/tokyodm/004.m4a",
+     "duration": 0.859,
+     "loop": false
+    },
+    {
+     "url": "sfx/tokyodm/005.m4a",
+     "duration": 0.945,
+     "loop": false
+    },
+    {
+     "url": "sfx/tokyodm/006.m4a",
+     "duration": 0.945,
+     "loop": false
+    },
+    {
+     "url": "sfx/tokyodm/007.m4a",
+     "duration": 1.042,
+     "loop": false
+    },
+    {
+     "url": "sfx/tokyodm/008.m4a",
+     "duration": 1.042,
+     "loop": false
+    },
+    {
+     "url": "sfx/tokyodm/009.m4a",
+     "duration": 0.799,
+     "loop": false
+    },
+    {
+     "url": "sfx/tokyodm/010.m4a",
+     "duration": 0.799,
+     "loop": false
+    }
+   ],
+   "D_CONCRETE_LG": [
+    {
+     "url": "sfx/tokyodm/011.m4a",
+     "duration": 1.19,
+     "loop": false
+    },
+    {
+     "url": "sfx/tokyodm/012.m4a",
+     "duration": 1.19,
+     "loop": false
+    },
+    {
+     "url": "sfx/tokyodm/013.m4a",
+     "duration": 1.313,
+     "loop": false
+    },
+    {
+     "url": "sfx/tokyodm/014.m4a",
+     "duration": 1.313,
+     "loop": false
+    },
+    {
+     "url": "sfx/tokyodm/015.m4a",
+     "duration": 1.006,
+     "loop": false
+    },
+    {
+     "url": "sfx/tokyodm/016.m4a",
+     "duration": 1.006,
+     "loop": false
+    },
+    {
+     "url": "sfx/tokyodm/017.m4a",
+     "duration": 3.049,
+     "loop": false
+    },
+    {
+     "url": "sfx/tokyodm/018.m4a",
+     "duration": 3.231,
+     "loop": false
+    },
+    {
+     "url": "sfx/tokyodm/019.m4a",
+     "duration": 2.211,
+     "loop": false
+    },
+    {
+     "url": "sfx/tokyodm/020.m4a",
+     "duration": 1.97,
+     "loop": false
+    }
+   ],
+   "D_GLASS_SM": [
+    {
+     "url": "sfx/tokyodm/021.m4a",
+     "duration": 1.316,
+     "loop": false
+    }
+   ],
+   "D_METALHOLOW_SM": [
+    {
+     "url": "sfx/tokyodm/022.m4a",
+     "duration": 0.633,
+     "loop": false
+    }
+   ],
+   "D_METALHOLOW_LG": [
+    {
+     "url": "sfx/tokyodm/023.m4a",
+     "duration": 1.167,
+     "loop": false
+    },
+    {
+     "url": "sfx/tokyodm/024.m4a",
+     "duration": 1.896,
+     "loop": false
+    },
+    {
+     "url": "sfx/tokyodm/025.m4a",
+     "duration": 1.591,
+     "loop": false
+    }
+   ],
+   "D_METAL_SLD_SM": [
+    {
+     "url": "sfx/tokyodm/026.m4a",
+     "duration": 0.62,
+     "loop": false
+    }
+   ],
+   "D_METAL_SHT_LG": [
+    {
+     "url": "sfx/tokyodm/027.m4a",
+     "duration": 1.102,
+     "loop": false
+    },
+    {
+     "url": "sfx/tokyodm/028.m4a",
+     "duration": 1.445,
+     "loop": false
+    }
+   ],
+   "D_METAL_MXD_SM": [
+    {
+     "url": "sfx/tokyodm/029.m4a",
+     "duration": 0.671,
+     "loop": false
+    },
+    {
+     "url": "sfx/tokyodm/030.m4a",
+     "duration": 1.478,
+     "loop": false
+    }
+   ],
+   "D_METAL_MXD_LG": [
+    {
+     "url": "sfx/tokyodm/031.m4a",
+     "duration": 2.139,
+     "loop": false
+    },
+    {
+     "url": "sfx/tokyodm/032.m4a",
+     "duration": 1.445,
+     "loop": false
+    }
+   ],
+   "D_WOOD_HOLOW_LG": [
+    {
+     "url": "sfx/tokyodm/033.m4a",
+     "duration": 1.743,
+     "loop": false
+    }
+   ],
+   "D_WOOD_SLD_SM": [
+    {
+     "url": "sfx/tokyodm/034.m4a",
+     "duration": 0.561,
+     "loop": false
+    },
+    {
+     "url": "sfx/tokyodm/035.m4a",
+     "duration": 0.555,
+     "loop": false
+    }
+   ],
+   "D_WOOD_MXD_LG": [
+    {
+     "url": "sfx/tokyodm/036.m4a",
+     "duration": 1.328,
+     "loop": false
+    }
+   ],
+   "D_FENCE_CHAIN": [
+    {
+     "url": "sfx/tokyodm/037.m4a",
+     "duration": 1.317,
+     "loop": false
+    }
+   ],
+   "D_TREE_HIT_LG": [
+    {
+     "url": "sfx/tokyodm/038.m4a",
+     "duration": 0.84,
+     "loop": false
+    },
+    {
+     "url": "sfx/tokyodm/039.m4a",
+     "duration": 0.757,
+     "loop": false
+    },
+    {
+     "url": "sfx/tokyodm/040.m4a",
+     "duration": 0.934,
+     "loop": false
+    },
+    {
+     "url": "sfx/tokyodm/041.m4a",
+     "duration": 0.757,
+     "loop": false
+    },
+    {
+     "url": "sfx/tokyodm/042.m4a",
+     "duration": 0.934,
+     "loop": false
+    },
+    {
+     "url": "sfx/tokyodm/043.m4a",
+     "duration": 1.049,
+     "loop": false
+    },
+    {
+     "url": "sfx/tokyodm/044.m4a",
+     "duration": 0.85,
+     "loop": false
+    },
+    {
+     "url": "sfx/tokyodm/045.m4a",
+     "duration": 0.882,
+     "loop": false
+    },
+    {
+     "url": "sfx/tokyodm/046.m4a",
+     "duration": 0.715,
+     "loop": false
+    }
+   ],
+   "D_TREE_FALL_LG": [
+    {
+     "url": "sfx/tokyodm/047.m4a",
+     "duration": 1.041,
+     "loop": false
+    },
+    {
+     "url": "sfx/tokyodm/048.m4a",
+     "duration": 0.842,
+     "loop": false
+    },
+    {
+     "url": "sfx/tokyodm/049.m4a",
+     "duration": 1.152,
+     "loop": false
+    },
+    {
+     "url": "sfx/tokyodm/050.m4a",
+     "duration": 1.22,
+     "loop": false
+    }
+   ],
+   "D_TREE_HIT_SM": [
+    {
+     "url": "sfx/tokyodm/051.m4a",
+     "duration": 0.802,
+     "loop": false
+    },
+    {
+     "url": "sfx/tokyodm/052.m4a",
+     "duration": 0.637,
+     "loop": false
+    },
+    {
+     "url": "sfx/tokyodm/053.m4a",
+     "duration": 0.785,
+     "loop": false
+    },
+    {
+     "url": "sfx/tokyodm/054.m4a",
+     "duration": 0.637,
+     "loop": false
+    },
+    {
+     "url": "sfx/tokyodm/055.m4a",
+     "duration": 0.785,
+     "loop": false
+    }
+   ],
+   "D_TREE_FALL_SM": [
+    {
+     "url": "sfx/tokyodm/056.m4a",
+     "duration": 0.75,
+     "loop": false
+    },
+    {
+     "url": "sfx/tokyodm/057.m4a",
+     "duration": 1.026,
+     "loop": false
+    },
+    {
+     "url": "sfx/tokyodm/058.m4a",
+     "duration": 0.969,
+     "loop": false
+    }
+   ]
+  },
+  "atvwp": {
+   "WSP_SHOTGUN": [
+    {
+     "url": "sfx/atvwp/001.m4a",
+     "duration": 0.687,
+     "loop": false
+    },
+    {
+     "url": "sfx/atvwp/002.m4a",
+     "duration": 0.376,
+     "loop": false
+    }
+   ],
+   "WSP_THROW": [
+    {
+     "url": "sfx/atvwp/003.m4a",
+     "duration": 0.244,
+     "loop": false
+    }
+   ],
+   "WSP_FUSE_L": [
+    {
+     "url": "sfx/atvwp/004.m4a",
+     "duration": 0.001,
+     "loop": true
+    },
+    {
+     "url": "sfx/atvwp/005.m4a",
+     "duration": 0.002,
+     "loop": true
+    }
+   ]
+  },
+  "axelwp": {
+   "WSP_LAUNCH": [
+    {
+     "url": "sfx/axelwp/001.m4a",
+     "duration": 1.053,
+     "loop": false
+    },
+    {
+     "url": "sfx/axelwp/002.m4a",
+     "duration": 1.023,
+     "loop": false
+    },
+    {
+     "url": "sfx/axelwp/003.m4a",
+     "duration": 1.488,
+     "loop": false
+    },
+    {
+     "url": "sfx/axelwp/004.m4a",
+     "duration": 1.533,
+     "loop": false
+    }
+   ],
+   "WSP_ENERGYBURST": [
+    {
+     "url": "sfx/axelwp/005.m4a",
+     "duration": 0.588,
+     "loop": false
+    },
+    {
+     "url": "sfx/axelwp/006.m4a",
+     "duration": 0.66,
+     "loop": false
+    },
+    {
+     "url": "sfx/axelwp/007.m4a",
+     "duration": 0.524,
+     "loop": false
+    },
+    {
+     "url": "sfx/axelwp/008.m4a",
+     "duration": 0.588,
+     "loop": false
+    }
+   ],
+   "WSP_LAUNCH_UP": [
+    {
+     "url": "sfx/axelwp/009.m4a",
+     "duration": 0.993,
+     "loop": false
+    },
+    {
+     "url": "sfx/axelwp/010.m4a",
+     "duration": 0.965,
+     "loop": false
+    },
+    {
+     "url": "sfx/axelwp/011.m4a",
+     "duration": 1.405,
+     "loop": false
+    },
+    {
+     "url": "sfx/axelwp/012.m4a",
+     "duration": 1.446,
+     "loop": false
+    },
+    {
+     "url": "sfx/axelwp/013.m4a",
+     "duration": 1.053,
+     "loop": false
+    },
+    {
+     "url": "sfx/axelwp/014.m4a",
+     "duration": 1.658,
+     "loop": false
+    },
+    {
+     "url": "sfx/axelwp/015.m4a",
+     "duration": 1.609,
+     "loop": false
+    }
+   ],
+   "WSP_ARC_L": [
+    {
+     "url": "sfx/axelwp/016.m4a",
+     "duration": 0.002,
+     "loop": true
+    },
+    {
+     "url": "sfx/axelwp/017.m4a",
+     "duration": 0.002,
+     "loop": true
+    }
+   ],
+   "S_DEPLOY": [
+    {
+     "url": "sfx/axelwp/018.m4a",
+     "duration": 0.212,
+     "loop": false
+    },
+    {
+     "url": "sfx/axelwp/019.m4a",
+     "duration": 0.502,
+     "loop": false
+    }
+   ],
+   "S_RETRACT": [
+    {
+     "url": "sfx/axelwp/020.m4a",
+     "duration": 0.178,
+     "loop": false
+    },
+    {
+     "url": "sfx/axelwp/021.m4a",
+     "duration": 0.318,
+     "loop": false
+    },
+    {
+     "url": "sfx/axelwp/022.m4a",
+     "duration": 0.178,
+     "loop": false
+    }
+   ]
+  },
+  "brimstwa": {
+   "WSP_SCREAM_L": [
+    {
+     "url": "sfx/brimstwa/001.m4a",
+     "duration": 0.638,
+     "loop": true
+    },
+    {
+     "url": "sfx/brimstwa/002.m4a",
+     "duration": 0.002,
+     "loop": true
+    }
+   ],
+   "WSP_HALIMPACT": [
+    {
+     "url": "sfx/brimstwa/003.m4a",
+     "duration": 0.674,
+     "loop": false
+    }
+   ],
+   "WSP_HALSTANDUP": [
+    {
+     "url": "sfx/brimstwa/004.m4a",
+     "duration": 1.205,
+     "loop": false
+    }
+   ],
+   "WSP_HALGRUNT_L": [
+    {
+     "url": "sfx/brimstwa/005.m4a",
+     "duration": 0.659,
+     "loop": true
+    },
+    {
+     "url": "sfx/brimstwa/006.m4a",
+     "duration": 0.521,
+     "loop": true
+    },
+    {
+     "url": "sfx/brimstwa/007.m4a",
+     "duration": 0.536,
+     "loop": true
+    },
+    {
+     "url": "sfx/brimstwa/008.m4a",
+     "duration": 0.463,
+     "loop": true
+    }
+   ],
+   "WSP_GUY_VO_L": [
+    {
+     "url": "sfx/brimstwa/009.m4a",
+     "duration": 0.568,
+     "loop": true
+    },
+    {
+     "url": "sfx/brimstwa/010.m4a",
+     "duration": 1.948,
+     "loop": true
+    },
+    {
+     "url": "sfx/brimstwa/011.m4a",
+     "duration": 1.085,
+     "loop": true
+    }
+   ],
+   "WSP_GUY_CHAIN_L": [
+    {
+     "url": "sfx/brimstwa/012.m4a",
+     "duration": 0.65,
+     "loop": true
+    }
+   ]
+  },
+  "copcarwp": {
+   "WSP_SIREN_L": [
+    {
+     "url": "sfx/copcarwp/001.m4a",
+     "duration": 0.377,
+     "loop": true
+    }
+   ],
+   "WSP_ARC_L": [
+    {
+     "url": "sfx/copcarwp/002.m4a",
+     "duration": 0.306,
+     "loop": true
+    },
+    {
+     "url": "sfx/copcarwp/003.m4a",
+     "duration": 0.327,
+     "loop": true
+    },
+    {
+     "url": "sfx/copcarwp/004.m4a",
+     "duration": 0.311,
+     "loop": true
+    },
+    {
+     "url": "sfx/copcarwp/005.m4a",
+     "duration": 0.372,
+     "loop": true
+    }
+   ],
+   "WSP_ENERGYBURST": [
+    {
+     "url": "sfx/copcarwp/006.m4a",
+     "duration": 0.498,
+     "loop": false
+    },
+    {
+     "url": "sfx/copcarwp/007.m4a",
+     "duration": 0.997,
+     "loop": false
+    },
+    {
+     "url": "sfx/copcarwp/008.m4a",
+     "duration": 0.18,
+     "loop": false
+    },
+    {
+     "url": "sfx/copcarwp/009.m4a",
+     "duration": 0.276,
+     "loop": false
+    },
+    {
+     "url": "sfx/copcarwp/010.m4a",
+     "duration": 0.302,
+     "loop": false
+    },
+    {
+     "url": "sfx/copcarwp/011.m4a",
+     "duration": 0.18,
+     "loop": false
+    },
+    {
+     "url": "sfx/copcarwp/012.m4a",
+     "duration": 0.276,
+     "loop": false
+    },
+    {
+     "url": "sfx/copcarwp/013.m4a",
+     "duration": 0.302,
+     "loop": false
+    }
+   ],
+   "S_DEPLOY": [
+    {
+     "url": "sfx/copcarwp/014.m4a",
+     "duration": 0.159,
+     "loop": false
+    },
+    {
+     "url": "sfx/copcarwp/015.m4a",
+     "duration": 0.252,
+     "loop": false
+    },
+    {
+     "url": "sfx/copcarwp/016.m4a",
+     "duration": 0.497,
+     "loop": false
+    },
+    {
+     "url": "sfx/copcarwp/017.m4a",
+     "duration": 0.821,
+     "loop": false
+    },
+    {
+     "url": "sfx/copcarwp/018.m4a",
+     "duration": 0.141,
+     "loop": false
+    }
+   ],
+   "S_RETRACT": [
+    {
+     "url": "sfx/copcarwp/019.m4a",
+     "duration": 0.238,
+     "loop": false
+    },
+    {
+     "url": "sfx/copcarwp/020.m4a",
+     "duration": 0.497,
+     "loop": false
+    },
+    {
+     "url": "sfx/copcarwp/021.m4a",
+     "duration": 0.821,
+     "loop": false
+    }
+   ]
+  },
+  "crazy8wa": {
+   "WSP_1ACTIVATE_L": [
+    {
+     "url": "sfx/crazy8wa/001.m4a",
+     "duration": 0.002,
+     "loop": true
+    }
+   ],
+   "WSP_1ATTACH_L": [
+    {
+     "url": "sfx/crazy8wa/002.m4a",
+     "duration": 0.002,
+     "loop": true
+    }
+   ],
+   "WSP_1PULSE": [
+    {
+     "url": "sfx/crazy8wa/003.m4a",
+     "duration": 1.041,
+     "loop": false
+    }
+   ],
+   "WSP_2ACTIVATE_L": [
+    {
+     "url": "sfx/crazy8wa/004.m4a",
+     "duration": 0.002,
+     "loop": true
+    }
+   ],
+   "WSP_2ATTACH_L": [
+    {
+     "url": "sfx/crazy8wa/005.m4a",
+     "duration": 0.002,
+     "loop": true
+    }
+   ],
+   "WSP_2PULSE": [
+    {
+     "url": "sfx/crazy8wa/006.m4a",
+     "duration": 1.042,
+     "loop": false
+    }
+   ]
+  },
+  "crimwp": {
+   "WSP_LAUNCH": [
+    {
+     "url": "sfx/crimwp/001.m4a",
+     "duration": 2.128,
+     "loop": false
+    },
+    {
+     "url": "sfx/crimwp/002.m4a",
+     "duration": 1.064,
+     "loop": false
+    },
+    {
+     "url": "sfx/crimwp/003.m4a",
+     "duration": 0.532,
+     "loop": false
+    },
+    {
+     "url": "sfx/crimwp/004.m4a",
+     "duration": 2.256,
+     "loop": false
+    }
+   ],
+   "WSP_THRUST_L": [
+    {
+     "url": "sfx/crimwp/005.m4a",
+     "duration": 0.002,
+     "loop": true
+    },
+    {
+     "url": "sfx/crimwp/006.m4a",
+     "duration": 0.001,
+     "loop": true
+    }
+   ],
+   "WSP_RETICLE_UP": [
+    {
+     "url": "sfx/crimwp/007.m4a",
+     "duration": 0.077,
+     "loop": false
+    }
+   ],
+   "S_DEPLOY": [
+    {
+     "url": "sfx/crimwp/008.m4a",
+     "duration": 0.469,
+     "loop": false
+    },
+    {
+     "url": "sfx/crimwp/009.m4a",
+     "duration": 1.098,
+     "loop": false
+    },
+    {
+     "url": "sfx/crimwp/010.m4a",
+     "duration": 0.921,
+     "loop": false
+    },
+    {
+     "url": "sfx/crimwp/011.m4a",
+     "duration": 0.212,
+     "loop": false
+    }
+   ],
+   "S_RETRACT": [
+    {
+     "url": "sfx/crimwp/012.m4a",
+     "duration": 0.212,
+     "loop": false
+    },
+    {
+     "url": "sfx/crimwp/013.m4a",
+     "duration": 0.921,
+     "loop": false
+    },
+    {
+     "url": "sfx/crimwp/014.m4a",
+     "duration": 1.098,
+     "loop": false
+    },
+    {
+     "url": "sfx/crimwp/015.m4a",
+     "duration": 0.469,
+     "loop": false
+    }
+   ]
+  },
+  "darksidw": {
+   "WSP_HORN": [
+    {
+     "url": "sfx/darksidw/001.m4a",
+     "duration": 1.132,
+     "loop": false
+    }
+   ],
+   "WSP_IMPACT": [
+    {
+     "url": "sfx/darksidw/002.m4a",
+     "duration": 1.655,
+     "loop": false
+    }
+   ]
+  },
+  "darkt1wp": {
+   "WSP_LAUNCH": [
+    {
+     "url": "sfx/darkt1wp/001.m4a",
+     "duration": 0.986,
+     "loop": false
+    },
+    {
+     "url": "sfx/darkt1wp/002.m4a",
+     "duration": 0.739,
+     "loop": false
+    },
+    {
+     "url": "sfx/darkt1wp/003.m4a",
+     "duration": 3.411,
+     "loop": false
+    },
+    {
+     "url": "sfx/darkt1wp/004.m4a",
+     "duration": 3.512,
+     "loop": false
+    }
+   ],
+   "WSP_THRUST_L": [
+    {
+     "url": "sfx/darkt1wp/005.m4a",
+     "duration": 0.002,
+     "loop": true
+    }
+   ],
+   "WSP_CHOMPER_CL": [
+    {
+     "url": "sfx/darkt1wp/006.m4a",
+     "duration": 0.807,
+     "loop": false
+    },
+    {
+     "url": "sfx/darkt1wp/007.m4a",
+     "duration": 1.078,
+     "loop": false
+    },
+    {
+     "url": "sfx/darkt1wp/008.m4a",
+     "duration": 0.605,
+     "loop": false
+    }
+   ],
+   "WSP_CHOMPER_OP": [
+    {
+     "url": "sfx/darkt1wp/009.m4a",
+     "duration": 0.68,
+     "loop": false
+    },
+    {
+     "url": "sfx/darkt1wp/010.m4a",
+     "duration": 0.809,
+     "loop": false
+    }
+   ]
+  },
+  "darkt2wp": {
+   "WSP_LAUNCH": [
+    {
+     "url": "sfx/darkt2wp/001.m4a",
+     "duration": 0.986,
+     "loop": false
+    },
+    {
+     "url": "sfx/darkt2wp/002.m4a",
+     "duration": 0.941,
+     "loop": false
+    }
+   ],
+   "WSP_THRUST_L": [
+    {
+     "url": "sfx/darkt2wp/003.m4a",
+     "duration": 0.002,
+     "loop": true
+    }
+   ],
+   "WSP_ARC_LP": [
+    {
+     "url": "sfx/darkt2wp/004.m4a",
+     "duration": 0.001,
+     "loop": false
+    },
+    {
+     "url": "sfx/darkt2wp/005.m4a",
+     "duration": 0.001,
+     "loop": false
+    }
+   ],
+   "WSP_ARC_ZAP": [
+    {
+     "url": "sfx/darkt2wp/006.m4a",
+     "duration": 0.47,
+     "loop": false
+    },
+    {
+     "url": "sfx/darkt2wp/007.m4a",
+     "duration": 0.444,
+     "loop": false
+    },
+    {
+     "url": "sfx/darkt2wp/008.m4a",
+     "duration": 0.419,
+     "loop": false
+    },
+    {
+     "url": "sfx/darkt2wp/009.m4a",
+     "duration": 0.396,
+     "loop": false
+    },
+    {
+     "url": "sfx/darkt2wp/010.m4a",
+     "duration": 0.373,
+     "loop": false
+    },
+    {
+     "url": "sfx/darkt2wp/011.m4a",
+     "duration": 0.628,
+     "loop": false
+    }
+   ],
+   "WSP_FIRE_GO": [
+    {
+     "url": "sfx/darkt2wp/012.m4a",
+     "duration": 0.003,
+     "loop": false
+    },
+    {
+     "url": "sfx/darkt2wp/013.m4a",
+     "duration": 0.002,
+     "loop": false
+    }
+   ],
+   "WSP_FIRE_L": [
+    {
+     "url": "sfx/darkt2wp/014.m4a",
+     "duration": 0.003,
+     "loop": true
+    },
+    {
+     "url": "sfx/darkt2wp/015.m4a",
+     "duration": 0.001,
+     "loop": true
+    }
+   ],
+   "WSP_LAUGH": [
+    {
+     "url": "sfx/darkt2wp/016.m4a",
+     "duration": 5.095,
+     "loop": false
+    },
+    {
+     "url": "sfx/darkt2wp/017.m4a",
+     "duration": 5.247,
+     "loop": false
+    }
+   ]
+  },
+  "eddywp": {
+   "WSP_LAUNCH": [
+    {
+     "url": "sfx/eddywp/001.m4a",
+     "duration": 1.957,
+     "loop": false
+    },
+    {
+     "url": "sfx/eddywp/002.m4a",
+     "duration": 1.553,
+     "loop": false
+    }
+   ],
+   "WSP_THRUST_L": [
+    {
+     "url": "sfx/eddywp/003.m4a",
+     "duration": 0.002,
+     "loop": true
+    },
+    {
+     "url": "sfx/eddywp/004.m4a",
+     "duration": 0.001,
+     "loop": true
+    }
+   ],
+   "WSP_FIRE_GO": [
+    {
+     "url": "sfx/eddywp/005.m4a",
+     "duration": 0.003,
+     "loop": false
+    },
+    {
+     "url": "sfx/eddywp/006.m4a",
+     "duration": 0.002,
+     "loop": false
+    }
+   ],
+   "WSP_FIRE_L": [
+    {
+     "url": "sfx/eddywp/007.m4a",
+     "duration": 0.003,
+     "loop": true
+    },
+    {
+     "url": "sfx/eddywp/008.m4a",
+     "duration": 0.001,
+     "loop": true
+    }
+   ],
+   "S_DEPLOY": [
+    {
+     "url": "sfx/eddywp/009.m4a",
+     "duration": 0.334,
+     "loop": false
+    },
+    {
+     "url": "sfx/eddywp/010.m4a",
+     "duration": 0.667,
+     "loop": false
+    },
+    {
+     "url": "sfx/eddywp/011.m4a",
+     "duration": 0.582,
+     "loop": false
+    },
+    {
+     "url": "sfx/eddywp/012.m4a",
+     "duration": 0.776,
+     "loop": false
+    }
+   ],
+   "S_RETRACT": [
+    {
+     "url": "sfx/eddywp/013.m4a",
+     "duration": 0.487,
+     "loop": false
+    },
+    {
+     "url": "sfx/eddywp/014.m4a",
+     "duration": 0.689,
+     "loop": false
+    },
+    {
+     "url": "sfx/eddywp/015.m4a",
+     "duration": 0.582,
+     "loop": false
+    }
+   ]
+  },
+  "grasswp": {
+   "WSP_JUMP": [
+    {
+     "url": "sfx/grasswp/001.m4a",
+     "duration": 0.827,
+     "loop": false
+    }
+   ],
+   "WSP_LURCH_L": [
+    {
+     "url": "sfx/grasswp/002.m4a",
+     "duration": 1.078,
+     "loop": true
+    },
+    {
+     "url": "sfx/grasswp/003.m4a",
+     "duration": 1.042,
+     "loop": true
+    }
+   ],
+   "WSP_MIS_LAUNCH": [
+    {
+     "url": "sfx/grasswp/004.m4a",
+     "duration": 0.727,
+     "loop": false
+    }
+   ],
+   "WSP_EXPLO_UP": [
+    {
+     "url": "sfx/grasswp/005.m4a",
+     "duration": 0.708,
+     "loop": false
+    },
+    {
+     "url": "sfx/grasswp/006.m4a",
+     "duration": 1.283,
+     "loop": false
+    },
+    {
+     "url": "sfx/grasswp/007.m4a",
+     "duration": 1.211,
+     "loop": false
+    }
+   ]
+  },
+  "grimmwp": {
+   "WSP_GRIMM_GLO_L": [
+    {
+     "url": "sfx/grimmwp/001.m4a",
+     "duration": 0.784,
+     "loop": true
+    },
+    {
+     "url": "sfx/grimmwp/002.m4a",
+     "duration": 0.001,
+     "loop": true
+    }
+   ],
+   "WSP_LAUNCH": [
+    {
+     "url": "sfx/grimmwp/003.m4a",
+     "duration": 2.343,
+     "loop": false
+    },
+    {
+     "url": "sfx/grimmwp/004.m4a",
+     "duration": 2.211,
+     "loop": false
+    }
+   ],
+   "WSP_ORGAN_L": [
+    {
+     "url": "sfx/grimmwp/005.m4a",
+     "duration": 2.255,
+     "loop": true
+    },
+    {
+     "url": "sfx/grimmwp/006.m4a",
+     "duration": 2.255,
+     "loop": true
+    },
+    {
+     "url": "sfx/grimmwp/007.m4a",
+     "duration": 3.19,
+     "loop": true
+    }
+   ],
+   "WSP_EXPLO_UP": [
+    {
+     "url": "sfx/grimmwp/008.m4a",
+     "duration": 2.468,
+     "loop": false
+    },
+    {
+     "url": "sfx/grimmwp/009.m4a",
+     "duration": 1.848,
+     "loop": false
+    },
+    {
+     "url": "sfx/grimmwp/010.m4a",
+     "duration": 1.385,
+     "loop": false
+    },
+    {
+     "url": "sfx/grimmwp/011.m4a",
+     "duration": 0.924,
+     "loop": false
+    }
+   ]
+  },
+  "hammerwp": {
+   "WSP_LAUNCH": [
+    {
+     "url": "sfx/hammerwp/001.m4a",
+     "duration": 1.205,
+     "loop": false
+    },
+    {
+     "url": "sfx/hammerwp/002.m4a",
+     "duration": 1.744,
+     "loop": false
+    },
+    {
+     "url": "sfx/hammerwp/003.m4a",
+     "duration": 1.646,
+     "loop": false
+    }
+   ],
+   "WSP_LAUNCH_UP": [
+    {
+     "url": "sfx/hammerwp/004.m4a",
+     "duration": 1.205,
+     "loop": false
+    },
+    {
+     "url": "sfx/hammerwp/005.m4a",
+     "duration": 1.276,
+     "loop": false
+    },
+    {
+     "url": "sfx/hammerwp/006.m4a",
+     "duration": 1.744,
+     "loop": false
+    },
+    {
+     "url": "sfx/hammerwp/007.m4a",
+     "duration": 1.646,
+     "loop": false
+    },
+    {
+     "url": "sfx/hammerwp/008.m4a",
+     "duration": 1.553,
+     "loop": false
+    },
+    {
+     "url": "sfx/hammerwp/009.m4a",
+     "duration": 1.466,
+     "loop": false
+    },
+    {
+     "url": "sfx/hammerwp/010.m4a",
+     "duration": 1.384,
+     "loop": false
+    }
+   ],
+   "S_DEPLOY": [
+    {
+     "url": "sfx/hammerwp/011.m4a",
+     "duration": 0.692,
+     "loop": false
+    },
+    {
+     "url": "sfx/hammerwp/012.m4a",
+     "duration": 0.527,
+     "loop": false
+    },
+    {
+     "url": "sfx/hammerwp/013.m4a",
+     "duration": 1.098,
+     "loop": false
+    },
+    {
+     "url": "sfx/hammerwp/014.m4a",
+     "duration": 0.522,
+     "loop": false
+    },
+    {
+     "url": "sfx/hammerwp/015.m4a",
+     "duration": 0.582,
+     "loop": false
+    }
+   ],
+   "S_RETRACT": [
+    {
+     "url": "sfx/hammerwp/016.m4a",
+     "duration": 0.692,
+     "loop": false
+    },
+    {
+     "url": "sfx/hammerwp/017.m4a",
+     "duration": 0.582,
+     "loop": false
+    },
+    {
+     "url": "sfx/hammerwp/018.m4a",
+     "duration": 0.418,
+     "loop": false
+    },
+    {
+     "url": "sfx/hammerwp/019.m4a",
+     "duration": 0.348,
+     "loop": false
+    },
+    {
+     "url": "sfx/hammerwp/020.m4a",
+     "duration": 1.098,
+     "loop": false
+    }
+   ]
+  },
+  "junkwa": {
+   "WSP_BALLLAUNCH": [
+    {
+     "url": "sfx/junkwa/001.m4a",
+     "duration": 1.879,
+     "loop": false
+    }
+   ],
+   "WSP_DETONATE": [
+    {
+     "url": "sfx/junkwa/002.m4a",
+     "duration": 1.048,
+     "loop": false
+    },
+    {
+     "url": "sfx/junkwa/003.m4a",
+     "duration": 0.934,
+     "loop": false
+    }
+   ],
+   "WSP_THRUST_L": [
+    {
+     "url": "sfx/junkwa/004.m4a",
+     "duration": 0.002,
+     "loop": true
+    }
+   ]
+  },
+  "mrslamwp": {
+   "WSP_SLAM_UP": [
+    {
+     "url": "sfx/mrslamwp/001.m4a",
+     "duration": 0.879,
+     "loop": false
+    },
+    {
+     "url": "sfx/mrslamwp/002.m4a",
+     "duration": 0.658,
+     "loop": false
+    },
+    {
+     "url": "sfx/mrslamwp/003.m4a",
+     "duration": 0.849,
+     "loop": false
+    },
+    {
+     "url": "sfx/mrslamwp/004.m4a",
+     "duration": 0.849,
+     "loop": false
+    },
+    {
+     "url": "sfx/mrslamwp/005.m4a",
+     "duration": 0.849,
+     "loop": false
+    }
+   ],
+   "WSP_ARM_DOWN": [
+    {
+     "url": "sfx/mrslamwp/006.m4a",
+     "duration": 0.505,
+     "loop": false
+    },
+    {
+     "url": "sfx/mrslamwp/007.m4a",
+     "duration": 0.673,
+     "loop": false
+    },
+    {
+     "url": "sfx/mrslamwp/008.m4a",
+     "duration": 0.762,
+     "loop": false
+    },
+    {
+     "url": "sfx/mrslamwp/009.m4a",
+     "duration": 0.381,
+     "loop": false
+    }
+   ],
+   "WSP_GRABOUT_UP": [
+    {
+     "url": "sfx/mrslamwp/010.m4a",
+     "duration": 1.044,
+     "loop": false
+    }
+   ],
+   "WSP_GRABIN_UP": [
+    {
+     "url": "sfx/mrslamwp/011.m4a",
+     "duration": 0.93,
+     "loop": false
+    }
+   ],
+   "S_DEPLOY": [
+    {
+     "url": "sfx/mrslamwp/012.m4a",
+     "duration": 1.383,
+     "loop": false
+    },
+    {
+     "url": "sfx/mrslamwp/013.m4a",
+     "duration": 0.348,
+     "loop": false
+    },
+    {
+     "url": "sfx/mrslamwp/014.m4a",
+     "duration": 0.522,
+     "loop": false
+    }
+   ],
+   "S_RETRACT": [
+    {
+     "url": "sfx/mrslamwp/015.m4a",
+     "duration": 0.348,
+     "loop": false
+    },
+    {
+     "url": "sfx/mrslamwp/016.m4a",
+     "duration": 0.522,
+     "loop": false
+    },
+    {
+     "url": "sfx/mrslamwp/017.m4a",
+     "duration": 1.466,
+     "loop": false
+    }
+   ]
+  },
+  "rdkillwp": {
+   "WSP_LAUNCH": [
+    {
+     "url": "sfx/rdkillwp/001.m4a",
+     "duration": 0.923,
+     "loop": false
+    },
+    {
+     "url": "sfx/rdkillwp/002.m4a",
+     "duration": 0.461,
+     "loop": false
+    }
+   ],
+   "WSP_THRUST_L": [
+    {
+     "url": "sfx/rdkillwp/003.m4a",
+     "duration": 0.002,
+     "loop": true
+    }
+   ],
+   "WSP_KICKBACK_L": [
+    {
+     "url": "sfx/rdkillwp/004.m4a",
+     "duration": 1.846,
+     "loop": true
+    },
+    {
+     "url": "sfx/rdkillwp/005.m4a",
+     "duration": 0.002,
+     "loop": true
+    }
+   ],
+   "WSP_LAUNCH_UP": [
+    {
+     "url": "sfx/rdkillwp/006.m4a",
+     "duration": 0.923,
+     "loop": false
+    },
+    {
+     "url": "sfx/rdkillwp/007.m4a",
+     "duration": 0.461,
+     "loop": false
+    },
+    {
+     "url": "sfx/rdkillwp/008.m4a",
+     "duration": 0.763,
+     "loop": false
+    },
+    {
+     "url": "sfx/rdkillwp/009.m4a",
+     "duration": 0.664,
+     "loop": false
+    }
+   ],
+   "WSP_THRUST_UP": [
+    {
+     "url": "sfx/rdkillwp/010.m4a",
+     "duration": 0.002,
+     "loop": false
+    },
+    {
+     "url": "sfx/rdkillwp/011.m4a",
+     "duration": 0.001,
+     "loop": false
+    },
+    {
+     "url": "sfx/rdkillwp/012.m4a",
+     "duration": 0.001,
+     "loop": false
+    }
+   ],
+   "S_DEPLOY": [
+    {
+     "url": "sfx/rdkillwp/013.m4a",
+     "duration": 0.238,
+     "loop": false
+    },
+    {
+     "url": "sfx/rdkillwp/014.m4a",
+     "duration": 0.126,
+     "loop": false
+    },
+    {
+     "url": "sfx/rdkillwp/015.m4a",
+     "duration": 0.627,
+     "loop": false
+    }
+   ],
+   "S_RETRACT": [
+    {
+     "url": "sfx/rdkillwp/016.m4a",
+     "duration": 0.159,
+     "loop": false
+    },
+    {
+     "url": "sfx/rdkillwp/017.m4a",
+     "duration": 0.558,
+     "loop": false
+    }
+   ]
+  },
+  "shadwp": {
+   "WSP_LAUNCH": [
+    {
+     "url": "sfx/shadwp/001.m4a",
+     "duration": 0.835,
+     "loop": false
+    }
+   ],
+   "WSP_THRUST_L": [
+    {
+     "url": "sfx/shadwp/002.m4a",
+     "duration": 1.953,
+     "loop": true
+    }
+   ],
+   "WSP_LAUNCH_UP": [
+    {
+     "url": "sfx/shadwp/003.m4a",
+     "duration": 0.663,
+     "loop": false
+    },
+    {
+     "url": "sfx/shadwp/004.m4a",
+     "duration": 0.744,
+     "loop": false
+    },
+    {
+     "url": "sfx/shadwp/005.m4a",
+     "duration": 2.26,
+     "loop": false
+    },
+    {
+     "url": "sfx/shadwp/006.m4a",
+     "duration": 2.3,
+     "loop": false
+    }
+   ],
+   "WSP_SHADOW_L": [
+    {
+     "url": "sfx/shadwp/007.m4a",
+     "duration": 0.784,
+     "loop": true
+    },
+    {
+     "url": "sfx/shadwp/008.m4a",
+     "duration": 0.002,
+     "loop": true
+    }
+   ]
+  },
+  "spectrwp": {
+   "WSP_LAUNCH": [
+    {
+     "url": "sfx/spectrwp/001.m4a",
+     "duration": 1.816,
+     "loop": false
+    },
+    {
+     "url": "sfx/spectrwp/002.m4a",
+     "duration": 1.361,
+     "loop": false
+    },
+    {
+     "url": "sfx/spectrwp/003.m4a",
+     "duration": 0.908,
+     "loop": false
+    }
+   ],
+   "WSP_THRUST_L": [
+    {
+     "url": "sfx/spectrwp/004.m4a",
+     "duration": 0.002,
+     "loop": true
+    }
+   ],
+   "WSP_LAUNCH_UP": [
+    {
+     "url": "sfx/spectrwp/005.m4a",
+     "duration": 0.72,
+     "loop": false
+    },
+    {
+     "url": "sfx/spectrwp/006.m4a",
+     "duration": 0.679,
+     "loop": false
+    },
+    {
+     "url": "sfx/spectrwp/007.m4a",
+     "duration": 0.908,
+     "loop": false
+    },
+    {
+     "url": "sfx/spectrwp/008.m4a",
+     "duration": 1.361,
+     "loop": false
+    },
+    {
+     "url": "sfx/spectrwp/009.m4a",
+     "duration": 1.816,
+     "loop": false
+    },
+    {
+     "url": "sfx/spectrwp/010.m4a",
+     "duration": 2.288,
+     "loop": false
+    }
+   ],
+   "WSP_THRUST_L_UP": [
+    {
+     "url": "sfx/spectrwp/011.m4a",
+     "duration": 0.001,
+     "loop": false
+    }
+   ],
+   "S_DEPLOY": [
+    {
+     "url": "sfx/spectrwp/012.m4a",
+     "duration": 0.692,
+     "loop": false
+    },
+    {
+     "url": "sfx/spectrwp/013.m4a",
+     "duration": 0.489,
+     "loop": false
+    },
+    {
+     "url": "sfx/spectrwp/014.m4a",
+     "duration": 0.395,
+     "loop": false
+    },
+    {
+     "url": "sfx/spectrwp/015.m4a",
+     "duration": 0.235,
+     "loop": false
+    }
+   ],
+   "S_RETRACT": [
+    {
+     "url": "sfx/spectrwp/016.m4a",
+     "duration": 0.692,
+     "loop": false
+    },
+    {
+     "url": "sfx/spectrwp/017.m4a",
+     "duration": 0.582,
+     "loop": false
+    },
+    {
+     "url": "sfx/spectrwp/018.m4a",
+     "duration": 0.527,
+     "loop": false
+    },
+    {
+     "url": "sfx/spectrwp/019.m4a",
+     "duration": 0.235,
+     "loop": false
+    }
+   ]
+  },
+  "suvwa": {
+   "WSP_POPUP": [
+    {
+     "url": "sfx/suvwa/001.m4a",
+     "duration": 1.519,
+     "loop": false
+    }
+   ],
+   "WSP_MGUN": [
+    {
+     "url": "sfx/suvwa/002.m4a",
+     "duration": 0.865,
+     "loop": false
+    }
+   ],
+   "WSP_LASERSITE_L": [
+    {
+     "url": "sfx/suvwa/003.m4a",
+     "duration": 0.002,
+     "loop": true
+    }
+   ]
+  },
+  "sweettwp": {
+   "WSP_LAUNCH": [
+    {
+     "url": "sfx/sweettwp/001.m4a",
+     "duration": 1.894,
+     "loop": false
+    },
+    {
+     "url": "sfx/sweettwp/002.m4a",
+     "duration": 1.787,
+     "loop": false
+    },
+    {
+     "url": "sfx/sweettwp/003.m4a",
+     "duration": 0.891,
+     "loop": false
+    },
+    {
+     "url": "sfx/sweettwp/004.m4a",
+     "duration": 1.0,
+     "loop": false
+    },
+    {
+     "url": "sfx/sweettwp/005.m4a",
+     "duration": 1.19,
+     "loop": false
+    }
+   ],
+   "WSP_THRUST_L": [
+    {
+     "url": "sfx/sweettwp/006.m4a",
+     "duration": 0.002,
+     "loop": true
+    }
+   ],
+   "S_DEPLOY": [
+    {
+     "url": "sfx/sweettwp/007.m4a",
+     "duration": 0.821,
+     "loop": false
+    },
+    {
+     "url": "sfx/sweettwp/008.m4a",
+     "duration": 0.439,
+     "loop": false
+    },
+    {
+     "url": "sfx/sweettwp/009.m4a",
+     "duration": 0.692,
+     "loop": false
+    }
+   ],
+   "S_RETRACT": [
+    {
+     "url": "sfx/sweettwp/010.m4a",
+     "duration": 0.582,
+     "loop": false
+    },
+    {
+     "url": "sfx/sweettwp/011.m4a",
+     "duration": 0.439,
+     "loop": false
+    },
+    {
+     "url": "sfx/sweettwp/012.m4a",
+     "duration": 0.821,
+     "loop": false
+    },
+    {
+     "url": "sfx/sweettwp/013.m4a",
+     "duration": 0.653,
+     "loop": false
+    }
+   ]
+  },
+  "tankwa": {
+   "WSP_TORCH_L": [
+    {
+     "url": "sfx/tankwa/001.m4a",
+     "duration": 0.82,
+     "loop": true
+    },
+    {
+     "url": "sfx/tankwa/002.m4a",
+     "duration": 0.002,
+     "loop": true
+    }
+   ]
+  },
+  "taxiwa": {
+   "WSP_LAUNCH": [
+    {
+     "url": "sfx/taxiwa/001.m4a",
+     "duration": 1.853,
+     "loop": false
+    }
+   ],
+   "WSP_THRUST_L": [
+    {
+     "url": "sfx/taxiwa/002.m4a",
+     "duration": 0.002,
+     "loop": true
+    }
+   ],
+   "WSP_SPIKE_OUT": [
+    {
+     "url": "sfx/taxiwa/003.m4a",
+     "duration": 0.494,
+     "loop": false
+    },
+    {
+     "url": "sfx/taxiwa/004.m4a",
+     "duration": 0.44,
+     "loop": false
+    }
+   ]
+  },
+  "thumpwp": {
+   "WSP_HYDRUALIC_U": [
+    {
+     "url": "sfx/thumpwp/001.m4a",
+     "duration": 0.225,
+     "loop": false
+    },
+    {
+     "url": "sfx/thumpwp/002.m4a",
+     "duration": 0.002,
+     "loop": false
+    },
+    {
+     "url": "sfx/thumpwp/003.m4a",
+     "duration": 0.002,
+     "loop": false
+    },
+    {
+     "url": "sfx/thumpwp/004.m4a",
+     "duration": 0.238,
+     "loop": false
+    }
+   ],
+   "WSP_HYDRUALIC_D": [
+    {
+     "url": "sfx/thumpwp/005.m4a",
+     "duration": 0.786,
+     "loop": false
+    },
+    {
+     "url": "sfx/thumpwp/006.m4a",
+     "duration": 0.416,
+     "loop": false
+    }
+   ],
+   "WSP_BLAST_UP": [
+    {
+     "url": "sfx/thumpwp/007.m4a",
+     "duration": 0.856,
+     "loop": false
+    },
+    {
+     "url": "sfx/thumpwp/008.m4a",
+     "duration": 0.891,
+     "loop": false
+    },
+    {
+     "url": "sfx/thumpwp/009.m4a",
+     "duration": 1.0,
+     "loop": false
+    },
+    {
+     "url": "sfx/thumpwp/010.m4a",
+     "duration": 1.19,
+     "loop": false
+    }
+   ],
+   "WSP_THRUST_L": [
+    {
+     "url": "sfx/thumpwp/011.m4a",
+     "duration": 0.002,
+     "loop": true
+    }
+   ],
+   "S_DEPLOY": [
+    {
+     "url": "sfx/thumpwp/012.m4a",
+     "duration": 0.522,
+     "loop": false
+    },
+    {
+     "url": "sfx/thumpwp/013.m4a",
+     "duration": 0.582,
+     "loop": false
+    },
+    {
+     "url": "sfx/thumpwp/014.m4a",
+     "duration": 0.212,
+     "loop": false
+    },
+    {
+     "url": "sfx/thumpwp/015.m4a",
+     "duration": 0.159,
+     "loop": false
+    }
+   ],
+   "S_RETRACT": [
+    {
+     "url": "sfx/thumpwp/016.m4a",
+     "duration": 0.522,
+     "loop": false
+    },
+    {
+     "url": "sfx/thumpwp/017.m4a",
+     "duration": 0.582,
+     "loop": false
+    },
+    {
+     "url": "sfx/thumpwp/018.m4a",
+     "duration": 0.212,
+     "loop": false
+    }
+   ],
+   "WSP_FIRE_GO": [
+    {
+     "url": "sfx/thumpwp/019.m4a",
+     "duration": 0.003,
+     "loop": false
+    },
+    {
+     "url": "sfx/thumpwp/020.m4a",
+     "duration": 0.002,
+     "loop": false
+    }
+   ],
+   "WSP_FIRE_L": [
+    {
+     "url": "sfx/thumpwp/021.m4a",
+     "duration": 0.003,
+     "loop": true
+    },
+    {
+     "url": "sfx/thumpwp/022.m4a",
+     "duration": 0.001,
+     "loop": true
+    }
+   ]
+  },
+  "twistwp": {
+   "WSP_TORNADO_L": [
+    {
+     "url": "sfx/twistwp/001.m4a",
+     "duration": 0.002,
+     "loop": true
+    },
+    {
+     "url": "sfx/twistwp/002.m4a",
+     "duration": 0.002,
+     "loop": true
+    }
+   ],
+   "WSP_TURBINE_L": [
+    {
+     "url": "sfx/twistwp/003.m4a",
+     "duration": 0.002,
+     "loop": true
+    },
+    {
+     "url": "sfx/twistwp/004.m4a",
+     "duration": 0.002,
+     "loop": true
+    },
+    {
+     "url": "sfx/twistwp/005.m4a",
+     "duration": 0.001,
+     "loop": true
+    }
+   ],
+   "WSP_SPIN_UP_TUR": [
+    {
+     "url": "sfx/twistwp/006.m4a",
+     "duration": 0.002,
+     "loop": false
+    }
+   ],
+   "WSP_SPIN_UP_SKI": [
+    {
+     "url": "sfx/twistwp/007.m4a",
+     "duration": 0.003,
+     "loop": false
+    }
+   ],
+   "WSP_SPIN_DN_TUR": [
+    {
+     "url": "sfx/twistwp/008.m4a",
+     "duration": 0.002,
+     "loop": false
+    }
+   ],
+   "WSP_SPIN_DN_SKI": [
+    {
+     "url": "sfx/twistwp/009.m4a",
+     "duration": 0.003,
+     "loop": false
+    }
+   ],
+   "WSP_ENERGY_UP": [
+    {
+     "url": "sfx/twistwp/010.m4a",
+     "duration": 1.046,
+     "loop": false
+    }
+   ],
+   "S_DEPLOY": [
+    {
+     "url": "sfx/twistwp/011.m4a",
+     "duration": 0.469,
+     "loop": false
+    },
+    {
+     "url": "sfx/twistwp/012.m4a",
+     "duration": 0.703,
+     "loop": false
+    },
+    {
+     "url": "sfx/twistwp/013.m4a",
+     "duration": 0.159,
+     "loop": false
+    }
+   ],
+   "S_RETRACT": [
+    {
+     "url": "sfx/twistwp/014.m4a",
+     "duration": 0.212,
+     "loop": false
+    },
+    {
+     "url": "sfx/twistwp/015.m4a",
+     "duration": 0.558,
+     "loop": false
+    },
+    {
+     "url": "sfx/twistwp/016.m4a",
+     "duration": 0.267,
+     "loop": false
+    }
+   ]
+  },
+  "wartwp": {
+   "WSP_LAUNCH": [
+    {
+     "url": "sfx/wartwp/001.m4a",
+     "duration": 1.078,
+     "loop": false
+    },
+    {
+     "url": "sfx/wartwp/002.m4a",
+     "duration": 1.282,
+     "loop": false
+    },
+    {
+     "url": "sfx/wartwp/003.m4a",
+     "duration": 1.711,
+     "loop": false
+    }
+   ],
+   "L_KLAXON": [
+    {
+     "url": "sfx/wartwp/004.m4a",
+     "duration": 1.591,
+     "loop": false
+    },
+    {
+     "url": "sfx/wartwp/005.m4a",
+     "duration": 1.591,
+     "loop": false
+    }
+   ],
+   "WSP_LAUNCH_UP": [
+    {
+     "url": "sfx/wartwp/006.m4a",
+     "duration": 0.96,
+     "loop": false
+    },
+    {
+     "url": "sfx/wartwp/007.m4a",
+     "duration": 0.72,
+     "loop": false
+    },
+    {
+     "url": "sfx/wartwp/008.m4a",
+     "duration": 0.808,
+     "loop": false
+    },
+    {
+     "url": "sfx/wartwp/009.m4a",
+     "duration": 0.794,
+     "loop": false
+    }
+   ],
+   "S_DEPLOY": [
+    {
+     "url": "sfx/wartwp/010.m4a",
+     "duration": 0.212,
+     "loop": false
+    },
+    {
+     "url": "sfx/wartwp/011.m4a",
+     "duration": 1.098,
+     "loop": false
+    },
+    {
+     "url": "sfx/wartwp/012.m4a",
+     "duration": 0.921,
+     "loop": false
+    },
+    {
+     "url": "sfx/wartwp/013.m4a",
+     "duration": 0.469,
+     "loop": false
+    },
+    {
+     "url": "sfx/wartwp/014.m4a",
+     "duration": 0.212,
+     "loop": false
+    },
+    {
+     "url": "sfx/wartwp/015.m4a",
+     "duration": 0.106,
+     "loop": false
+    }
+   ],
+   "S_RETRACT": [
+    {
+     "url": "sfx/wartwp/016.m4a",
+     "duration": 0.159,
+     "loop": false
+    },
+    {
+     "url": "sfx/wartwp/017.m4a",
+     "duration": 1.098,
+     "loop": false
+    },
+    {
+     "url": "sfx/wartwp/018.m4a",
+     "duration": 0.921,
+     "loop": false
+    },
+    {
+     "url": "sfx/wartwp/019.m4a",
+     "duration": 0.469,
+     "loop": false
+    }
+   ]
+  },
+  "shell": {
+   "FE_AMB": [
+    {
+     "url": "sfx/shell/001.m4a",
+     "duration": 0.001,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/002.m4a",
+     "duration": 0.001,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/003.m4a",
+     "duration": 0.002,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/004.m4a",
+     "duration": 0.003,
+     "loop": false
+    }
+   ],
+   "S_PAUSE_AMB_L": [
+    {
+     "url": "sfx/shell/005.m4a",
+     "duration": 0.002,
+     "loop": true
+    },
+    {
+     "url": "sfx/shell/006.m4a",
+     "duration": 0.002,
+     "loop": true
+    }
+   ],
+   "S_SCROLL": [
+    {
+     "url": "sfx/shell/007.m4a",
+     "duration": 2.467,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/008.m4a",
+     "duration": 2.467,
+     "loop": false
+    }
+   ],
+   "S_ACCEPT": [
+    {
+     "url": "sfx/shell/009.m4a",
+     "duration": 2.475,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/010.m4a",
+     "duration": 2.475,
+     "loop": false
+    }
+   ],
+   "S_BACK": [
+    {
+     "url": "sfx/shell/011.m4a",
+     "duration": 3.025,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/012.m4a",
+     "duration": 3.025,
+     "loop": false
+    }
+   ],
+   "S_ENTER": [
+    {
+     "url": "sfx/shell/013.m4a",
+     "duration": 2.475,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/014.m4a",
+     "duration": 2.475,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/015.m4a",
+     "duration": 1.238,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/016.m4a",
+     "duration": 1.238,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/017.m4a",
+     "duration": 1.355,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/018.m4a",
+     "duration": 1.336,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/019.m4a",
+     "duration": 0.677,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/020.m4a",
+     "duration": 0.658,
+     "loop": false
+    }
+   ],
+   "S_BAD_INPUT": [
+    {
+     "url": "sfx/shell/021.m4a",
+     "duration": 3.025,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/022.m4a",
+     "duration": 3.025,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/023.m4a",
+     "duration": 2.71,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/024.m4a",
+     "duration": 2.71,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/025.m4a",
+     "duration": 6.05,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/026.m4a",
+     "duration": 6.05,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/027.m4a",
+     "duration": 4.279,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/028.m4a",
+     "duration": 4.279,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/029.m4a",
+     "duration": 4.279,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/030.m4a",
+     "duration": 4.279,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/031.m4a",
+     "duration": 4.279,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/032.m4a",
+     "duration": 4.279,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/033.m4a",
+     "duration": 4.279,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/034.m4a",
+     "duration": 4.279,
+     "loop": false
+    }
+   ],
+   "S_SFX_VOL": [
+    {
+     "url": "sfx/shell/035.m4a",
+     "duration": 0.876,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/036.m4a",
+     "duration": 0.851,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/037.m4a",
+     "duration": 1.275,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/038.m4a",
+     "duration": 1.204,
+     "loop": false
+    }
+   ],
+   "ATV_REV": [
+    {
+     "url": "sfx/shell/039.m4a",
+     "duration": 1.01,
+     "loop": false
+    }
+   ],
+   "AXEL_REV": [
+    {
+     "url": "sfx/shell/040.m4a",
+     "duration": 1.351,
+     "loop": false
+    }
+   ],
+   "COP_REV": [
+    {
+     "url": "sfx/shell/041.m4a",
+     "duration": 1.307,
+     "loop": false
+    }
+   ],
+   "CRIMSON_REV": [
+    {
+     "url": "sfx/shell/042.m4a",
+     "duration": 1.147,
+     "loop": false
+    }
+   ],
+   "DARKT1_REV": [
+    {
+     "url": "sfx/shell/043.m4a",
+     "duration": 0.876,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/044.m4a",
+     "duration": 0.851,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/045.m4a",
+     "duration": 1.275,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/046.m4a",
+     "duration": 1.204,
+     "loop": false
+    }
+   ],
+   "DARKT2_REV": [
+    {
+     "url": "sfx/shell/047.m4a",
+     "duration": 1.702,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/048.m4a",
+     "duration": 1.516,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/049.m4a",
+     "duration": 1.65,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/050.m4a",
+     "duration": 1.387,
+     "loop": false
+    }
+   ],
+   "EDDY_REV": [
+    {
+     "url": "sfx/shell/051.m4a",
+     "duration": 2.279,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/052.m4a",
+     "duration": 4.558,
+     "loop": false
+    }
+   ],
+   "GRASS_REV": [
+    {
+     "url": "sfx/shell/053.m4a",
+     "duration": 1.141,
+     "loop": false
+    }
+   ],
+   "GRIMM_REV": [
+    {
+     "url": "sfx/shell/054.m4a",
+     "duration": 1.564,
+     "loop": false
+    }
+   ],
+   "HAMMER_REV": [
+    {
+     "url": "sfx/shell/055.m4a",
+     "duration": 1.32,
+     "loop": false
+    }
+   ],
+   "MRSLAM_REV": [
+    {
+     "url": "sfx/shell/056.m4a",
+     "duration": 2.01,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/057.m4a",
+     "duration": 4.019,
+     "loop": false
+    }
+   ],
+   "ROADKILL_REV": [
+    {
+     "url": "sfx/shell/058.m4a",
+     "duration": 1.468,
+     "loop": false
+    }
+   ],
+   "SHADOW_REV": [
+    {
+     "url": "sfx/shell/059.m4a",
+     "duration": 1.296,
+     "loop": false
+    }
+   ],
+   "SPECTRE_REV": [
+    {
+     "url": "sfx/shell/060.m4a",
+     "duration": 1.364,
+     "loop": false
+    }
+   ],
+   "SWEETT_REV": [
+    {
+     "url": "sfx/shell/061.m4a",
+     "duration": 1.195,
+     "loop": false
+    }
+   ],
+   "THUMPER_REV": [
+    {
+     "url": "sfx/shell/062.m4a",
+     "duration": 1.538,
+     "loop": false
+    }
+   ],
+   "TWISTER_REV": [
+    {
+     "url": "sfx/shell/063.m4a",
+     "duration": 0.827,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/064.m4a",
+     "duration": 0.984,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/065.m4a",
+     "duration": 0.303,
+     "loop": false
+    }
+   ],
+   "WARTHOG_REV": [
+    {
+     "url": "sfx/shell/066.m4a",
+     "duration": 2.279,
+     "loop": false
+    }
+   ],
+   "ATV_IDLE_L": [
+    {
+     "url": "sfx/shell/067.m4a",
+     "duration": 0.003,
+     "loop": true
+    },
+    {
+     "url": "sfx/shell/068.m4a",
+     "duration": 1.928,
+     "loop": true
+    }
+   ],
+   "AXEL_IDLE_L": [
+    {
+     "url": "sfx/shell/069.m4a",
+     "duration": 0.002,
+     "loop": true
+    }
+   ],
+   "COP_IDLE_L": [
+    {
+     "url": "sfx/shell/070.m4a",
+     "duration": 0.002,
+     "loop": true
+    }
+   ],
+   "COP_SIREN_L": [
+    {
+     "url": "sfx/shell/071.m4a",
+     "duration": 0.002,
+     "loop": true
+    }
+   ],
+   "CRIMSON_IDLE_L": [
+    {
+     "url": "sfx/shell/072.m4a",
+     "duration": 0.002,
+     "loop": true
+    },
+    {
+     "url": "sfx/shell/073.m4a",
+     "duration": 0.002,
+     "loop": true
+    }
+   ],
+   "DARKT1_IDLE_L": [
+    {
+     "url": "sfx/shell/074.m4a",
+     "duration": 0.002,
+     "loop": true
+    },
+    {
+     "url": "sfx/shell/075.m4a",
+     "duration": 0.002,
+     "loop": true
+    },
+    {
+     "url": "sfx/shell/076.m4a",
+     "duration": 0.002,
+     "loop": true
+    },
+    {
+     "url": "sfx/shell/077.m4a",
+     "duration": 0.002,
+     "loop": true
+    },
+    {
+     "url": "sfx/shell/078.m4a",
+     "duration": 0.002,
+     "loop": true
+    }
+   ],
+   "DARKT2_IDLE_L": [
+    {
+     "url": "sfx/shell/079.m4a",
+     "duration": 0.002,
+     "loop": true
+    },
+    {
+     "url": "sfx/shell/080.m4a",
+     "duration": 0.002,
+     "loop": true
+    },
+    {
+     "url": "sfx/shell/081.m4a",
+     "duration": 0.003,
+     "loop": true
+    },
+    {
+     "url": "sfx/shell/082.m4a",
+     "duration": 0.003,
+     "loop": true
+    },
+    {
+     "url": "sfx/shell/083.m4a",
+     "duration": 0.003,
+     "loop": true
+    },
+    {
+     "url": "sfx/shell/084.m4a",
+     "duration": 0.002,
+     "loop": true
+    }
+   ],
+   "EDDY_IDLE_L": [
+    {
+     "url": "sfx/shell/085.m4a",
+     "duration": 0.002,
+     "loop": true
+    },
+    {
+     "url": "sfx/shell/086.m4a",
+     "duration": 0.004,
+     "loop": true
+    }
+   ],
+   "GRASS_IDLE_L": [
+    {
+     "url": "sfx/shell/087.m4a",
+     "duration": 0.002,
+     "loop": true
+    }
+   ],
+   "GRIMM_IDLE_L": [
+    {
+     "url": "sfx/shell/088.m4a",
+     "duration": 0.002,
+     "loop": true
+    }
+   ],
+   "HAMMER_IDLE_L": [
+    {
+     "url": "sfx/shell/089.m4a",
+     "duration": 0.002,
+     "loop": true
+    }
+   ],
+   "MRSLAM_IDLE_L": [
+    {
+     "url": "sfx/shell/090.m4a",
+     "duration": 0.002,
+     "loop": true
+    },
+    {
+     "url": "sfx/shell/091.m4a",
+     "duration": 0.005,
+     "loop": true
+    }
+   ],
+   "ROADKILL_IDLE_L": [
+    {
+     "url": "sfx/shell/092.m4a",
+     "duration": 0.002,
+     "loop": true
+    }
+   ],
+   "SHADOW_IDLE_L": [
+    {
+     "url": "sfx/shell/093.m4a",
+     "duration": 0.002,
+     "loop": true
+    }
+   ],
+   "SHADOW_PUTT_L": [
+    {
+     "url": "sfx/shell/094.m4a",
+     "duration": 0.627,
+     "loop": true
+    },
+    {
+     "url": "sfx/shell/095.m4a",
+     "duration": 0.627,
+     "loop": true
+    },
+    {
+     "url": "sfx/shell/096.m4a",
+     "duration": 0.627,
+     "loop": true
+    }
+   ],
+   "SPECTRE_IDLE_L": [
+    {
+     "url": "sfx/shell/097.m4a",
+     "duration": 0.002,
+     "loop": true
+    }
+   ],
+   "SWEETT_IDLE_L": [
+    {
+     "url": "sfx/shell/098.m4a",
+     "duration": 0.002,
+     "loop": true
+    },
+    {
+     "url": "sfx/shell/099.m4a",
+     "duration": 0.003,
+     "loop": true
+    }
+   ],
+   "SWEETT_PUTT_L": [
+    {
+     "url": "sfx/shell/100.m4a",
+     "duration": 0.627,
+     "loop": true
+    },
+    {
+     "url": "sfx/shell/101.m4a",
+     "duration": 0.627,
+     "loop": true
+    },
+    {
+     "url": "sfx/shell/102.m4a",
+     "duration": 0.627,
+     "loop": true
+    }
+   ],
+   "THUMPER_IDLE_L": [
+    {
+     "url": "sfx/shell/103.m4a",
+     "duration": 0.002,
+     "loop": true
+    }
+   ],
+   "TWISTER_IDLE_L": [
+    {
+     "url": "sfx/shell/104.m4a",
+     "duration": 0.001,
+     "loop": true
+    },
+    {
+     "url": "sfx/shell/105.m4a",
+     "duration": 1.17,
+     "loop": true
+    },
+    {
+     "url": "sfx/shell/106.m4a",
+     "duration": 1.314,
+     "loop": true
+    }
+   ],
+   "WARTHOG_IDLE_L": [
+    {
+     "url": "sfx/shell/107.m4a",
+     "duration": 0.002,
+     "loop": true
+    }
+   ],
+   "AGENT_EARPIECE": [
+    {
+     "url": "sfx/shell/108.m4a",
+     "duration": 0.396,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/109.m4a",
+     "duration": 1.251,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/110.m4a",
+     "duration": 0.768,
+     "loop": false
+    }
+   ],
+   "AXEL_SERVO": [
+    {
+     "url": "sfx/shell/111.m4a",
+     "duration": 0.531,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/112.m4a",
+     "duration": 0.763,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/113.m4a",
+     "duration": 0.475,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/114.m4a",
+     "duration": 1.115,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/115.m4a",
+     "duration": 0.763,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/116.m4a",
+     "duration": 0.475,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/117.m4a",
+     "duration": 1.115,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/118.m4a",
+     "duration": 0.763,
+     "loop": false
+    }
+   ],
+   "CATFISH_RIFLE": [
+    {
+     "url": "sfx/shell/119.m4a",
+     "duration": 0.414,
+     "loop": false
+    }
+   ],
+   "CATFISH_LAUGH": [
+    {
+     "url": "sfx/shell/120.m4a",
+     "duration": 0.979,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/121.m4a",
+     "duration": 0.979,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/122.m4a",
+     "duration": 1.117,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/123.m4a",
+     "duration": 1.117,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/124.m4a",
+     "duration": 1.791,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/125.m4a",
+     "duration": 1.791,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/126.m4a",
+     "duration": 1.791,
+     "loop": false
+    }
+   ],
+   "COPS": [
+    {
+     "url": "sfx/shell/127.m4a",
+     "duration": 2.001,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/128.m4a",
+     "duration": 2.041,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/129.m4a",
+     "duration": 0.412,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/130.m4a",
+     "duration": 0.597,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/131.m4a",
+     "duration": 0.262,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/132.m4a",
+     "duration": 1.014,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/133.m4a",
+     "duration": 0.785,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/134.m4a",
+     "duration": 0.437,
+     "loop": false
+    }
+   ],
+   "EDDY_FLIES": [
+    {
+     "url": "sfx/shell/135.m4a",
+     "duration": 0.001,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/136.m4a",
+     "duration": 0.001,
+     "loop": false
+    }
+   ],
+   "GRIMM_LAUGH": [
+    {
+     "url": "sfx/shell/137.m4a",
+     "duration": 2.158,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/138.m4a",
+     "duration": 4.317,
+     "loop": false
+    }
+   ],
+   "KRISTA_GUM_BLO": [
+    {
+     "url": "sfx/shell/139.m4a",
+     "duration": 0.862,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/140.m4a",
+     "duration": 0.913,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/141.m4a",
+     "duration": 0.967,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/142.m4a",
+     "duration": 1.025,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/143.m4a",
+     "duration": 1.086,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/144.m4a",
+     "duration": 1.151,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/145.m4a",
+     "duration": 0.105,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/146.m4a",
+     "duration": 0.07,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/147.m4a",
+     "duration": 0.053,
+     "loop": false
+    }
+   ],
+   "KRISTA_GUM_POP": [
+    {
+     "url": "sfx/shell/148.m4a",
+     "duration": 0.105,
+     "loop": false
+    }
+   ],
+   "NEEDLES_FIRE": [
+    {
+     "url": "sfx/shell/149.m4a",
+     "duration": 1.283,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/150.m4a",
+     "duration": 1.713,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/151.m4a",
+     "duration": 0.002,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/152.m4a",
+     "duration": 0.002,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/153.m4a",
+     "duration": 0.001,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/154.m4a",
+     "duration": 0.001,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/155.m4a",
+     "duration": 0.001,
+     "loop": false
+    }
+   ],
+   "SIMON_GLOW": [
+    {
+     "url": "sfx/shell/156.m4a",
+     "duration": 0.002,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/157.m4a",
+     "duration": 0.002,
+     "loop": false
+    }
+   ],
+   "SIMON_SNIFF": [
+    {
+     "url": "sfx/shell/158.m4a",
+     "duration": 0.33,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/159.m4a",
+     "duration": 0.437,
+     "loop": false
+    }
+   ],
+   "TWISTER_GLOVE": [
+    {
+     "url": "sfx/shell/160.m4a",
+     "duration": 0.43,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/161.m4a",
+     "duration": 0.418,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/162.m4a",
+     "duration": 0.406,
+     "loop": false
+    }
+   ],
+   "PLANET_PARK": [
+    {
+     "url": "sfx/shell/163.m4a",
+     "duration": 0.437,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/164.m4a",
+     "duration": 0.607,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/165.m4a",
+     "duration": 0.235,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/166.m4a",
+     "duration": 0.642,
+     "loop": false
+    }
+   ],
+   "PLANET_UNPARK": [
+    {
+     "url": "sfx/shell/167.m4a",
+     "duration": 0.454,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/168.m4a",
+     "duration": 0.235,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/169.m4a",
+     "duration": 0.482,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/170.m4a",
+     "duration": 0.437,
+     "loop": false
+    }
+   ],
+   "TITLESLIDE_ON": [
+    {
+     "url": "sfx/shell/171.m4a",
+     "duration": 1.232,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/172.m4a",
+     "duration": 0.732,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/173.m4a",
+     "duration": 0.72,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/174.m4a",
+     "duration": 0.474,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/175.m4a",
+     "duration": 0.474,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/176.m4a",
+     "duration": 1.232,
+     "loop": false
+    }
+   ],
+   "TITLESLIDE_OFF": [
+    {
+     "url": "sfx/shell/177.m4a",
+     "duration": 1.372,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/178.m4a",
+     "duration": 1.395,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/179.m4a",
+     "duration": 0.532,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/180.m4a",
+     "duration": 0.376,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/181.m4a",
+     "duration": 0.732,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/182.m4a",
+     "duration": 0.72,
+     "loop": false
+    }
+   ],
+   "PLANETSLIDE_IN": [
+    {
+     "url": "sfx/shell/183.m4a",
+     "duration": 1.491,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/184.m4a",
+     "duration": 1.516,
+     "loop": false
+    }
+   ],
+   "PLANET_ROTATE": [
+    {
+     "url": "sfx/shell/185.m4a",
+     "duration": 1.911,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/186.m4a",
+     "duration": 1.803,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/187.m4a",
+     "duration": 0.422,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/188.m4a",
+     "duration": 0.428,
+     "loop": false
+    }
+   ],
+   "SELECT_AI": [
+    {
+     "url": "sfx/shell/189.m4a",
+     "duration": 0.54,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/190.m4a",
+     "duration": 0.316,
+     "loop": false
+    }
+   ],
+   "DESELECT_AI": [
+    {
+     "url": "sfx/shell/191.m4a",
+     "duration": 0.642,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/192.m4a",
+     "duration": 0.316,
+     "loop": false
+    }
+   ],
+   "CONNECTED_L": [
+    {
+     "url": "sfx/shell/193.m4a",
+     "duration": 0.002,
+     "loop": true
+    },
+    {
+     "url": "sfx/shell/194.m4a",
+     "duration": 0.002,
+     "loop": true
+    },
+    {
+     "url": "sfx/shell/195.m4a",
+     "duration": 0.003,
+     "loop": true
+    },
+    {
+     "url": "sfx/shell/196.m4a",
+     "duration": 0.002,
+     "loop": true
+    },
+    {
+     "url": "sfx/shell/197.m4a",
+     "duration": 1.079,
+     "loop": true
+    },
+    {
+     "url": "sfx/shell/198.m4a",
+     "duration": 1.079,
+     "loop": true
+    }
+   ],
+   "PLAYER_ENTER": [
+    {
+     "url": "sfx/shell/199.m4a",
+     "duration": 0.571,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/200.m4a",
+     "duration": 0.561,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/201.m4a",
+     "duration": 0.445,
+     "loop": false
+    }
+   ],
+   "PLAYER_LEAVE": [
+    {
+     "url": "sfx/shell/202.m4a",
+     "duration": 0.445,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/203.m4a",
+     "duration": 0.905,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/204.m4a",
+     "duration": 0.89,
+     "loop": false
+    }
+   ],
+   "COUNTDOWN": [
+    {
+     "url": "sfx/shell/205.m4a",
+     "duration": 1.122,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/206.m4a",
+     "duration": 1.141,
+     "loop": false
+    }
+   ],
+   "LEVEL_EXPLODE_L": [
+    {
+     "url": "sfx/shell/207.m4a",
+     "duration": 1.715,
+     "loop": true
+    },
+    {
+     "url": "sfx/shell/208.m4a",
+     "duration": 1.817,
+     "loop": true
+    },
+    {
+     "url": "sfx/shell/209.m4a",
+     "duration": 2.16,
+     "loop": true
+    },
+    {
+     "url": "sfx/shell/210.m4a",
+     "duration": 2.289,
+     "loop": true
+    },
+    {
+     "url": "sfx/shell/211.m4a",
+     "duration": 3.237,
+     "loop": true
+    },
+    {
+     "url": "sfx/shell/212.m4a",
+     "duration": 3.428,
+     "loop": true
+    }
+   ],
+   "GLASS_SHATTER": [
+    {
+     "url": "sfx/shell/213.m4a",
+     "duration": 0.613,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/214.m4a",
+     "duration": 0.818,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/215.m4a",
+     "duration": 1.031,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/216.m4a",
+     "duration": 1.225,
+     "loop": false
+    }
+   ],
+   "MORTIMER_MUM": [
+    {
+     "url": "sfx/shell/217.m4a",
+     "duration": 0.836,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/218.m4a",
+     "duration": 0.741,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/219.m4a",
+     "duration": 0.471,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/220.m4a",
+     "duration": 0.488,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/221.m4a",
+     "duration": 0.471,
+     "loop": false
+    }
+   ],
+   "EDDY_MUTTER": [
+    {
+     "url": "sfx/shell/222.m4a",
+     "duration": 0.843,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/223.m4a",
+     "duration": 0.648,
+     "loop": false
+    }
+   ],
+   "CPTROGER_VOX": [
+    {
+     "url": "sfx/shell/224.m4a",
+     "duration": 1.282,
+     "loop": false
+    }
+   ],
+   "CHUCKY_WINK": [
+    {
+     "url": "sfx/shell/225.m4a",
+     "duration": 0.222,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/226.m4a",
+     "duration": 0.218,
+     "loop": false
+    }
+   ],
+   "ATV_GUY_YEEHAW": [
+    {
+     "url": "sfx/shell/227.m4a",
+     "duration": 1.928,
+     "loop": false
+    }
+   ],
+   "TOWER_RAISE": [
+    {
+     "url": "sfx/shell/228.m4a",
+     "duration": 1.665,
+     "loop": false
+    }
+   ],
+   "TOWER_LOWER": [
+    {
+     "url": "sfx/shell/229.m4a",
+     "duration": 1.596,
+     "loop": false
+    }
+   ],
+   "TOWER_ARCING_L": [
+    {
+     "url": "sfx/shell/230.m4a",
+     "duration": 0.001,
+     "loop": true
+    },
+    {
+     "url": "sfx/shell/231.m4a",
+     "duration": 0.001,
+     "loop": true
+    }
+   ],
+   "CONNECTED": [
+    {
+     "url": "sfx/shell/232.m4a",
+     "duration": 1.141,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/233.m4a",
+     "duration": 1.121,
+     "loop": false
+    }
+   ],
+   "SWEETTOOTH_LAF": [
+    {
+     "url": "sfx/shell/234.m4a",
+     "duration": 2.506,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/235.m4a",
+     "duration": 2.464,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/236.m4a",
+     "duration": 3.758,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/237.m4a",
+     "duration": 3.647,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/238.m4a",
+     "duration": 1.785,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/239.m4a",
+     "duration": 2.123,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/240.m4a",
+     "duration": 2.674,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/241.m4a",
+     "duration": 3.57,
+     "loop": false
+    }
+   ],
+   "DT1_LAUGH": [
+    {
+     "url": "sfx/shell/242.m4a",
+     "duration": 3.607,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/243.m4a",
+     "duration": 3.71,
+     "loop": false
+    }
+   ],
+   "DT2_LAUGH": [
+    {
+     "url": "sfx/shell/244.m4a",
+     "duration": 5.247,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/245.m4a",
+     "duration": 5.095,
+     "loop": false
+    }
+   ],
+   "PLANET_EXPLO": [
+    {
+     "url": "sfx/shell/246.m4a",
+     "duration": 1.715,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/247.m4a",
+     "duration": 2.289,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/248.m4a",
+     "duration": 2.884,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/249.m4a",
+     "duration": 3.428,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/250.m4a",
+     "duration": 4.079,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/251.m4a",
+     "duration": 4.579,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/252.m4a",
+     "duration": 5.138,
+     "loop": false
+    },
+    {
+     "url": "sfx/shell/253.m4a",
+     "duration": 6.857,
+     "loop": false
+    }
+   ]
   }
  },
  "cars": {
@@ -2827,5 +9372,32 @@
   "hc_tank": "tank",
   "hc_preac": "brimstne",
   "hc_semi": "darkside"
+ },
+ "carWeapons": {
+  "axel": "axelwp",
+  "cop": "copcarwp",
+  "crim": "crimwp",
+  "sweet": "sweettwp",
+  "twist": "twistwp",
+  "spectre": "spectrwp",
+  "thump": "thumpwp",
+  "grass": "grasswp",
+  "hamr": "hammerwp",
+  "rkill": "rdkillwp",
+  "wart": "wartwp",
+  "mrslam": "mrslamwp",
+  "mrgrim": "grimmwp",
+  "hearse": "shadwp",
+  "edatv": "atvwp",
+  "edboss": "eddywp",
+  "dark1": "darkt1wp",
+  "dark2": "darkt2wp",
+  "hc_taxi": "taxiwa",
+  "hc_suv": "suvwa",
+  "hc_tank": "tankwa",
+  "hc_preac": "brimstwa",
+  "hc_semi": "darksidw",
+  "hc_derby": "crazy8wa",
+  "hc_tow": "junkwa"
  }
 }

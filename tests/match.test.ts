@@ -28,7 +28,7 @@ test('pegar Health 30% recupera vida e o pickup some até renascer', () => {
   car.health = 50;
   m.addPickups([{ id: 8, pos: v3(0, 1, 0) }]);
   run(m, 0.2);
-  assert.equal(car.health, 50 + MATCH_RULES.maxHealth * 0.3);
+  assert.equal(car.health, 50 + 30); // FUN_00120ba0: +30 pontos (0x35b4d4)
   assert.ok(m.pickups[0].respawnIn > 0);
   assert.ok(m.drain().some((e) => e.kind === 'pickup'));
 });
@@ -38,9 +38,15 @@ test('pegar arma dá munição e disparar consome', () => {
   const car = m.addCar('p', 'axel', SHAPE, false);
   m.addPickups([{ id: 6, pos: v3(0, 1, 0) }]);
   run(m, 0.1);
+  assert.equal(car.ammo.power, 2); // FUN_001bc6f8: 2 por pickup no Head-On
+  // Nasce com Fire 1, Homing 1 e o especial 1 (FUN_00147420).
+  assert.deepEqual([car.ammo.fire, car.ammo.homing, car.ammo.special], [1, 1, 1]);
+  car.selected = 'power';
+  m.step(1 / 60, new Map([[car.id, { ...NO_ACTIONS, fireSpecial: true }]]));
   assert.equal(car.ammo.power, 1);
-  run(m, 0.1, new Map([[car.id, { ...NO_ACTIONS, fireSpecial: true }]]));
-  assert.equal(car.ammo.power ?? 0, 0);
+  // Outro disparo só depois de 48 tiques (carro+0x6300).
+  m.step(1 / 60, new Map([[car.id, { ...NO_ACTIONS, fireSpecial: true }]]));
+  assert.equal(car.ammo.power, 1);
   assert.ok(m.projectiles.length + m.drain().filter((e) => e.kind === 'explosion').length > 0);
 });
 
@@ -89,4 +95,47 @@ test('carros não se atravessam (colisão carro × carro)', () => {
   }
   const r = (SHAPE.halfWidth + SHAPE.halfLength) * 0.5;
   assert.ok(minGap > 2 * r - 1.5, `se atravessaram: menor distância ${minGap.toFixed(1)}`);
+});
+
+test('especial do Axel: onda de choque fere quem está a até 100 pés e recarrega em 1800 tiques', () => {
+  const m = new Match(flat, [v3(0, 0, 0), v3(0, 0, 80), v3(0, 0, 300)], ground, () => 0.5);
+  const axel = m.addCar('p', 'axel', SHAPE, false);
+  const near = m.addCar('perto', 'cop', SHAPE, false);
+  const far = m.addCar('longe', 'cop', SHAPE, false);
+  axel.state.pos = ground(v3(0, 0, 0), SHAPE);
+  near.state.pos = ground(v3(0, 0, 80), SHAPE);
+  far.state.pos = ground(v3(0, 0, 300), SHAPE);
+  axel.selected = 'special';
+  m.step(1 / 60, new Map([[axel.id, { ...NO_ACTIONS, fireSpecial: true }]]));
+  assert.equal(near.health, MATCH_RULES.maxHealth - 15);
+  assert.equal(far.health, MATCH_RULES.maxHealth);
+  assert.equal(axel.ammo.special, 0);
+  run(m, 1800 / 60 + 0.1);
+  assert.equal(axel.ammo.special, 1);
+});
+
+test('Swarmer: segurar carrega até 6 mísseis e solta sozinho em 210 tiques', () => {
+  const m = new Match(flat, [v3(0, 0, 0)], ground, () => 0.5);
+  const car = m.addCar('p', 'axel', SHAPE, false);
+  car.ammo.swarmer = 1;
+  car.selected = 'swarmer';
+  const hold = { ...NO_ACTIONS, fireSpecialHeld: true };
+  m.step(1 / 60, new Map([[car.id, { ...hold, fireSpecial: true }]]));
+  for (let i = 0; i < 230; i++) m.step(1 / 60, new Map([[car.id, hold]]));
+  assert.equal(m.projectiles.filter((p) => p.type === 9).length, 6);
+  assert.equal(car.ammo.swarmer, 0);
+});
+
+test('metralhadora: um tiro a cada 10 tiques e superaquece depois de 500 tiques segurando', () => {
+  const m = new Match(flat, [v3(0, 0, 0)], ground);
+  const car = m.addCar('p', 'axel', SHAPE, false);
+  m.drain();
+  const fireGun = new Map([[car.id, { ...NO_ACTIONS, fireGun: true }]]);
+  for (let i = 0; i < 100; i++) m.step(1 / 60, fireGun);
+  assert.equal(m.drain().filter((e) => e.kind === 'shot').length, 10);
+  for (let i = 0; i < 420; i++) m.step(1 / 60, fireGun);
+  assert.ok(car.mg.overheat > 0, `calor ${car.mg.heat}`);
+  m.drain();
+  for (let i = 0; i < 60; i++) m.step(1 / 60, fireGun);
+  assert.equal(m.drain().filter((e) => e.kind === 'shot').length, 0);
 });

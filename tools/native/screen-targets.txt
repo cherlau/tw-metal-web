@@ -1,0 +1,3 @@
+# Dimensões da tela (FUN_002663c0 lê (&DAT_00606844)[i*0x50] +4/+6): quem grava a estrutura da viewport
+refsrange:606840:606850 tela_vp
+at:266390 tela_origem

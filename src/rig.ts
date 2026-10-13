@@ -13,6 +13,8 @@ export interface RigBone {
   vis: number; // >= 0 canal; -1 sempre visível; -2 nunca
   pre: number[] | null;
   post: number[] | null;
+  /** Nó 0x18: canal de cada componente da escala (u16 +0x12/+0x14/+0x16; -1 = constante de `pre`). */
+  schan?: number[];
 }
 export interface RigTrack {
   ch: number;
@@ -194,7 +196,7 @@ export class CarRig {
 
   private constructor(readonly rig: RigDoc) {
     let n = 0;
-    for (const b of rig.bones) for (const c of [...b.chan, b.vis]) n = Math.max(n, c + 1);
+    for (const b of rig.bones) for (const c of [...b.chan, b.vis, ...(b.schan ?? [])]) n = Math.max(n, c + 1);
     for (const c of rig.clips) for (const t of c.tracks) n = Math.max(n, t.ch + 1);
     this.channels = new Float32Array(n);
     for (const [k, v] of Object.entries(rig.rest ?? {})) if (Number(k) < n) this.channels[Number(k)] = v;
@@ -498,7 +500,12 @@ export class CarRig {
         vals[k] = k < 3 ? -v : v; // FUN_0021b3c0: rotação sempre negada (constante ou canal)
       }
       euler(vals[0], vals[1], vals[2], m);
-      if (b.pre) mul(b.pre, m, m);
+      if (b.schan && b.pre) {
+        // nó 0x18 com escala por canal (medidores do HUD): diagonal de `pre` trocada pelo canal
+        const s = b.pre.slice();
+        b.schan.forEach((c, k) => c >= 0 && (s[k * 5] = ch[c]));
+        mul(s, m, m);
+      } else if (b.pre) mul(b.pre, m, m);
       if (b.post) mul(m, b.post, m);
       m[12] += vals[3];
       m[13] += vals[4];
@@ -512,6 +519,11 @@ export class CarRig {
       visible[i] = own && (b.parent < 0 || visible[b.parent]);
       this.boneGroups[i].visible = visible[i];
     });
+  }
+
+  /** Grupo do osso `i` (HUD: tingir as malhas de um medidor). */
+  boneGroup(i: number): THREE.Group | undefined {
+    return this.boneGroups[i];
   }
 
   clipsWithRole(role: RigClip['role']): RigClip[] {

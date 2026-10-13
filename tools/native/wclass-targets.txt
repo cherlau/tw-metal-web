@@ -1,0 +1,17 @@
+# Construtores das classes de arma do inventário (gravam as vtables 0x2d6588..0x2d69a8)
+at:14acf0 ctor_2d69a8
+at:14b7c0 ctor_2d6948
+at:14bc18 ctor_2d68e8
+at:14c0c0 ctor_2d6888
+at:14c490 ctor_2d6828
+at:14cf38 ctor_2d67c8
+at:14d468 ctor_2d6768
+at:14d7a0 ctor_2d6708
+at:14de80 ctor_2d66a8
+at:14e298 ctor_2d6648
+at:14e668 ctor_2d65e8
+at:14f390 ctor_2d6588
+at:14ae38 fire_mg
+at:14c648 fire_2d6828
+at:14d970 fire_2d6708
+at:14e890 fire_2d65e8

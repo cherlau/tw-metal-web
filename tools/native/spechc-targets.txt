@@ -1,0 +1,27 @@
+# Armas especiais dos carros Harbor City (vtable+0x44) e inits
+at:1b0968 init_hcaxel
+at:1b0b40 fire_hcaxel
+at:1c2bb0 init_derby
+at:1c2cf0 fire_derby
+at:1c8cf0 init_hchearse
+at:1c8ee8 fire_hchearse
+at:1d05c8 init_hcgrim
+at:1d06a8 fire_hcgrim
+at:1daf98 init_preacher
+at:1db178 fire_preacher
+at:1dca30 init_hcrkill
+at:1dcbd8 fire_hcrkill
+at:1dd530 init_semi
+at:1dd5e8 fire_semi
+at:1e3080 init_suv
+at:1e3120 fire_suv
+at:1d63c8 init_hcsweet
+at:1d64a8 fire_hcsweet
+at:1c9678 init_taxi
+at:1c9730 fire_taxi
+at:1d7fd8 init_tow
+at:1d8160 fire_tow
+at:1e0a68 init_hcvette
+at:1e0c58 fire_hcvette
+at:199eb0 init_x79
+at:19a0a0 fire_x79

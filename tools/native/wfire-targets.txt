@@ -1,0 +1,4 @@
+# Disparo: quem chama FUN_00147ec8 (cria projétil do inventário) e o gerente de projéteis (atualização)
+147ec8 fire_inv
+148300 fire_inv2
+range:1fed60:204ee8 projupd

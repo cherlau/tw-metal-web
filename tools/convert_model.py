@@ -25,6 +25,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import ngp  # noqa: E402
 import tex  # noqa: E402
 import actions  # noqa: E402
+import hud  # noqa: E402
 import launchers  # noqa: E402
 import rig  # noqa: E402
 import wheels  # noqa: E402
@@ -131,13 +132,16 @@ def convert(name: str, folder: str) -> dict:
     textures = {f"{t.id:x}": save_texture(t) for t in tex.decode(tex_bytes)}
     meshes = ngp.find_meshes(ngp_bytes, ptr_bytes)
     errors: list[str] = []
-    # Carros: todas as entradas dos nós 0x13 (estado de dano escolhido pela vida no runtime, FUN_0012e8c0).
+    # Carros e níveis: todas as entradas dos nós 0x13 (carros: pela vida, FUN_0012e8c0; níveis: destrutíveis
+    # por golpe, FUN_00168aa8 → FUN_00171838).
     # Carros: seletores 0x05 com todos os filhos (o runtime mostra o do estado; FUN_0022cd58 / FUN_00230138).
     scene_rep = ngp.scene(ngp_bytes, ptr_bytes, meshes, place_objects=folder == "lvl",
-                          damage_states=folder in ("cars", "aicars"), selectors=folder in ("cars", "aicars"))
+                          damage_states=folder in ("cars", "aicars", "lvl"), selectors=folder in ("cars", "aicars"))
+    # GLOBALS: peças do HUD presas à câmera (tools/hud.py; FUN_0013b310 / FUN_0019e580).
+    hud_json, hud_insts = hud.export(ngp_bytes, ptr_bytes, meshes) if folder == "globals" else ({}, [])
     # Estado do GS herdado do grupo (camada de reflexo: mistura pelo alfa de vértice, sem gravar z).
     mesh_state: dict[int, dict] = {}
-    for inst in scene_rep.instances + scene_rep.damaged + scene_rep.selected + [i for v in scene_rep.effects.values() for i in v]:
+    for inst in scene_rep.instances + scene_rep.damaged + scene_rep.selected + [i for v in scene_rep.effects.values() for i in v] + hud_insts:
         if inst.state >= 0 and inst.mesh not in mesh_state:
             regs = ngp.gs_state(ngp_bytes, inst.state)
             if regs:
@@ -280,6 +284,30 @@ def convert(name: str, folder: str) -> dict:
         if kind:
             scene_rep.selected.remove(inst)
             scene_rep.code_effects.setdefault(kind, []).append(inst)
+
+    def category_objects_json() -> dict[str, list[dict]]:
+        """GLOBALS: 1º nó de cada categoria que o jogo registra por código — modelos dos projéteis (FUN_00204778:
+        4000..4099 no Head-On, 0x1004.. no Harbor City) e ícones dos pickups (FUN_001bdad0: 0x13ba + tipo no
+        Head-On, 5000 + tipo no Harbor City). Instâncias relativas ao nó da categoria."""
+        if folder != "globals":
+            return {}
+
+        def wanted(c: int) -> bool:
+            return 4000 <= c < 4100 or 0x1004 <= c < 0x1068 or 5000 <= c < 5050 or 0x13BA <= c < 0x13E2
+
+        first: dict[int, int] = {}
+        for inst in scene_rep.instances + scene_rep.selected:
+            for n in inst.path:
+                c = struct.unpack_from("<I", ngp_bytes, n)[0] >> 18
+                if wanted(c) and c not in first:
+                    first[c] = n
+        out: dict[str, list[dict]] = {}
+        for c, node in sorted(first.items()):
+            rep = ngp.scene(ngp_bytes, ptr_bytes, meshes, root=node, lenient=True)
+            insts = [inst_json(i) for i in rep.instances if f"m{i.mesh:06x}" in mesh_json]
+            if insts:
+                out[f"{c:x}"] = insts
+        return out
 
     def level_objects_json() -> list[dict]:
         base = {i.mesh for i in scene_rep.instances}
@@ -440,6 +468,8 @@ def convert(name: str, folder: str) -> dict:
              "base": [f"m{m:06x}" for m in la.meshes],
              "doors": [{"mesh": f"m{m:06x}", "pivot": h.pivot, "axis": h.axis, "angle": h.angle} for m, h in la.doors]}
             for la in launcher_list]} if folder in ("cars", "aicars") else {}),
+        # HUD (GLOBALS): raízes por papel, posição na tela, instâncias com seletores, ossos/canais e clipes.
+        **({"hud": hud_json} if hud_json else {}),
         # Céu: desenhado centrado na câmera, atrás de tudo (runtime).
         "sky": [inst_json(i) for i in sky],
         # Slots de efeito (nós 0x05), fora da pose base; o runtime liga cada um quando precisar.
@@ -459,6 +489,8 @@ def convert(name: str, folder: str) -> dict:
         # Objetos do nível (cabeçalho +0x10): os que não aparecem na cena são pré-fabricados
         # (centrados na origem) instanciados pelo jogo em runtime.
         "objects": level_objects_json(),
+        # GLOBALS: nós registrados por categoria (projéteis e ícones de pickup), relativos ao próprio nó.
+        **({"categories": category_objects_json()} if folder == "globals" else {}),
         # Ossos para animação: matrizes 4x4 vetor-linha achatadas (= column-major do Three).
         "bones": {
             f"n{b.node:06x}": {"parent": f"n{b.parent:06x}" if b.parent >= 0 else None,

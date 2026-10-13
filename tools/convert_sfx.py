@@ -32,7 +32,20 @@ CAR_BANKS = {
     "edboss": "eddy", "dark1": "darkt1", "dark2": "darkt2", "hc_taxi": "taxi", "hc_suv": "suv",
     "hc_tank": "tank", "hc_preac": "brimstne", "hc_semi": "darkside",
 }
-BANKS = ["global", *sorted(set(CAR_BANKS.values()))]
+# carro -> banco de armas do carro (*WP.BNK: S_DEPLOY/S_RETRACT dos suportes, FUN_001451a0/FUN_001452d8, e os
+# WSP_* da arma especial). ⚠️ ESCOLHA DO HOST pelo nome do arquivo (HC: *WA.BNK).
+CAR_WEAPON_BANKS = {
+    "axel": "axelwp", "cop": "copcarwp", "crim": "crimwp", "sweet": "sweettwp", "twist": "twistwp",
+    "spectre": "spectrwp", "thump": "thumpwp", "grass": "grasswp", "hamr": "hammerwp", "rkill": "rdkillwp",
+    "wart": "wartwp", "mrslam": "mrslamwp", "mrgrim": "grimmwp", "hearse": "shadwp", "edatv": "atvwp",
+    "edboss": "eddywp", "dark1": "darkt1wp", "dark2": "darkt2wp", "hc_taxi": "taxiwa", "hc_suv": "suvwa",
+    "hc_tank": "tankwa", "hc_preac": "brimstwa", "hc_semi": "darksidw", "hc_derby": "crazy8wa", "hc_tow": "junkwa",
+}
+# Menu (SHELL.BNK: FE_AMB, S_*).
+SHELL_BANKS = ["shell"]
+# Bancos das arenas (sons do cenário: destruição D_*/B_*, tocados pelas ações dos nós 0x13 — FUN_001a0db8).
+LEVEL_BANKS = ["arena", "castledm", "colisdm", "egyptdm", "greecedm", "parisdm", "tokyodm"]
+BANKS = ["global", *sorted(set(CAR_BANKS.values())), *LEVEL_BANKS, *sorted(set(CAR_WEAPON_BANKS.values())), *SHELL_BANKS]
 
 
 def info(bank: Path, i: int) -> dict:
@@ -76,7 +89,7 @@ def main() -> int:
         results = dict(zip(BANKS, ex.map(convert, BANKS)))
     for b, s in results.items():
         print(f"{b:10s} {sum(len(v) for v in s.values()):4d} sons, {len(s):3d} nomes")
-    index = {"banks": results, "cars": CAR_BANKS}
+    index = {"banks": results, "cars": CAR_BANKS, "carWeapons": CAR_WEAPON_BANKS}
     (OUT / "index.json").write_text(json.dumps(index, indent=1), "utf-8")
     total = sum(f.stat().st_size for f in OUT.rglob("*.m4a"))
     print(f"total {total / 2**20:.1f} MB")

@@ -58,6 +58,7 @@ export class Input {
     let handbrake = this.held.has('handbrake');
     let fireGun = this.held.has('fireGun');
     let turbo = this.held.has('turbo');
+    let fireSpecialHeld = this.held.has('fireSpecial');
     const pad = navigator.getGamepads?.().find((g) => g?.connected);
     if (pad) {
       const ax = pad.axes[0] ?? 0;
@@ -68,12 +69,13 @@ export class Input {
       turbo ||= !!pad.buttons[4]?.pressed; // LB
       handbrake ||= !!pad.buttons[10]?.pressed; // L3
       this.padEdge('fireSpecial', !!pad.buttons[1]?.pressed); // B
+      fireSpecialHeld ||= !!pad.buttons[1]?.pressed;
       this.padEdge('nextWeapon', !!pad.buttons[3]?.pressed); // Y
       this.padEdge('reset', !!pad.buttons[8]?.pressed); // Select/View
       this.padEdge('camera', !!pad.buttons[9]?.pressed); // Start
     }
     return {
-      throttle, brake, steer, handbrake, fireGun, turbo,
+      throttle, brake, steer, handbrake, fireGun, turbo, fireSpecialHeld,
       fireSpecial: this.consume('fireSpecial'),
       nextWeapon: this.consume('nextWeapon'),
     };

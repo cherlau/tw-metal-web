@@ -30,11 +30,11 @@ def _f32(b: bytes, p: int) -> float:
 # FUN_001a0db8: id -> (som, distância mínima, máxima). Nomes montados por dois u64 little-endian no código.
 SOUND_NAMES = {
     10: ("D_CONCRETE_SM", 60, 300), 11: ("D_CONCRETE_LG", 80, 600),
-    0x14: ("D_METALHOLLOW_SM", 60, 300), 0x15: ("D_METALHOLLOW_LG", 80, 600),
+    0x14: ("D_METALHOLOW_SM", 60, 300), 0x15: ("D_METALHOLOW_LG", 80, 600),
     0x16: ("D_METAL_SLD_SM", 60, 300), 0x17: ("D_METAL_SLD_LG", 80, 600), 0x19: ("D_METAL_SLD_LG", 80, 600),
     0x18: ("D_METAL_SHT_SM", 60, 300), 0x1A: ("D_METAL_MXD_SM", 60, 300), 0x1B: ("D_METAL_MXD_LG", 80, 600),
     0x28: ("D_PLASTIC", 60, 300), 0x32: ("D_TREE_HIT_SM", 60, 300), 0x33: ("D_TREE_HIT_LG", 80, 600),
-    0x3C: ("D_WOOD_HOLLOW_SM", 60, 300), 0x3D: ("D_WOOD_HOLLOW_LG", 80, 600),
+    0x3C: ("D_WOOD_HOLOW_SM", 60, 300), 0x3D: ("D_WOOD_HOLOW_LG", 80, 600),
     0x3E: ("D_WOOD_SLD_SM", 60, 300), 0x3F: ("D_WOOD_SLD_LG", 80, 600),
     0x40: ("D_WOOD_MXD_SM", 60, 300), 0x41: ("D_WOOD_MXD_LG", 80, 600),
     0x46: ("D_GLASS_SM", 60, 300), 0x47: ("D_GLASS_LG", 80, 600),

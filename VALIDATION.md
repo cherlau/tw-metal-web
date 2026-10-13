@@ -245,3 +245,39 @@ RE em `docs/NATIVE.md` ("Ações e destroços", "Seletores dos carros", "Piloto"
 | Malhas sem textura | Herdam a última textura do GS (giroflex da viatura deixou de ser branco) |
 
 Python 67/67 (novo `tools/test_actions.py`; contagens de `test_m2` atualizadas pelos `0x18`), TS 26/26 (novo `tests/debris.test.ts`), `tsc` ok.
+
+## 2026-10-12 — Objetos destrutíveis das arenas
+
+Pendência A. Conversor exporta as entradas dos `0x13` dos níveis (`damageScene`, `damage`, `actions`, `debris`; Castelo DM: 475 nós, 562 modelos de peça). Runtime (`src/destructibles.ts`): os destrutíveis saem do lote estático; render e colisão têm todas as entradas e escondem as que não são do estado atual (vértices recolhidos + `refit` do BVH). Golpes pelo dono do triângulo atingido (`tag` do raycast: projétil e metralhadora), explosões em área e batidas de carro (`contacts` da física). Regras de `FUN_00171838`: dano mínimo, fogo não quebra árvores, `0x11a3` só de perto, árvores e postes tombam como corpo rígido (pool de 15). Sons `D_*` dos bancos das arenas (novos em `tools/convert_sfx.py`, 7 bancos).
+
+QA `tools/web/destruct-qa.mjs`: Castelo DM — monte de toras quebra nas próprias toras, árvore tomba até deitar (~80°), metralhadora de verdade destrói o alvo; teste nas 6 arenas com destrutíveis sem erros (Tóquio DM não tem). Python 67/67, TS 28/28 (novo `tests/collision.test.ts`), `verify_assets` ok.
+
+## 2026-10-13 — Jogo, interface e som (pendências A e B)
+
+RE em `docs/NATIVE.md` (HUD, Menu, IA dos bots, Direção, Som).
+
+| Pendência | Resultado |
+|---|---|
+| HUD e menus com a arte original (A) | HUD do jogo: radar (0x206d), painel de armas/vida/turbo/energia (0x206e) do GLOBALS presos à câmera como `FUN_0019e580`, barras animadas pelos clipes do objeto (nó 0x18 com canal de escala), seletores de arma atual/próxima/anterior, pontos do radar, nome do alvo, mensagens da tabela 0x2ba4c0 e fonte do RESIDENT.RTX (agora decodificado: PSMT8H/4HL/4HH). Menu com logo montado das malhas da UI, ícones, cartões dos pilotos, biografias do ELF, miniaturas e nomes das fases, dificuldade e túnel do SWIRL |
+| IA dos bots (B) | Perfis, preferências de arma, alcances e cone da metralhadora do ELF; máquina das armas com 1 de munição grátis; turbo e recuo como o jogo |
+| Física por carro (B) | Origem de carro+0x848/+0x854/+0x858 achada: tabela 0x2b8ab0; vel. máx., aceleração, giro com rampa, turbo, alinhamento, massa nas colisões e dano de batida |
+| Sons (B) | Nomes e faixas de distância das chamadas do código; atenuação linear, ouvinte no carro; turbo, vida baixa, troca de arma, impactos de bala, ricochete, mortes, suportes, pouso; sons do menu (SHELL.BNK) |
+
+QA: capturas do HUD na Arena e Coliseu DM (texto dentro das molduras, vida verde→amarelo→vermelho), `menu-qa` (vai para `…&diff=2`), `audio-qa` 0 falhas, `match-qa` 45 s em HARD (bots usam especiais e metralhadora; batem mais nas paredes — pendente). TS 37/37 (novos `tests/drive.test.ts`, `tests/ai.test.ts`), Python 70/70 (novo `tools/test_ui.py`), `verify_assets` ok. O Vite da porta 5199 travou com os sons novos; QA rodou num segundo Vite na 5201.
+
+## 2026-10-13 — Armas e pickups (pendências A, B e C)
+
+RE em `docs/NATIVE.md` ("Armas", "Armas especiais"). A tabela dos 57 tipos de projétil fica no BSS e é montada por
+código (`FUN_001fd4e0`): `tools/native/mips.py` emula a função (modos Head-On e Harbor City) e
+`tools/native/export_weapons.py` gera `src/game/weapon-tables.ts`, junto com o renascimento dos pickups (`0x2c3a70`).
+
+| Pendência | Resultado |
+|---|---|
+| Dano, velocidade, munição, curva (A) | `src/game/weapons.ts` reescrito sobre a tabela: voo por tique como `FUN_001fef00` (velocidade escalar com aceleração, perseguição reta/antecipada, cone de trava que solta, passo de giro limitado, oscilação do Swarmer, rente ao chão), balísticos (Napalm sobe, pousa e queima 300 tiques; 2º toque derruba), Remote parado com contato e 2º toque, Ricochete que rola e quica (×3 depois do 1º quique), fantasma do Spectre, área com queda e mínimo de 33 %. Inventário com as classes de `FUN_0011d340` (Fire 1 e Homing 1 ao nascer, espera de 48 tiques, cones de trava), metralhadora com calor/superaquecimento, Swarmer carregado até 6. Pickups: +2, compartimento de 30, vida +30/+100, turbo, recusa com "Bay Full", renascimento U(30, 45) s (Remote 60–90) |
+| Arma especial de cada carro (A) | `src/game/specials.ts`: 15 Head-On + ATV com os projéteis/constantes das classes (`FUN_001165a8`… `FUN_001fcd00`); carga +1 a cada 1800 tiques até 5; 7 especiais HC com o tipo nativo. ⚠️ Twister, Mr. Slam, Hammerhead e Grasshopper aproximados (pendente) |
+| Ícones de Machine Gun/Mega Gun/Ambiente (B) | Ícone = nó de categoria `0x13ba + tipo` (`FUN_001bdad0`/`FUN_001bd680`). Corrigiu 3 trocas do host: 15 = Ambiente (raio amarelo), 20 = Napalm (lata com chama), 25 = Turbo (tanques). Metralhadora/Mega Gun só existem no Harbor City (5000 + tipo); os PKP do Head-On nunca têm esses tipos |
+| Visual dos projéteis e explosões (B) | Modelo por tipo = nó da categoria do GLOBALS (`FUN_00204778`; conversor exporta `categories`), o mesmo pendurado no lançador; brilho na cor da luz da tabela; explosão do tamanho do raio/escala. ⚠️ partículas nativas pendentes |
+| Cor das auras (C) | Continua escolha do host (brilho do ícone não achado) — mantida em PENDENTES |
+
+QA: `tools/web/pickup-qa.mjs` (ícones na Arena), novos `tools/web/projectile-qa.mjs` (modelos de perto: Fire laranja, Homing roxo, Power vermelho, Swarmer amarelo, Ricochete, Remote, efeitos do Grimm/Hearse) e `tools/web/weapons-qa.mjs` (disparo de cada arma); `match-qa` com 5 bots na Arena sem erros (bots usam especiais, mísseis e metralhadora). TS 45/45 (`tests/weapons.test.ts` reescrito; novos casos de especial, Swarmer e metralhadora em `tests/match.test.ts`), `tsc` ok.
+

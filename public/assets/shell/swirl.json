@@ -1,0 +1,243 @@
+{
+ "version": 1,
+ "name": "swirl",
+ "source": "shell/swirl",
+ "sha256": {
+  "ngp": "238ceb1087cbf22900b4b3b778f9c269827a336051fa7192aa64bb35d80f72c5",
+  "ptr": "32160ca4c609cf38c570b0c592f79fead771b0a7f3a0e57448c3a1565d660f32",
+  "tex": "fc64a06bcfd04b93e57c981371a26db5f9b39d09405ae6d96419fd2c3e34d9d4"
+ },
+ "coords": "ps2",
+ "counts": {
+  "meshes": 3,
+  "triangles": 504,
+  "sprites": 0,
+  "beams": 0,
+  "textures": 2,
+  "instances": 3
+ },
+ "errors": [],
+ "wheelFixes": {},
+ "scene": [
+  {
+   "mesh": "m000010",
+   "bone": null
+  },
+  {
+   "mesh": "m001230",
+   "bone": null
+  },
+  {
+   "mesh": "m001760",
+   "bone": null
+  }
+ ],
+ "sky": [],
+ "effects": {},
+ "points": {},
+ "objects": [
+  {
+   "node": "n001da0",
+   "inScene": true,
+   "instances": [
+    {
+     "mesh": "m000010",
+     "bone": null
+    },
+    {
+     "mesh": "m001230",
+     "bone": null
+    },
+    {
+     "mesh": "m001760",
+     "bone": null
+    }
+   ]
+  }
+ ],
+ "bones": {},
+ "sceneUnknown": {},
+ "meshes": {
+  "m000010": {
+   "offset": 16,
+   "flags": 2157513216,
+   "texture": "3efa8",
+   "texture2": null,
+   "textures": [
+    "3efa8"
+   ],
+   "scale": 0.0078125,
+   "packed": "fixed16",
+   "poolOwner": "m000010",
+   "sphere": [
+    0.51463,
+    297.19275,
+    -14.24259,
+    243.40926
+   ],
+   "gs": {
+    "alpha": [
+     0,
+     1,
+     0,
+     1,
+     64
+    ],
+    "zwrite": false
+   },
+   "parts": [
+    {
+     "texture": "3efa8",
+     "attributes": {
+      "position": [
+       0,
+       1134
+      ],
+      "normal": [
+       4536,
+       1134
+      ],
+      "uv": [
+       9072,
+       756
+      ],
+      "colorA": [
+       12096,
+       1512
+      ],
+      "indices": [
+       18144,
+       1080
+      ]
+     }
+    }
+   ]
+  },
+  "m001230": {
+   "offset": 4656,
+   "flags": 2157513216,
+   "texture": "6f888",
+   "texture2": null,
+   "textures": [
+    "6f888"
+   ],
+   "scale": 0.0078125,
+   "packed": "fixed16",
+   "poolOwner": "m001230",
+   "sphere": [
+    1e-05,
+    207.30667,
+    0.02479,
+    155.78575
+   ],
+   "gs": {
+    "alpha": [
+     0,
+     1,
+     0,
+     1,
+     64
+    ],
+    "zwrite": false
+   },
+   "parts": [
+    {
+     "texture": "6f888",
+     "attributes": {
+      "position": [
+       22464,
+       234
+      ],
+      "normal": [
+       23400,
+       234
+      ],
+      "uv": [
+       24336,
+       156
+      ],
+      "colorA": [
+       24960,
+       312
+      ],
+      "indices": [
+       26208,
+       216
+      ]
+     }
+    }
+   ]
+  },
+  "m001760": {
+   "offset": 5984,
+   "flags": 2157513216,
+   "texture": "6f888",
+   "texture2": null,
+   "textures": [
+    "6f888"
+   ],
+   "scale": 0.0078125,
+   "packed": "fixed16",
+   "poolOwner": "m001760",
+   "sphere": [
+    0.0,
+    207.4017,
+    0.02477,
+    156.69574
+   ],
+   "gs": {
+    "alpha": [
+     0,
+     1,
+     0,
+     1,
+     64
+    ],
+    "zwrite": false
+   },
+   "parts": [
+    {
+     "texture": "6f888",
+     "attributes": {
+      "position": [
+       27072,
+       234
+      ],
+      "normal": [
+       28008,
+       234
+      ],
+      "uv": [
+       28944,
+       156
+      ],
+      "colorA": [
+       29568,
+       312
+      ],
+      "indices": [
+       30816,
+       216
+      ]
+     }
+    }
+   ]
+  }
+ },
+ "textures": {
+  "6f888": {
+   "url": "textures/3635f8b0a712f44fe0db.png",
+   "width": 256,
+   "height": 256,
+   "bpp": 8,
+   "alpha": "blend"
+  },
+  "3efa8": {
+   "url": "textures/22d8e6c1c59803641655.png",
+   "width": 512,
+   "height": 512,
+   "bpp": 8,
+   "alpha": "opaque"
+  }
+ }
+}

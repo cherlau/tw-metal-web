@@ -54,6 +54,9 @@ class Bone:
     vis: int  # >= 0: índice do canal de visibilidade; -1: sempre visível; -2: nunca
     pre: list[float] | None  # matriz +0x20 (16 floats, vetor-linha)
     post: list[float] | None  # matriz +0x60
+    # Nó 0x18: canal de cada componente da escala (u16 em +0x12/+0x14/+0x16, 0xFFFF = constante +0x20..+0x28);
+    # medidores do HUD (globals 0x206e: turbo = canal 2 em x, vida = canal 4 em z). None = sem canal.
+    schan: list[int] | None = None
 
 
 @dataclass
@@ -136,8 +139,13 @@ def scale_of(data: bytes, node: int, parent: int) -> Bone:
     sx, sy, sz = struct.unpack_from("<3f", data, node + 0x20)
     t = list(struct.unpack_from("<3f", data, node + 0x30))
     pre = [sx, 0, 0, 0, 0, sy, 0, 0, 0, 0, sz, 0, 0, 0, 0, 1]
+    # Canais da escala: u16 em +0x12/+0x14/+0x16 (0xFFFF = constante). Evidência: nos medidores do HUD o canal
+    # cai sempre no componente cuja constante é 0,01 (turbo: +0x12 ↔ sx = 0,01; vida: +0x16 ↔ sz = 0,01) e os
+    # clipes 0..2 do objeto 0x206e levam esse canal de 0,01 a 1 (FUN_00139938 / FUN_00139de0 dão o tempo).
+    raw = struct.unpack_from("<3H", data, node + 0x12)
+    schan = [c if c != 0xFFFF else -1 for c in raw]
     return Bone(node, parent, [0.0, 0.0, 0.0] + [round(float(c), 6) for c in t], [-1] * 6, -1,
-                [round(float(v), 6) for v in pre], None)
+                [round(float(v), 6) for v in pre], None, schan if any(c >= 0 for c in schan) else None)
 
 
 def leaf_bone(data: bytes, inst: ngp.Instance, index: dict[int, int]) -> int:

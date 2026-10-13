@@ -75,7 +75,7 @@ Tipo do nó = **6 bits baixos** do 1º word (bits 6..7 = flags, ex.: `0x41` = gr
 | `0x02` LOD | `+0x04` n; entradas de 16 bytes em `+0x20`: (?, f32 distância², *filho, ?) | **opção com mais triângulos** (empate: menor distância). "Menor distância" falhava: opção vazia com d²=0 (Arena, 19 nós), carro inteiro na 2ª opção (Tank Car) |
 | `0x03`, `0x12` | `+0x08` n, **translação em `+0x10..+0x18`** (FUN_0021b3c0 soma `R·t`), filhos em `+0x1C` | todos; nos carros vira osso fixo em `tools/rig.py` (Twister 0x10b10 leva a roda traseira à origem do osso); nos níveis aplica a posição às malhas modeladas na origem |
 | `0x05` **seletor** | n no byte `+0x0B`, filhos em `+0x0C`; **filho desenhado = byte `+0x08`** (FUN_0022cd58; gravado por FUN_00230138); byte 3 do word = tipo; categoria = `word >> 18` (ver NATIVE "Seletores dos carros") | byte 3 = `0x06` (pose do personagem: braços/foice do Mr. Grimm): 1º filho não vazio ⚠️; byte 3 = `0x01` com 1º filho > 500 tri (carroceria do hc_sweet/hc_chrom): 1º filho ⚠️; demais: **fora da pose base** → `effects` (escudo, gelo, fogo, turbo, fachos, clarão) |
-| `0x06` lista de objetos | `+0x04` n, `+0x08` n ponteiros para objetos `0x11` (nos níveis **não relocados**) | carros: o próprio objeto; níveis: exportados em `objects` (prefabs centrados na origem = instanciados pelo jogo) |
+| `0x06` lista de objetos | `+0x04` n, `+0x08` n ponteiros para objetos `0x11` (nos níveis **não relocados**) | carros: o próprio objeto; níveis: exportados em `objects` (prefabs centrados na origem = instanciados pelo jogo); GLOBALS: também `categories` = 1º nó de cada categoria que o código registra (projéteis 4000..4099 / 0x1004.. por `FUN_00204778`, ícones de pickup 0x13ba+tipo / 5000+tipo por `FUN_001bdad0`), instâncias relativas ao nó |
 | `0x07` BSP (níveis) | `+0x04` frente, `+0x08` trás, `+0x10` esfera, `+0x20` *plano | ambos |
 | `0x0A` plano/portal (níveis) | 🟡 | ignorado |
 | `0x0C` grade de setores (níveis) | `u16 w, u16 h`, f32 célula, f32 ?, 4 f32 limites, `*A`, `*B`, células `(i<<10)|1`… | nós visuais referenciados na faixa entre `min(A,B)` e a grade (Tokyo B só é alcançável assim) |
@@ -119,6 +119,6 @@ A frente dos modelos de carro é **+Y no PS2** (grade e faróis da viatura, lant
 ## Outros
 | Formato | Status |
 |---|---|
-| `resident.rtx` | ❌ (texturas residentes, layout diferente do `.tex`) |
+| `resident.rtx` | ✅ mesmo layout do `.tex` (cabeçalho com 0 grupos, entradas a partir de 0xF0); família B com PSM 0x1B (PSMT8H), 0x24 (PSMT4HL) e 0x2C (PSMT4HH), pixels lineares — fontes do HUD (0x46e98/0x46f20), explosões, fumaça (`tools/tex.py`) |
 | `PTS/GPS/PKP/SPT/FPT/VPT/HLI` | 🟡 ver RECON |
 | Áudio/vídeo | ver RECON §4.4–4.5 |

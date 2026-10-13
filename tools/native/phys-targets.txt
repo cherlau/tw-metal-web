@@ -1,0 +1,2 @@
+# Tabela de física por carro 0x2b8ab0 + id*0x34
+refsrange:2b8ab0:2b9234 fis_tab

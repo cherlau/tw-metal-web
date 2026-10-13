@@ -1,0 +1,3 @@
+# IA dos bots: FUN_00104b28 liga o bit 4 do controle (+0x1C); vizinhança = controlador da IA
+range:103300:10cc00 ai_mod
+str:ptool:: ai_ptool

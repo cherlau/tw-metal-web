@@ -127,6 +127,8 @@ export interface ModelDoc {
   bones: Record<string, BoneDef>;
   effects: Record<string, InstanceDef[]>;
   objects?: { node: string; inScene: boolean; instances: InstanceDef[] }[];
+  /** GLOBALS: nós registrados pelo código por categoria (hex), relativos ao nó — projéteis e ícones de pickup. */
+  categories?: Record<string, InstanceDef[]>;
   /** Listas de pontos das arenas (coordenadas do PS2): spt, pkp, pts, gps. */
   points?: Record<string, { pos: [number, number, number]; raw: string[] }[]>;
   sceneUnknown: Record<string, string[]>;
