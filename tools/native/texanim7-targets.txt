@@ -1,0 +1,4 @@
+# Animação de textura: quem toca clipes de objetos do nível
+2110d8 clip_by_cat
+211348 clip_loop
+2113c0 clip_time

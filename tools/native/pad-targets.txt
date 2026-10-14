@@ -1,0 +1,7 @@
+# Registro do controle (0x18 bytes por quadro, histórico de 90 em +0x0..+0x870) e quem o preenche
+223c90 hist_push
+at:223c90 hist_push_fn
+# Globais da IA usados nas decisões de energia (FUN_00106cf0 / FUN_00106a88 / FUN_00108398)
+3277dc ai_glob_dc
+3277e0 ai_glob_e0
+3277e8 ai_glob_e8

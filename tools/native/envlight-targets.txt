@@ -1,0 +1,5 @@
+at:1a8b68 level_fog
+at:24d0e0 dir_light
+at:244f58 part_light
+at:2346c8 amb_light
+at:24ca98 light_commit

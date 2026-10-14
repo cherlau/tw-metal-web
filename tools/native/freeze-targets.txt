@@ -1,0 +1,3 @@
+# Congelamento (FUN_00120838) e o que o lê
+at:120838 freeze_set
+120838 freeze_callers

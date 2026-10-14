@@ -1,0 +1,4 @@
+# Luzes dinâmicas (pool 0x585880, 32 × 0x40)
+at:24c300 light_init
+at:24c2c8 light_pos
+585880 light_users

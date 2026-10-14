@@ -1,0 +1,5 @@
+at:1e1e60 pool_init
+at:1e1e88 pool_tick
+at:1e1f60 pool_draw
+at:1e1fb8 pool_reset
+range:1e2c00:1e3200 pool_misc

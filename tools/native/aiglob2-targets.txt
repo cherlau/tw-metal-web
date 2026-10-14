@@ -1,0 +1,3 @@
+# Intervalos globais entre usos de energia pelos bots: gp-0x645c (0x2f4194, casca) e gp-0x6450 (0x2f41a0, congelar)
+2f4194 shell_gap
+2f41a0 freeze_gap

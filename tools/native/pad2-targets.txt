@@ -1,0 +1,3 @@
+# Leitura dos botões (máscara -> pressão) usada pelo registro do controle FUN_00223908
+at:233ce0 pad_button
+at:234068 pad_axis_raw

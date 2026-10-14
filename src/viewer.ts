@@ -3,6 +3,8 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { loadModel, type InstanceDef, type ModelDoc } from './assets';
 import { buildBatched, buildMeshObject } from './render';
+import { ObjectClips } from './objanim';
+import { MaterialAnimator } from './texanim';
 import { buildLevelLights, buildSky } from './levelfx';
 import { buildCarRest, visibleBox } from './rig';
 import { PS2_TO_THREE } from './coords';
@@ -70,12 +72,25 @@ const objIndex = params.get('obj');
 
 const renderOpts = { unlit, vertexColors };
 
+// Materiais animados pelos canais dos objetos (src/texanim.ts); ?matanim=0 desliga.
+let matAnim: MaterialAnimator | null = null;
+const matAnimStart = performance.now();
+
 async function buildBatchedView(doc: ModelDoc, instances: InstanceDef[], bin: ArrayBuffer) {
+  if (doc.matAnim && params.get('matanim') !== '0') {
+    const clips = new ObjectClips();
+    matAnim = new MaterialAnimator(doc, clips);
+    clips.autoStart(0); // FUN_002111f8: clipes "auto" tocam desde a carga
+  }
   const { group, drawCalls, triangles } = await buildBatched(
     doc,
     bin,
     instances, // mantém o deslocamento dos objetos posicionados (nós 0x03/0x1F)
-    { ...renderOpts, filter: (key, def) => def.sphere[3] <= maxRadius && (!only || only.test(key)) && !(hide && hide.test(key)) },
+    {
+      ...renderOpts,
+      animator: matAnim ?? undefined,
+      filter: (key, def) => def.sphere[3] <= maxRadius && (!only || only.test(key)) && !(hide && hide.test(key)),
+    },
   );
   root.add(...group.children);
   status.textContent += ` · ${drawCalls} draw calls · ${triangles} tri visíveis`;
@@ -234,6 +249,7 @@ renderer.setAnimationLoop(() => {
   fly();
   controls.update();
   skyUpdate?.(camera);
+  matAnim?.update(((performance.now() - matAnimStart) / 1000) * 60);
   renderer.render(scene, camera);
 });
 

@@ -1,0 +1,2 @@
+# Animação de textura: percurso de desenho real
+at:22f3d0 render_walk

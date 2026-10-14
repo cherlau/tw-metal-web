@@ -23,14 +23,13 @@ SRC = ROOT / "source" / "disc" / "snd"
 OUT = ROOT / "public" / "assets" / "sfx"
 VGM = Path(os.environ.get("LOCALAPPDATA", "")) / "Programs" / "vgmstream" / "vgmstream-cli.exe"
 
-# carro (public/assets/cars) -> banco de som do carro. ⚠️ ESCOLHA DO HOST pelo nome do piloto/veículo
+# carro (public/assets/cars) -> banco de som do carro. Só Head-On (Harbor City removido a pedido, 2026-10-14). ⚠️ ESCOLHA DO HOST pelo nome do piloto/veículo
 # (Shadow dirige o carro funerário; Preacher/Brimstone; Darkside é o caminhão).
 CAR_BANKS = {
     "axel": "axel", "cop": "copcar", "crim": "crimson", "sweet": "sweett", "twist": "twister",
     "spectre": "spectre", "thump": "thumper", "grass": "grasshop", "hamr": "hammer", "rkill": "roadkill",
     "wart": "warthog", "mrslam": "mrslam", "mrgrim": "grimm", "hearse": "shadow", "edatv": "atv",
-    "edboss": "eddy", "dark1": "darkt1", "dark2": "darkt2", "hc_taxi": "taxi", "hc_suv": "suv",
-    "hc_tank": "tank", "hc_preac": "brimstne", "hc_semi": "darkside",
+    "edboss": "eddy", "dark1": "darkt1", "dark2": "darkt2", "edplayer": "eddy", "darkpla1": "darkt1",
 }
 # carro -> banco de armas do carro (*WP.BNK: S_DEPLOY/S_RETRACT dos suportes, FUN_001451a0/FUN_001452d8, e os
 # WSP_* da arma especial). ⚠️ ESCOLHA DO HOST pelo nome do arquivo (HC: *WA.BNK).
@@ -38,8 +37,7 @@ CAR_WEAPON_BANKS = {
     "axel": "axelwp", "cop": "copcarwp", "crim": "crimwp", "sweet": "sweettwp", "twist": "twistwp",
     "spectre": "spectrwp", "thump": "thumpwp", "grass": "grasswp", "hamr": "hammerwp", "rkill": "rdkillwp",
     "wart": "wartwp", "mrslam": "mrslamwp", "mrgrim": "grimmwp", "hearse": "shadwp", "edatv": "atvwp",
-    "edboss": "eddywp", "dark1": "darkt1wp", "dark2": "darkt2wp", "hc_taxi": "taxiwa", "hc_suv": "suvwa",
-    "hc_tank": "tankwa", "hc_preac": "brimstwa", "hc_semi": "darksidw", "hc_derby": "crazy8wa", "hc_tow": "junkwa",
+    "edboss": "eddywp", "dark1": "darkt1wp", "dark2": "darkt2wp", "edplayer": "eddywp", "darkpla1": "darkt1wp",
 }
 # Menu (SHELL.BNK: FE_AMB, S_*).
 SHELL_BANKS = ["shell"]

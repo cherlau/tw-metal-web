@@ -1,0 +1,6 @@
+# Animação de textura: candidatos (andi 4 perto de lwc1 +8)
+at:219a64 tex_a
+at:219cf8 tex_b
+at:234e4c tex_c
+at:2350e8 tex_d
+at:1c1390 tex_e

@@ -2,6 +2,7 @@
 // exporta por malha mas o batching não desenha. Coordenadas do PS2: o grupo vai dentro da raiz do nível.
 import * as THREE from 'three';
 import { instanceMatrix, loadTexture, type InstanceDef, type MeshDef, type ModelDoc } from './assets';
+import { spriteUV } from './render';
 
 export interface BeamDef {
   points: number[][]; // (x, y, z, largura) — sempre em pares: cada par é um quadrilátero
@@ -118,7 +119,7 @@ export async function buildLevelLights(doc: ModelDoc, instances: InstanceDef[]):
       const base = await loadTexture(texDef);
       for (const s of def.sprites) {
         const map = base.clone();
-        const [u0, v0, u1, v1] = s.uv;
+        const [u0, v0, u1, v1] = spriteUV(s.uv, texDef);
         map.offset.set(Math.min(u0, u1), Math.min(v0, v1));
         map.repeat.set(Math.abs(u1 - u0) || 1, Math.abs(v1 - v0) || 1);
         map.needsUpdate = true;
@@ -130,6 +131,7 @@ export async function buildLevelLights(doc: ModelDoc, instances: InstanceDef[]):
             blending: THREE.AdditiveBlending,
             depthWrite: false,
             transparent: true,
+            fog: false,
           }),
         );
         sprite.position.set(...place(s.center[0], s.center[1], s.center[2]));
@@ -183,6 +185,7 @@ export async function buildSky(
     mat.blending = THREE.NormalBlending;
     mat.depthTest = false;
     mat.depthWrite = false;
+    (mat as THREE.MeshBasicMaterial).fog = false; // a cúpula fica muito além do "longe" da névoa
     mesh.material = mat;
     mesh.renderOrder = -100;
     mesh.frustumCulled = false;
@@ -194,4 +197,34 @@ export async function buildSky(
     group.matrixWorldNeedsUpdate = true;
   };
   return { group, update };
+}
+
+/**
+ * Névoa por fase (FUN_001a8540 → FUN_001a8b68 → FUN_00221218): perto, longe (pés) e cor RGB 0..255, pelo índice da
+ * fase (DAT_002f4900). Castelo DM cai no padrão da função (50, 50, 60; 5000..10000); Tóquio DM zera a cor.
+ */
+export const LEVEL_FOG: Record<string, { near: number; far: number; color: [number, number, number] }> = {
+  egyptdm: { near: 900, far: 5000, color: [70, 55, 30] }, // 0xb
+  parisdm: { near: 1200, far: 4000, color: [105, 90, 75] }, // 0xc
+  colisdm: { near: 2000, far: 10000, color: [40, 35, 30] }, // 0xd
+  greecedm: { near: 1200, far: 4000, color: [16, 17, 22] }, // 0xe
+  tokyodm: { near: 5000, far: 10000, color: [0, 0, 0] }, // 0xf
+  arena: { near: 400, far: 10000, color: [25, 25, 30] }, // 0x10
+  castledm: { near: 5000, far: 10000, color: [50, 50, 60] }, // 0x12 (padrão)
+};
+
+/**
+ * Fórmula da névoa do GS (FUN_00220de0 → FUN_00221010): coeficiente f = A + B/z com f = 255 (sem névoa) em `near`
+ * e 1 em `far` — B = 254·near·far/(far − near), A = 1 − B/far; cor = (f·C + (255 − f)·FOGCOL)/255. Troca o trecho
+ * linear do THREE.Fog (fogNear/fogFar continuam sendo perto/longe).
+ */
+export function installPs2Fog(): void {
+  if (THREE.ShaderChunk.fog_fragment.includes('ps2fog')) return;
+  THREE.ShaderChunk.fog_fragment = THREE.ShaderChunk.fog_fragment.replace(
+    'float fogFactor = smoothstep( fogNear, fogFar, vFogDepth );',
+    `// ps2fog
+		float fogB = 254.0 * fogNear * fogFar / max( fogFar - fogNear, 1e-3 );
+		float fogF = clamp( 1.0 + fogB * ( 1.0 / max( vFogDepth, 1e-3 ) - 1.0 / fogFar ), 0.0, 255.0 );
+		float fogFactor = 1.0 - fogF / 255.0;`,
+  );
 }

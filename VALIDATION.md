@@ -281,3 +281,138 @@ código (`FUN_001fd4e0`): `tools/native/mips.py` emula a função (modos Head-On
 
 QA: `tools/web/pickup-qa.mjs` (ícones na Arena), novos `tools/web/projectile-qa.mjs` (modelos de perto: Fire laranja, Homing roxo, Power vermelho, Swarmer amarelo, Ricochete, Remote, efeitos do Grimm/Hearse) e `tools/web/weapons-qa.mjs` (disparo de cada arma); `match-qa` com 5 bots na Arena sem erros (bots usam especiais, mísseis e metralhadora). TS 45/45 (`tests/weapons.test.ts` reescrito; novos casos de especial, Swarmer e metralhadora em `tests/match.test.ts`), `tsc` ok.
 
+## 2026-10-13 — Ataque de ambiente
+
+RE em `docs/NATIVE.md` ("Ataque de ambiente"). O disparo do tipo 8 (`FUN_0014d040`) escolhe o evento pelo índice da
+fase; das arenas do port só a ARENA tem (as DM respondem "Env Weapon Unavailable" sem gastar munição, e nenhuma delas
+tem o pickup 9).
+
+| Item | Resultado |
+|---|---|
+| Regras | `src/game/environment.ts` + `Match.setLevel`: munição gasta só com sucesso, "Already Active" com o evento em curso, um raio `0x13` por inimigo vivo saindo do bocal de índice igual ao do carro, 120 tiques de faíscas (1/7 por tique) |
+| Visual e som | `L_ENV_PYRO` e `L_ENV_ZAP` do banco da Arena; ⚠️ jatos/clarão/faíscas como sprites aditivos nas cores nativas |
+| Escolhas do host | ⚠️ os bocais ficam dentro dos aparelhos de pirotecnia e 0,1 pé abaixo do piso do palco: o raio sai de cima do aparelho e ignora o cenário a até 6 pés dos bocais (sem isso explodia no próprio aparelho) |
+| IA | O tipo 8 tem peso 0 em todas as tabelas: bots não usam (fiel); a nota antiga de "peso alto" estava errada |
+
+QA: novo `tools/web/env-qa.mjs` na Arena com 3 bots — jatos verde/azul/vermelho no palco, 2 dos 3 bots atingidos (−7 cada); o 3º raio bateu numa malha transparente do cenário (pendência de colisão registrada). TS 47/47 (2 casos novos em `tests/match.test.ts`), `tsc` ok.
+
+## 2026-10-13 — Armas e pickups (2ª rodada: corpo a corpo, energia, HC, trava, luz)
+
+RE em `docs/NATIVE.md` ("Especiais corpo a corpo", "Upgrade", "Ataques de energia", "Especiais do Harbor City", "Trava",
+"Luzes dinâmicas", "Partículas"); alvos novos `tools/native/melee-`, `energy-`, `energy2-`, `freeze-`, `combo-`, `light-targets.txt`.
+
+| Pendência | Resultado |
+|---|---|
+| Especiais corpo a corpo (B) | Twister (tornado: preparo 25, giro 150 capturando a 50 pés, órbita de 20 pés a 35 de altura, arremesso a 80 mph), Mr. Slam (garra automática com o especial selecionado: 10 + 5 × 3, arremesso a 200 mph), Hammerhead (pisão: 15, sem alvo só pula e não gasta), Grasshopper (salto de 61 mph, mergulho, 18) pelas máquinas de estado do jogo; pose visual (subida, inclinação, de cabeça para baixo) |
+| Ataques de energia (B) | Congelar (Cima, Baixo, Cima; 0,4; 300 tiques, botões descongelam), mina (Dir., Esq., Baixo; 0,1), onda (Cima, Baixo, Esq., Dir.; 0,3; 10 de dano, detona projéteis), casca de fogo (Dir., Dir., Baixo, Baixo; 0,6; seletor 0x43 — resolve a pendência dos Carros); energia com a recarga nativa e barra do HUD real. ⚠️ mapeamento dos índices de botão para direções |
+| Especiais carregados / Upgrade (B) | Fora do deathmatch: o nível de Upgrade só vai a 6 por trapaça e o pickup 10 não tem efeito nem aparece nos PKP (documentado) |
+| Especiais do Harbor City (B) | Vtables mapeadas (as funções antes chamadas de "classe" eram ajudantes); hc_axel com atraso do clipe, HC Hearse com rajada carregada de 1–6, HC Grimm com arrancada a 250 mph, Preacher com 20 tiros em 300 tiques, SUV com 2º toque que derruba. Derby, Manslaughter, HC Roadkill e HC Spectre seguem pendentes |
+| Trava e mira (C) | Sem a reserva ponderada inventada pelo host; mira de 7,5° da metralhadora do humano em 7 veículos |
+| Luz dinâmica (C) | 8 luzes mais perto do jogador nos materiais opacos (no lugar do sprite aditivo); ⚠️ queda/escala do host |
+| Detalhes do voo (C) | Napalm sem gravidade enquanto o botão segue apertado (⚠️ para no ápice) |
+
+QA: novo `tools/web/specials-qa.mjs` (Arena e Tóquio DM): Twister segura o alvo no ar, Slam −25, Hammerhead −15,
+Grasshopper −18, congelar (alvo congelado 257 tiques, energia 1 → 0,61), onda −10 no alvo congelado, chão iluminado pelo
+Homing; 0 erros de console. Bug achado: toques do direcional mais curtos que um quadro se perdiam (agora ficam guardados até a
+leitura). TS 55/55 (8 casos novos em `tests/match.test.ts`), `tsc` ok.
+
+
+## 2026-10-13 — Animação de material das arenas (pendência A)
+
+RE em `docs/NATIVE.md` ("Animação de material"); alvos `tools/native/texanim*-targets.txt`. A premissa da pendência
+estava errada: os nós `0x1A` são folhas de colisão. O mecanismo real é o pacote de `FUN_0024baa8`: deslocamento de UV
+e escalas R/G/B/alfa lidos dos canais do objeto `0x11` dono, escritos pelos clipes `0x0B` do objeto.
+
+| Item | Resultado |
+|---|---|
+| Conversor | `mat` por malha (`ngp.material_channels`), `obj` por instância e `matAnim` (clipes do objeto só com as trilhas dos canais usados; `rig.object_clips`). Arena: 11 objetos / 69 malhas; Paris DM 1 / 27; Grécia DM 2 / 3; Coliseu DM 1 / 2 (slot de efeito); Castelo, Egito e Tóquio DM: nenhum |
+| Runtime | `src/texanim.ts` (`MaterialAnimator`): material e textura por objeto, canais avaliados a cada quadro com o amostrador dos carros; ligado no jogo e no visualizador (`?matanim=0` desliga) |
+| Água de Paris DM | Corre (V de 0 a 2 em 480 quadros, em laço) — conferido em `tools/web/matanim-qa.mjs`: só a área da água muda entre as fotos |
+| Fogo e telões da Arena | Só têm clipes da cinemática de abertura (sem laço): ficam no quadro 0. Pendente (B) |
+| ⚠️ host | Clipe de categoria 0 em laço toca desde a carga; o disparo real dos laços das DM não foi achado |
+
+Não conferido visualmente: mar da Grécia DM e faixa `b7c60` da Arena (o enquadramento do QA não pegou bem as malhas).
+Testes: `tools/test_matanim.py` (7), `tests/texanim.test.ts` (3); TS 58/58, Python 77/77, `tsc` ok.
+
+
+## 2026-10-13 — Armas e pickups (3ª rodada: partículas, energia da IA, HC, fogo, trava no cenário)
+
+RE em `docs/NATIVE.md` ("Partículas", "Controle e combos", "Energia da IA", "Golpe por tipo e fogo no carro",
+"Especiais do Harbor City", "Trava", "Pickups"); alvos `tools/native/{pad,pad2,aiglob,aiglob2,burn,burn2,part,parttex,spechc2,mansl}-targets.txt`.
+
+| Item | Resultado |
+|---|---|
+| Partículas (B) | Sistema do jogo portado (`src/particles.ts`): 84 emissores das tabelas `0x2cab00/0x2cbd60/0x2cd8e0/0x2cf320` (`tools/native/export_particles.py` → `rules/particles.json`), 21 texturas do `RESIDENT.BDD` (nós de categoria 7000.., extraído agora — não estava no `source/game`), nascimento/física decodificados do asm do VU0, 12 efeitos compostos (0x55..0x64). Ligado nas explosões (+0x74/+0x84 da tabela de projéteis), balas, rastros em voo (+0x6c/+0x70), ataque de ambiente da ARENA, fogo no carro, golpe do Hearse, luzes das partículas |
+| Energia da IA e tiro para trás (B) | Bots usam casca (FUN_00106a88/FUN_00104b28, sem gastar), congelar (FUN_00106cf0), onda quando lentos 1200 quadros (FUN_00103ca8) e atiram para trás nas armas de ré (FUN_001088e0). Humano: Cima, Baixo, Baixo = tiro para trás (bit 0x10); Direita, Esquerda, Cima, Cima = míssil de energia 0xf (bit 0x40). Remote sai sempre de ré |
+| Combos (C) | Mapeamento confirmado no leitor do controle (`~(data[2]<<8 \| data[3])`: 0xd Esq., 0xe Dir., 0xf Cima, 0x10 Baixo); os 6 combos reescritos com as buscas de toque/soltura do jogo (histórico de 90 quadros) |
+| Casca de fogo e congelado (C) | Carros pegam fogo (tipos 0x20/0x21/0x29: 0,01/tique por 300; turbo e casca apagam; partícula 0x42). Congelado toca o clipe 0x18 (volta nos últimos 30 tiques), casca o 0x19 em laço; descongelar = soltar os 12 botões e apertar um |
+| Golpe por tipo | Impulsos de FUN_0011f280 (Power 44 pés/s para cima, Ricochete, Remote 110, Hearse 73,3, Grimm 58,7, SUV 58,7), espera de 12 quadros |
+| Especiais do HC (B) | Derby (objeto teleguiado que agarra, 20; desviado pela casca), canhão do Roadkill/Manslaughter (segurar, 10 × 0x30/0x31), raio do Spectre HC (0x85: 225 tiques, 0,11/tique, acende fogo), Semi (anel de 8 × 0x32 e disparo ao bater), Preacher (0x2e a cada toque), Taxi (10 × 0x35..0x37 do teto), Tow (trava acumula, n = carga/60 + 1), HC Sweet com tiro para trás. Bug corrigido: especiais com vários tiros imediatos só soltavam o 1º (Warthog) |
+| Corpo a corpo (C) | Captura do Twister pela origem do carro, sem visada (FUN_001e4d30) |
+| Luz dinâmica (C) | Luz azul do Hammerhead com alvo do pisão (FUN_001977b8); luzes das partículas no mesmo pool |
+| Voo (C) | Trava em objetos do cenário sem carro no cone (FUN_00147cf0) nas armas teleguiadas e no congelar; projéteis atravessam malhas sem escrita de profundidade |
+| Auras dos pickups (C) | O brilho é a malha aditiva do próprio ícone: sprite do host removido (corrigido em 2026-10-14: corpo sólido + sprites com UV certo) |
+
+QA (capturas em `artifacts/qa/`, fora do git): `tools/web/particles-qa.mjs`, `tools/web/explosions-qa.mjs`, `env-qa.mjs`,
+`pickup-qa.mjs`, `specials-qa.mjs` com os HC; 0 erros de console. TS 68/68 (11 casos novos), `tsc` ok.
+
+## 2026-10-14 — Pontos de disparo das armas (`0x00F8`)
+
+| Item | Resultado |
+|---|---|
+| Origem dos tiros (C → relatado como A) | Antes tudo saía de um ponto do host no centro da frente. Agora cada arma sai do seu registro `0x00F8` (`FUN_00124288` grava o ponteiro em `obj+0x10` da classe; `FUN_00147ec8` aplica a matriz do carro, com inclinação): Fire/Homing 2/3, Napalm 4, Swarmer 5, Power 6, Ricochet 7, Remote 15, especial 1. Metralhadora alterna entre 8 e 9 (`FUN_0014ae38`, flag `obj+0x80`, começa no 9) — dois canos nos carros que têm os dois |
+| Casos fixos | Ricochet do Cousin Eddy/Dark1/Dark2 e projétil 0x1f do Mr. Grimm com as constantes de `FUN_00147ec8`; congelar (0, 0, 5,172), mina e Remote sem ponto 15 em (0, −3, −1) / (0, 0, −1) (`FUN_0014d478`, `FUN_0014c0d0`, `FUN_0014de98`) |
+| Sem ponto | Arma sem registro sai da origem do carro, como no jogo (ex.: Dark1/Dark2 sem 7/8/9, vários HC sem 4/15) |
+
+QA: `tools/web/muzzle-qa.mjs` (Sweet Tooth, Thumper; capturas `artifacts/qa/muzzle-*.png`): saídas medidas no espaço do
+carro batem com `mounts` (±0,2 pela inclinação do terreno); 0 erros de console. TS 71/71 (1 caso novo), `tsc` ok.
+
+## 2026-10-14 — Lançador e bala da metralhadora
+
+| Item | Resultado |
+|---|---|
+| Míssil preso no suporte | No disparo o modelo sai do marcador (`FUN_001474f0`); com munição sobrando o suporte recomeça o clipe do 0 com S_DEPLOY e pendura outro modelo (`FUN_00148978`/`FUN_00127778`). Antes o modelo ficava parado no suporte enquanto o projétil saía |
+| Marcador do Remote | Slots dos marcadores `0x00F0` como `FUN_00124288` (id 15 → Remote); antes o Remote nunca aparecia no lançador. Swarmer não tem slot no jogo (sem modelo no lançador) |
+| Projéteis voavam de ré | O modelo em voo usava só `PS2_TO_THREE` (+Y do PS2 → −Z), com o voo em +Z: nariz dos mísseis e ponta da bala para trás. Agora com o giro de 180° dos carros (`VEHICLE_TO_THREE`) |
+| Bala da metralhadora | Modelo `0xfa0` do GLOBALS: traçante de 23 pés com cor por vértice (vermelho → laranja-amarelo) e mistura aditiva do pacote do GS. Estava achatado em opaco junto com os mísseis e substituído por uma linha amarela do host (removida). Malhas com pacote do GS dos projéteis (brilhos do Ricochet, Remote, Spectre…) agora usam a mistura delas, com sprites |
+
+QA: `tools/web/launcher-qa.mjs` (Sweet Tooth): Fire e Remote saem a 0,0 pé do modelo no lançador, Homing/Ricochet a 1,8/3,6
+pés (distância entre marcador `0x00F0` e ponto `0x00F8` no modelo); todos recarregam. `muzzle-qa.mjs`: traçante visível
+nos dois faróis. 0 erros de console. TS 71/71, `tsc` ok.
+
+## 2026-10-14 — Napalm/Remote no suporte, pickups sólidos, UV dos sprites
+
+| Item | Resultado |
+|---|---|
+| Napalm invisível no suporte | O Head-On pendura modelos próprios do lançador (`FUN_00148978`): Napalm = categoria 0x1002 (barril), Remote = 0x1001 (`FUN_00204778`: tabela+0xdc04/+0xdc08). O port tentava o modelo do projétil (0xfa4, que não existe) |
+| Remote quebrado no suporte | Usava o modelo do Remote em voo (0xfab, com os sprites de brilho grandes); agora o 0x1001 encaixa na garra |
+| Pickups translúcidos | Corpo (atlas 5574c, sem GS ou com mistura normal gravando z) estava aditivo pelo bit 15 das flags; agora sólido. Aura = malhas com GS aditivo e seus sprites, fora da medida de tamanho |
+| UV dos sprites | O retângulo de UV dos sprites vinha bruto/4096 (só certo em textura 256): em 32×32 pegava o canto 4×4 de alfa ~0 e os brilhos sumiam. Normalizado por ×256/dimensão (`spriteUV`, carros, GLOBALS e níveis): auras dos pickups, refletores da Arena |
+
+QA: `launcher-qa.mjs` (Napalm e Remote carregados e recarregando), close do Remote na garra (`artifacts/qa/launcher-close-sweet-remote-b.png`),
+`pickup-qa.mjs` (`artifacts/qa/pickups-solid.png`), Arena/Tokyo. 0 erros de console. TS 71/71, `tsc` ok.
+
+## 2026-10-14 — Pendentes das arenas
+
+| Item | Resultado |
+|---|---|
+| Fogo nos destrutíveis | Napalm em árvore/poste inflamável acende emissores 0x41 nas alturas de `FUN_00172bb0`, toca `W_FIRE_BURN_L` e escurece a malha (cor de vértice) até R ≤ 0,2 (~7–12 s); então a árvore cai com o próprio golpe (`FUN_001730b8`). 0x11a3 (Paris DM) acende com qualquer arma menos metralhadora/congelar e só apaga |
+| Batida e explosão | Batida = máx(1, mph/vel. máx. do carro·10) (`FUN_001349f0`), antes 0,2·velocidade; explosão = dano·(1 − d/raio) pela origem, sem o 0,6 do host, com empurrão de 1100 (`FUN_00202d08`); batida também derruba postes/árvores (× 30) |
+| Queda | Poeira 0x34 (cinza nos postes, marrom nas árvores) e folhas 0x2f no golpe; ao tocar o chão, brasas/folhas e `D_TREE_FALL_LG` / `D_LPOST_SIM_FAL` (60..800 pés) — antes o host escolhia `D_TREE_FALL_LG/SM` e `D_LPOST_FALL` na hora do golpe |
+| Luzes dos postes | Sprites e fachos dos destrutíveis são montados por instância e somem com a entrada (Paris DM) |
+| Auto-play e peças móveis | Bit "auto" dos clipes (`FUN_002111f8`); objetos com ossos animados viram esqueletos (`objRigs`, `src/objanim.ts`): telão/placar, hélices e luzes da Arena, portões do Castelo DM e plataformas da Grécia DM no lugar do esqueleto (antes alguns ficavam na origem) |
+| Abertura da Arena | Cena retirada a pedido do usuário (2026-10-14): a partida começa no estado de "pulado" (`FUN_001b5d88`) — objetos do roteiro 0xC1C no fim do clipe e o 0xC23 no clipe 2. Sem câmera da abertura nem `CALYPSO.VAG` |
+| Névoa e fundo | Tabela por fase (`FUN_001a8b68`) com a curva do GS em 1/z (`FUN_00220de0`); Arena e Tóquio DM ganham fundo na cor da névoa; cúpula e aditivos sem névoa |
+| Escala `0x12` | Aplicada no conversor (aparelho do ataque de ambiente da Arena, 0,655) |
+| Spawn | Nós PTS com bit 0x08; entrada a > 800 pés sem repetir nó, renascer a > 300 pés, virado para o 1º vizinho (antes: todos os PTS e a "direção mais livre" do host) |
+
+QA: `tools/web/fire-qa.mjs` (`artifacts/qa/fire/`), Arena sem abertura (`artifacts/qa/arena-sem-abertura.png`), névoa
+(`artifacts/qa/fog/folha.png`), spawn (`artifacts/qa/spawn/folha.png`), portões/plataformas (`artifacts/qa/objrig/folha.png`).
+0 erros de console. TS 73/73 (2 casos novos), Python 77/77, `tsc` ok.
+
+## 2026-10-14 — Carros do Harbor City removidos
+
+A pedido do usuário: só os carros do Head-On ficam no menu e nos assets. Apagados `public/assets/cars/hc_*` e
+`aicars/hc_*` (64 arquivos, ~37 MB) e os bancos de som exclusivos do HC (`taxi`, `suv`, `tank`, `brimstne`, `darkside`
+e os `*wa`); `index.json` e `sfx/index.json` refeitos. A lógica do HC no código (especiais, tabelas do ELF) fica,
+sem uso; os carros são recriáveis com `tools/convert_model.py` e `tools/convert_sfx.py`. TS 73/73, `tsc` ok.

@@ -1,0 +1,2 @@
+# Quem grava os globais 0x3277dc/e0/e8 (lidos pela IA): qualquer referência ao bloco 0x327798..0x327800
+refsrange:327798:327800 ai_block

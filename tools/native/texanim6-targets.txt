@@ -1,0 +1,4 @@
+# Animação de textura: candidatos com lq/lqc2 no cabeçalho de malha
+at:2287e8 r_a
+at:230920 r_b
+at:231550 r_c

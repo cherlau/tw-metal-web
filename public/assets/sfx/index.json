@@ -1813,36 +1813,6 @@
     }
    ]
   },
-  "brimstne": {
-   "C_REV": [
-    {
-     "url": "sfx/brimstne/001.m4a",
-     "duration": 1.417,
-     "loop": false
-    }
-   ],
-   "C_IDLE_L": [
-    {
-     "url": "sfx/brimstne/002.m4a",
-     "duration": 0.002,
-     "loop": true
-    }
-   ],
-   "C_MID_L": [
-    {
-     "url": "sfx/brimstne/003.m4a",
-     "duration": 0.002,
-     "loop": true
-    }
-   ],
-   "C_HIGH_L": [
-    {
-     "url": "sfx/brimstne/004.m4a",
-     "duration": 0.002,
-     "loop": true
-    }
-   ]
-  },
   "copcar": {
    "C_REV": [
     {
@@ -1940,36 +1910,6 @@
     },
     {
      "url": "sfx/crimson/006.m4a",
-     "duration": 0.002,
-     "loop": true
-    }
-   ]
-  },
-  "darkside": {
-   "C_REV": [
-    {
-     "url": "sfx/darkside/001.m4a",
-     "duration": 1.789,
-     "loop": false
-    }
-   ],
-   "C_IDLE_L": [
-    {
-     "url": "sfx/darkside/002.m4a",
-     "duration": 0.002,
-     "loop": true
-    }
-   ],
-   "C_MID_L": [
-    {
-     "url": "sfx/darkside/003.m4a",
-     "duration": 0.002,
-     "loop": true
-    }
-   ],
-   "C_HIGH_L": [
-    {
-     "url": "sfx/darkside/004.m4a",
      "duration": 0.002,
      "loop": true
     }
@@ -2518,36 +2458,6 @@
     }
    ]
   },
-  "suv": {
-   "C_REV": [
-    {
-     "url": "sfx/suv/001.m4a",
-     "duration": 2.279,
-     "loop": false
-    }
-   ],
-   "C_IDLE_L": [
-    {
-     "url": "sfx/suv/002.m4a",
-     "duration": 0.002,
-     "loop": true
-    }
-   ],
-   "C_MID_L": [
-    {
-     "url": "sfx/suv/003.m4a",
-     "duration": 0.002,
-     "loop": true
-    }
-   ],
-   "C_HIGH_L": [
-    {
-     "url": "sfx/suv/004.m4a",
-     "duration": 0.002,
-     "loop": true
-    }
-   ]
-  },
   "sweett": {
    "C_REV": [
     {
@@ -2603,66 +2513,6 @@
     {
      "url": "sfx/sweett/009.m4a",
      "duration": 0.002,
-     "loop": true
-    }
-   ]
-  },
-  "tank": {
-   "C_REV": [
-    {
-     "url": "sfx/tank/001.m4a",
-     "duration": 1.47,
-     "loop": false
-    }
-   ],
-   "C_IDLE_L": [
-    {
-     "url": "sfx/tank/002.m4a",
-     "duration": 0.002,
-     "loop": true
-    }
-   ],
-   "C_MID_L": [
-    {
-     "url": "sfx/tank/003.m4a",
-     "duration": 0.002,
-     "loop": true
-    }
-   ],
-   "C_HIGH_L": [
-    {
-     "url": "sfx/tank/004.m4a",
-     "duration": 0.002,
-     "loop": true
-    }
-   ]
-  },
-  "taxi": {
-   "C_REV": [
-    {
-     "url": "sfx/taxi/001.m4a",
-     "duration": 1.37,
-     "loop": false
-    }
-   ],
-   "C_IDLE_L": [
-    {
-     "url": "sfx/taxi/002.m4a",
-     "duration": 0.002,
-     "loop": true
-    }
-   ],
-   "C_MID_L": [
-    {
-     "url": "sfx/taxi/003.m4a",
-     "duration": 0.002,
-     "loop": true
-    }
-   ],
-   "C_HIGH_L": [
-    {
-     "url": "sfx/taxi/004.m4a",
-     "duration": 0.001,
      "loop": true
     }
    ]
@@ -6236,80 +6086,6 @@
     }
    ]
   },
-  "brimstwa": {
-   "WSP_SCREAM_L": [
-    {
-     "url": "sfx/brimstwa/001.m4a",
-     "duration": 0.638,
-     "loop": true
-    },
-    {
-     "url": "sfx/brimstwa/002.m4a",
-     "duration": 0.002,
-     "loop": true
-    }
-   ],
-   "WSP_HALIMPACT": [
-    {
-     "url": "sfx/brimstwa/003.m4a",
-     "duration": 0.674,
-     "loop": false
-    }
-   ],
-   "WSP_HALSTANDUP": [
-    {
-     "url": "sfx/brimstwa/004.m4a",
-     "duration": 1.205,
-     "loop": false
-    }
-   ],
-   "WSP_HALGRUNT_L": [
-    {
-     "url": "sfx/brimstwa/005.m4a",
-     "duration": 0.659,
-     "loop": true
-    },
-    {
-     "url": "sfx/brimstwa/006.m4a",
-     "duration": 0.521,
-     "loop": true
-    },
-    {
-     "url": "sfx/brimstwa/007.m4a",
-     "duration": 0.536,
-     "loop": true
-    },
-    {
-     "url": "sfx/brimstwa/008.m4a",
-     "duration": 0.463,
-     "loop": true
-    }
-   ],
-   "WSP_GUY_VO_L": [
-    {
-     "url": "sfx/brimstwa/009.m4a",
-     "duration": 0.568,
-     "loop": true
-    },
-    {
-     "url": "sfx/brimstwa/010.m4a",
-     "duration": 1.948,
-     "loop": true
-    },
-    {
-     "url": "sfx/brimstwa/011.m4a",
-     "duration": 1.085,
-     "loop": true
-    }
-   ],
-   "WSP_GUY_CHAIN_L": [
-    {
-     "url": "sfx/brimstwa/012.m4a",
-     "duration": 0.65,
-     "loop": true
-    }
-   ]
-  },
   "copcarwp": {
    "WSP_SIREN_L": [
     {
@@ -6427,50 +6203,6 @@
     }
    ]
   },
-  "crazy8wa": {
-   "WSP_1ACTIVATE_L": [
-    {
-     "url": "sfx/crazy8wa/001.m4a",
-     "duration": 0.002,
-     "loop": true
-    }
-   ],
-   "WSP_1ATTACH_L": [
-    {
-     "url": "sfx/crazy8wa/002.m4a",
-     "duration": 0.002,
-     "loop": true
-    }
-   ],
-   "WSP_1PULSE": [
-    {
-     "url": "sfx/crazy8wa/003.m4a",
-     "duration": 1.041,
-     "loop": false
-    }
-   ],
-   "WSP_2ACTIVATE_L": [
-    {
-     "url": "sfx/crazy8wa/004.m4a",
-     "duration": 0.002,
-     "loop": true
-    }
-   ],
-   "WSP_2ATTACH_L": [
-    {
-     "url": "sfx/crazy8wa/005.m4a",
-     "duration": 0.002,
-     "loop": true
-    }
-   ],
-   "WSP_2PULSE": [
-    {
-     "url": "sfx/crazy8wa/006.m4a",
-     "duration": 1.042,
-     "loop": false
-    }
-   ]
-  },
   "crimwp": {
    "WSP_LAUNCH": [
     {
@@ -6554,22 +6286,6 @@
     {
      "url": "sfx/crimwp/015.m4a",
      "duration": 0.469,
-     "loop": false
-    }
-   ]
-  },
-  "darksidw": {
-   "WSP_HORN": [
-    {
-     "url": "sfx/darksidw/001.m4a",
-     "duration": 1.132,
-     "loop": false
-    }
-   ],
-   "WSP_IMPACT": [
-    {
-     "url": "sfx/darksidw/002.m4a",
-     "duration": 1.655,
      "loop": false
     }
    ]
@@ -7044,34 +6760,6 @@
     }
    ]
   },
-  "junkwa": {
-   "WSP_BALLLAUNCH": [
-    {
-     "url": "sfx/junkwa/001.m4a",
-     "duration": 1.879,
-     "loop": false
-    }
-   ],
-   "WSP_DETONATE": [
-    {
-     "url": "sfx/junkwa/002.m4a",
-     "duration": 1.048,
-     "loop": false
-    },
-    {
-     "url": "sfx/junkwa/003.m4a",
-     "duration": 0.934,
-     "loop": false
-    }
-   ],
-   "WSP_THRUST_L": [
-    {
-     "url": "sfx/junkwa/004.m4a",
-     "duration": 0.002,
-     "loop": true
-    }
-   ]
-  },
   "mrslamwp": {
    "WSP_SLAM_UP": [
     {
@@ -7431,29 +7119,6 @@
     }
    ]
   },
-  "suvwa": {
-   "WSP_POPUP": [
-    {
-     "url": "sfx/suvwa/001.m4a",
-     "duration": 1.519,
-     "loop": false
-    }
-   ],
-   "WSP_MGUN": [
-    {
-     "url": "sfx/suvwa/002.m4a",
-     "duration": 0.865,
-     "loop": false
-    }
-   ],
-   "WSP_LASERSITE_L": [
-    {
-     "url": "sfx/suvwa/003.m4a",
-     "duration": 0.002,
-     "loop": true
-    }
-   ]
-  },
   "sweettwp": {
    "WSP_LAUNCH": [
     {
@@ -7525,48 +7190,6 @@
     {
      "url": "sfx/sweettwp/013.m4a",
      "duration": 0.653,
-     "loop": false
-    }
-   ]
-  },
-  "tankwa": {
-   "WSP_TORCH_L": [
-    {
-     "url": "sfx/tankwa/001.m4a",
-     "duration": 0.82,
-     "loop": true
-    },
-    {
-     "url": "sfx/tankwa/002.m4a",
-     "duration": 0.002,
-     "loop": true
-    }
-   ]
-  },
-  "taxiwa": {
-   "WSP_LAUNCH": [
-    {
-     "url": "sfx/taxiwa/001.m4a",
-     "duration": 1.853,
-     "loop": false
-    }
-   ],
-   "WSP_THRUST_L": [
-    {
-     "url": "sfx/taxiwa/002.m4a",
-     "duration": 0.002,
-     "loop": true
-    }
-   ],
-   "WSP_SPIKE_OUT": [
-    {
-     "url": "sfx/taxiwa/003.m4a",
-     "duration": 0.494,
-     "loop": false
-    },
-    {
-     "url": "sfx/taxiwa/004.m4a",
-     "duration": 0.44,
      "loop": false
     }
    ]
@@ -9367,11 +8990,8 @@
   "edboss": "eddy",
   "dark1": "darkt1",
   "dark2": "darkt2",
-  "hc_taxi": "taxi",
-  "hc_suv": "suv",
-  "hc_tank": "tank",
-  "hc_preac": "brimstne",
-  "hc_semi": "darkside"
+  "edplayer": "eddy",
+  "darkpla1": "darkt1"
  },
  "carWeapons": {
   "axel": "axelwp",
@@ -9392,12 +9012,7 @@
   "edboss": "eddywp",
   "dark1": "darkt1wp",
   "dark2": "darkt2wp",
-  "hc_taxi": "taxiwa",
-  "hc_suv": "suvwa",
-  "hc_tank": "tankwa",
-  "hc_preac": "brimstwa",
-  "hc_semi": "darksidw",
-  "hc_derby": "crazy8wa",
-  "hc_tow": "junkwa"
+  "edplayer": "eddywp",
+  "darkpla1": "darkt1wp"
  }
 }

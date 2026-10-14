@@ -1,0 +1,9 @@
+# Derby: objeto por jogador 0x3573f0 + i·0xe0 (FUN_00196608 → FUN_00195548) e a atualização dele
+range:195400:196700 derby_obj
+3573f0 derby_mgr
+# Manslaughter (FUN_001dcbd8, tabela de saltos 0x2eb540) e HC Roadkill (FUN_001e0c58, init FUN_001e0a68)
+range:1dc900:1dd5e0 mansl
+range:1e0a00:1e1300 hcrkill
+# Semi: disparo ao bater (+0x902) e preacher (FUN_001db178)
+range:1dd5e0:1dda00 semi
+at:1db178 preacher

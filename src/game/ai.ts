@@ -13,10 +13,13 @@
 //   metralhadora pelo cone que estreita com a distância e a habilidade (FUN_00105970);
 //   turbo só em reta (|esterço| < 10°) com > 20 % de carga, até esvaziar (FUN_001034a0);
 //   recuo para buscar vida abaixo de `retreatHealth`·U(0,75; 1,25) (FUN_001049a8 / FUN_001027f8);
-//   "atolado": < 4,4 pés/s acumula, > 73,3 pés/s corta pela metade (FUN_00104df0).
+//   "atolado": < 4,4 pés/s acumula, > 73,3 pés/s corta pela metade (FUN_00104df0);
+//   energia (a IA escreve os bits de controle direto em jogador+0x13c): casca de fogo agendada por FUN_00106a88 e
+//     ligada por FUN_00104b28 (sem gastar energia, mas exige > 0,6), congelar por FUN_00106cf0, onda quando fica
+//     lenta por 1200 quadros (FUN_00103ca8), tiro para trás (bit 0x10) nas armas de ré (FUN_001088e0).
 // ⚠️ ESCOLHA DO HOST: navegação (o jogo segue o grafo PTS/GPS pelo "ptool"; aqui o bot mira direto no objetivo e
 //   dá ré quando atola), escolha do alvo (regra do jogador, FUN_00102f50), base da habilidade (+0x4c/+0x50 do
-//   modo de jogo) e o que fazer com a arma especial e o ataque de ambiente (tipos 1 e 8: não implementados).
+//   modo de jogo).
 import type { WeaponId } from './weapons';
 
 export interface AiProfile {
@@ -27,7 +30,20 @@ export interface AiProfile {
   losHeight: number;
   aggression: number;
   retreatHealth: number;
+  /** +0x18 / +0x1c: quadros mínimos entre decisões de congelar e de casca de fogo (escalados pela dificuldade) */
+  timerA?: number;
+  timerB?: number;
 }
+
+/**
+ * Estado global da IA no jogo (BSS): último congelar/casca de qualquer bot (DAT_002f41a4 / DAT_002f4198) e o
+ * intervalo mínimo entre eles (FUN_001027f8: 0x4b0 quadros para os carros comuns).
+ */
+export interface AiShared {
+  lastShell: number;
+  lastFreeze: number;
+}
+export const AI_ENERGY_GAP = 0x4b0;
 
 export interface AiTables {
   profiles: AiProfile[];
@@ -36,8 +52,8 @@ export interface AiTables {
   range: { max: number[]; min: number[]; dot: number[] };
 }
 
-/** Tipo de arma do jogo (FUN_00120ba0) → arma implementada. 8 = ambiente fica de fora (evento de arena não feito). */
-export const AI_WEAPON: Partial<Record<number, WeaponId>> = { 1: 'special', 2: 'fire', 3: 'homing', 4: 'napalm', 6: 'power', 7: 'ricochet', 9: 'swarmer', 10: 'remote' };
+/** Tipo de arma do jogo (FUN_00120ba0) → arma do port. O 8 (ambiente) tem peso 0 em todas as tabelas: bot não usa. */
+export const AI_WEAPON: Partial<Record<number, WeaponId>> = { 1: 'special', 2: 'fire', 3: 'homing', 4: 'napalm', 6: 'power', 7: 'ricochet', 8: 'env', 9: 'swarmer', 10: 'remote' };
 
 /** Teto da habilidade por dificuldade (FUN_0013d800). */
 const SKILL_CAP = [0.72, 0.85, 1.0, 1.0];
@@ -57,6 +73,18 @@ export interface AiView {
   steerAngle: number; // rad até o objetivo
   ammo: Partial<Record<WeaponId, number>>;
   selected: WeaponId | null;
+  /** energia 0..1 (carro+0x6898), congelado, quadro atual e o estado global da IA */
+  energy?: number;
+  frozen?: boolean;
+  frame?: number;
+  shared?: AiShared;
+  /** progresso do modo (struct 0x327798 +0x50, DAT_003277e8) — ⚠️ host 0,5, o mesmo da habilidade */
+  progress?: number;
+  /** rivais abatidos / total (DAT_003277dc / DAT_003277e0, 🟡 papel inferido) */
+  rivalsDone?: number;
+  rivalsTotal?: number;
+  /** esterço pedido no quadro anterior (FUN_00133008) */
+  steerCmd?: number;
 }
 
 export interface AiOutput {
@@ -67,6 +95,8 @@ export interface AiOutput {
   /** arma a ganhar 1 de munição (FUN_00107148) */
   grant: WeaponId | null;
   retreat: boolean;
+  /** bits de energia (src/game/energy.ts BIT) escritos em jogador+0x13c neste quadro */
+  bits: number;
 }
 
 /** Estado da IA de um carro (campos +0x280..+0x478 do controlador do jogo). */
@@ -87,6 +117,16 @@ export class BotBrain {
   reverseFrames = 0;
   readonly retreatAt: number; // +0x32c
   readonly skill: number; // +0x31c
+  /** energia: quadros com o alvo à vista (+0x3e8), desde a última decisão de congelar/casca (+0x3d8/+0x3dc),
+   *  contagem para ligar a casca (+0x45c), fator da vida para a casca (+0x328), quadros lento (+0x448) */
+  visRun = 0;
+  sinceFreeze = 0;
+  sinceShell = 0;
+  shellIn = 0;
+  shellScale: number;
+  slowFrames = 0;
+  readonly freezeEvery: number;
+  readonly shellEvery: number;
 
   constructor(
     readonly profile: AiProfile,
@@ -102,6 +142,12 @@ export class BotBrain {
     const k = [0.33, 0.4, 0.5, 1.0][difficulty] ?? 0.5; // FUN_0013d800 (Head-On; HC usa 0,3 e 0,4)
     this.skill = Math.min(SKILL_CAP[difficulty] ?? 0.85, 0.5 + 0.5 * 0.5 * k);
     this.switchTimer = p.switchFrames;
+    // FUN_00102300: +0x18 ×5/×4/×2/×1 e +0x1c ×3/×2/×1/÷2 pela dificuldade; contadores começam sorteados.
+    this.freezeEvery = (p.timerA ?? 1800) * ([5, 4, 2, 1][difficulty] ?? 2);
+    this.shellEvery = Math.trunc((p.timerB ?? 1800) * ([3, 2, 1, 0.5][difficulty] ?? 1));
+    this.sinceFreeze = Math.floor(rand() * (this.freezeEvery + 1));
+    this.sinceShell = Math.floor(rand() * (this.shellEvery + 1));
+    this.shellScale = this.skill;
   }
 
   private setState(s: number) {
@@ -161,7 +207,7 @@ export class BotBrain {
 
   /** Um quadro de 1/60 s. */
   step(v: AiView): AiOutput {
-    const out: AiOutput = { fireGun: false, fireSpecial: false, nextWeapon: false, turbo: false, grant: null, retreat: false };
+    const out: AiOutput = { fireGun: false, fireSpecial: false, nextWeapon: false, turbo: false, grant: null, retreat: false, bits: 0 };
     const p = this.profile;
     this.stateFrames++;
     this.see(v.visible);
@@ -217,6 +263,8 @@ export class BotBrain {
         const aligned = this.rearPick ? -v.align > Math.max(dot, 0.5) : v.align > dot;
         if (w && v.selected === w && aligned && v.dist < (r.max[this.chosen] ?? 0) && v.dist > (r.min[this.chosen] ?? 0)) {
           out.fireSpecial = true;
+          // FUN_001088e0: de ré, os tipos 1, 2, 3, 4, 6, 7 e 10 saem para trás (bit 0x10)
+          if (this.rearPick && REAR_TYPES.has(this.chosen)) out.bits |= 0x10;
           if (this.rearPick) {
             this.usedRear[this.chosen]++;
             this.usedRearTotal++;
@@ -240,9 +288,66 @@ export class BotBrain {
     if (this.turboOn && v.turbo01 < 0.01) this.turboOn = false;
     out.turbo = this.turboOn;
 
+    this.energyStep(v, out);
+
     // Atolado (FUN_00104df0): < 4,4 pés/s acumula; > 73,3 corta pela metade.
     if (v.speed < 4.4) this.stuck++;
     else if (v.speed > 73.333336) this.stuck = Math.floor(this.stuck / 2);
     return out;
   }
+
+  /** Decisões de energia (FUN_00104b28 → FUN_00106a88 / FUN_00106cf0, FUN_00103ca8). */
+  private energyStep(v: AiView, out: AiOutput) {
+    const sh = v.shared;
+    if (!sh || v.frame === undefined) return;
+    const now = v.frame;
+    const p = this.profile;
+    const energy = v.energy ?? 0;
+    const progress = v.progress ?? 0.5;
+    this.visRun = v.visible ? this.visRun + 1 : 0; // FUN_00104df0: bit 0x20 de +0x478 (visada, FUN_00105520)
+    this.sinceFreeze++;
+    this.sinceShell++;
+
+    // FUN_00106a88: agenda a casca de fogo quando a vida cai abaixo de (1 − perfil+4)·fator.
+    if (this.shellIn === 0 && this.visRun >= 8 && this.sinceShell > this.shellEvery && now - sh.lastShell > AI_ENERGY_GAP &&
+      energy > 0.6 && !v.frozen && v.health01 < (1 - p.fleeHealth) * this.shellScale) {
+      if (this.rand() > progress + 0.5) {
+        const k = p.switchFrames * ([7, 5, 3, 1][this.difficulty] ?? 3);
+        this.shellIn = k + Math.floor(this.rand() * (3 * k + 1));
+      }
+      this.sinceShell = 0;
+    }
+    // FUN_00104b28: a contagem chega a zero → bit 4 (casca), e o fator da vida cai (×habilidade).
+    if (this.shellIn > 0 && --this.shellIn < 1) {
+      out.bits |= 0x4;
+      this.shellScale *= this.skill;
+      sh.lastShell = now;
+      this.shellIn = 0;
+    }
+
+    // FUN_00106cf0: congelar com a arma em preparo, alvo a < 300 pés bem alinhado e quase sem esterço.
+    if (this.skill >= 0.1 && this.state >= 2 && this.state <= 6 && v.dist < 300 && Math.abs(v.steerCmd ?? 0) < 0.4 &&
+      this.sinceFreeze > this.freezeEvery && now - sh.lastFreeze > AI_ENERGY_GAP && v.align > 0.95) {
+      if (this.rand() < progress + 0.5 && (v.rivalsTotal ?? 0) * 0.25 < (v.rivalsDone ?? 0)) {
+        if (this.rand() < this.skill) {
+          out.bits |= 0x1;
+          sh.lastFreeze = now;
+        }
+      }
+      this.sinceFreeze = 0;
+    }
+
+    // FUN_00103ca8: lento (< 40 mph) acumula, rápido desconta; passou de 1200 quadros → onda se o alvo está a
+    // < 200 pés ou virado para mim (senão o jogo reposiciona o bot no grafo — não portado).
+    if (v.frozen) this.slowFrames = 0;
+    else if (v.speed >= 58.666668) this.slowFrames = Math.max(0, this.slowFrames - 1);
+    else this.slowFrames++;
+    if (this.slowFrames > 0x4b0) {
+      if (v.dist < 200 || v.targetFacing > 0) out.bits |= 0x20;
+      this.slowFrames = 0;
+    }
+  }
 }
+
+/** Tipos que FUN_001088e0 dispara para trás quando escolhidos pela tabela de ré. */
+const REAR_TYPES = new Set([1, 2, 3, 4, 6, 7, 10]);

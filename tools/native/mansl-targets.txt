@@ -1,0 +1,6 @@
+# Manslaughter: estados da tabela de saltos 0x2eb540 dentro de FUN_001dcbd8
+at:1dcc6c mansl_s0
+at:1dcd40 mansl_s1
+at:1dce7c mansl_s2
+at:1dcfa8 mansl_s3
+at:1dcfe0 mansl_s4

@@ -1,0 +1,15 @@
+# Gerentes de categoria dos níveis (FUN_00168aa8)
+at:183470 m3493d0_reg_a0
+at:1834e8 m3493d0_reg_12d
+at:18ad48 m351620_reg_136
+at:18adb8 m351620_reg_12e
+at:18add0 m351620_reg_12f
+at:19b8c0 m358040_reg_3f8
+at:19b8f0 m358040_reg_3f6
+at:1773b8 m341eb0_reg_1450
+at:1afee0 m35a2b0_reg
+at:1cc4b0 m373160_reg
+at:113b28 objective
+refsrange:3493d0:3497d4 m3493d0_users
+refsrange:351620:351764 m351620_users
+refsrange:358040:358100 m358040_users

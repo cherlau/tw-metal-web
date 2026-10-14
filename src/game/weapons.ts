@@ -90,7 +90,7 @@ const STATIC_BOMB = new Set([10, 13]);
 
 // ------------------------------------------------------------------ armas do inventário
 
-export type WeaponId = 'machinegun' | 'special' | 'fire' | 'homing' | 'napalm' | 'power' | 'ricochet' | 'env' | 'swarmer' | 'remote';
+export type WeaponId = 'machinegun' | 'special' | 'fire' | 'homing' | 'napalm' | 'power' | 'ricochet' | 'env' | 'swarmer' | 'remote' | 'energy';
 
 export interface WeaponClass {
   name: string;
@@ -111,7 +111,7 @@ export interface WeaponClass {
  * Classes do inventário criadas em FUN_0011d340 (Head-On). Ordem do inventário carro+0x4fbc = nomes 0x2ba680:
  * 0 Special, 1 Fire, 2 Homing, 3 Napalm, 4 Power, 5 Ricochet, 6 Env, 7 Swarmer, 8 Remote.
  */
-export const WEAPON_CLASSES: Record<Exclude<WeaponId, 'machinegun' | 'special'>, WeaponClass> = {
+export const WEAPON_CLASSES: Record<Exclude<WeaponId, 'machinegun' | 'special' | 'energy'>, WeaponClass> = {
   fire: { name: 'Fire Missile', type: 2, proj: 2, start: 1, lockDeg: 14.5, range: 7000, refire: 48 },
   homing: { name: 'Homing Missile', type: 3, proj: 3, start: 1, lockDeg: 30.5, range: 7000, refire: 48 },
   napalm: { name: 'Napalm', type: 4, proj: 4, start: 0, lockDeg: 5, range: 7000, refire: 48 },
@@ -122,9 +122,21 @@ export const WEAPON_CLASSES: Record<Exclude<WeaponId, 'machinegun' | 'special'>,
   remote: { name: 'Remote Bomb', type: 10, proj: 10, start: 0, lockDeg: 0, range: 0, refire: 48 },
 };
 
+/**
+ * Ponto de disparo 0x00F8 de cada arma: FUN_00124288 grava o ponteiro do registro de id n em obj+0x10 da classe
+ * (classes em carro+0x5520.. criadas por FUN_0011d340), e FUN_00147ec8 sai de matriz do carro × ponto. Sem ponto
+ * (Env, energia) o projétil sai da origem do carro. A metralhadora usa os ids 8 e 9 (MG_MOUNTS).
+ */
+export const WEAPON_MOUNT: Partial<Record<WeaponId, number>> = {
+  special: 1, fire: 2, homing: 3, napalm: 4, swarmer: 5, power: 6, ricochet: 7, remote: 15,
+};
+/** Metralhadora (FUN_0014ae38): obj+0x84 = ponto 8, obj+0x88 = ponto 9; com os dois, alterna pela flag obj+0x80. */
+export const MG_MOUNTS = [8, 9] as const;
+
 export const INVENTORY_ORDER: WeaponId[] = ['special', 'fire', 'homing', 'napalm', 'power', 'ricochet', 'env', 'swarmer', 'remote'];
 
-export const weaponName = (w: WeaponId): string => (w === 'machinegun' ? 'Machine Gun' : w === 'special' ? 'Special' : WEAPON_CLASSES[w].name);
+export const weaponName = (w: WeaponId): string =>
+  w === 'machinegun' ? 'Machine Gun' : w === 'special' ? 'Special' : w === 'energy' ? 'Energy' : WEAPON_CLASSES[w].name;
 
 /** Metralhadora (FUN_0014ad00 / FUN_0014ae38 / FUN_0014b738). */
 export const MACHINE_GUN = {
@@ -216,8 +228,9 @@ export function pickTarget(from: V3, forward: V3, targets: Target[], maxRange = 
 }
 
 /**
- * Trava das armas (FUN_00147700(cos, alcance²)): o mais perto dentro do cone; sem ninguém no cone, cai na escolha
- * ponderada dentro do alcance (FUN_00147cf0). ⚠️ host: critério "mais perto" dentro do cone.
+ * Trava das armas (FUN_00147700(cos, alcance²)): o carro mais perto com cos(ângulo) > cos do cone e distância² <
+ * alcance². Sem ninguém no cone o jogo tenta objetos do cenário (FUN_00147cf0: o mais alinhado) — ver
+ * Match.sceneLock (Projectile.aimPoint).
  */
 export function lockTarget(from: V3, forward: V3, targets: Target[], coneDeg: number, range: number): Target | null {
   if (coneDeg <= 0) return null;
@@ -227,13 +240,21 @@ export function lockTarget(from: V3, forward: V3, targets: Target[], coneDeg: nu
   for (const t of targets) {
     const d = sub(t.pos, from);
     const dist = len(d);
-    if (dist < 1e-6 || dist > bestD) continue;
-    if (dot(scale(d, 1 / dist), forward) < cos) continue;
+    if (dist < 1e-6 || dist >= bestD) continue;
+    if (dot(scale(d, 1 / dist), forward) <= cos) continue;
     bestD = dist;
     best = t;
   }
-  return best ?? pickTarget(from, forward, targets, range);
+  return best;
 }
+
+/**
+ * Mira da metralhadora (FUN_0014ae38): só o jogador humano, só nestes veículos (carro+0x10 = 0x69 Sweet Tooth,
+ * 0x6d Mr. Slam, 0x70 Hammerhead, 0x75/0x76 chefes Dark, 0x7f HC Roadkill, 0x86 Manslaughter) — trava a 7,5° em
+ * 7000 pés e aponta a bala para o alvo (FUN_00237480), sem perseguir.
+ */
+export const MG_AIM_MODELS = new Set(['sweet', 'mrslam', 'hamr', 'dark1', 'dark2', 'hc_rkill', 'hc_rock']);
+export const MG_AIM = { coneDeg: 7.5, range: 7000 } as const;
 
 // ------------------------------------------------------------------ projéteis
 
@@ -255,11 +276,15 @@ export interface Projectile {
   target: number | null;
   /** modo de perseguição atual (cai para 0 quando perde a trava) */
   homing: number;
+  /** objeto do cenário travado (FUN_00147cf0) quando não há carro: ponto fixo a perseguir */
+  aimPoint?: V3;
   damage: number;
   bounces: number;
   landed: boolean;
   /** detonação pedida pelo dono (segundo toque no Napalm/Remote/Hearse) */
   detonate: boolean;
+  /** Napalm com o botão ainda apertado: sem gravidade (bit +0x08, FUN_00191880) */
+  hover?: boolean;
   /** oscilação do Swarmer: tiques até trocar, alvo e velocidade angular atuais (rad/tique) */
   wobbleIn: number;
   wobbleAmp: number;
@@ -277,6 +302,8 @@ export interface HitResult {
   victim: number | null; // id do carro atingido diretamente
   /** Dono do triângulo do cenário atingido (objetos destrutíveis), quando o impacto foi no cenário. */
   tag?: number;
+  /** Normal da superfície atingida (efeitos de partícula: FUN_002024a8 passa a normal do contato). */
+  normal?: V3;
 }
 
 export interface CarBody {
@@ -297,6 +324,8 @@ export interface FireOptions {
   damage?: number;
   /** dobra o dano (balas com munição da metralhadora, fim de FUN_00203c68) */
   doubleDamage?: boolean;
+  /** objeto do cenário travado (sem carro no cone) */
+  aimPoint?: V3;
   rand?: () => number;
 }
 
@@ -336,6 +365,7 @@ export function fire(type: number, weapon: WeaponId, owner: number, origin: V3, 
     wobbleIn: r.wobbleFirst, wobbleAmp: 1, wobbleGoal: [0, 0], wobbleRate: [0, 0], turnRate: r.turn, alive: true, vel: v3(),
   };
   if (type === 36) p.speed = Math.max(0, r.speedMph + (rand() * 200 - 100)) * MPH; // FUN_00203c68 caso 0x24
+  if (o.aimPoint && target === null && r.homing > 0) p.aimPoint = o.aimPoint;
   p.vel = scale(dirOf(p.yaw, p.pitch), p.speed);
   return p;
 }
@@ -348,7 +378,7 @@ function heightAbove(world: CollisionWorld, p: V3, below = 300): { h: number; no
 
 /** Direção (FUN_001ff0a8 → FUN_001ff3a8): trava, giro limitado e oscilação. */
 function steer(p: Projectile, r: ProjectileRule, cars: CarBody[], ticks: number, rand: () => number) {
-  const tgt = p.target !== null ? cars.find((c) => c.id === p.target && c.alive) : undefined;
+  const tgt = p.target !== null ? cars.find((c) => c.id === p.target && c.alive) : p.aimPoint ? { pos: p.aimPoint, vel: undefined } : undefined;
   if (p.homing === 0 || !tgt || p.age <= 2) return;
   let aim = tgt.pos;
   if (p.homing === 2 && tgt.vel) {
@@ -367,6 +397,7 @@ function steer(p: Projectile, r: ProjectileRule, cars: CarBody[], ticks: number,
   // FUN_001ff5a0/FUN_001ff800: fora do cone de trava (sem oscilação) a trava cai e o projétil segue reto.
   if (!r.wobble && (Math.abs(ey) > r.lockYaw * DEG || Math.abs(ep) > r.lockPitch * DEG)) {
     p.target = null;
+    p.aimPoint = undefined;
     p.homing = 0;
     return;
   }
@@ -439,7 +470,8 @@ export function stepProjectile(p: Projectile, dt: number, world: CollisionWorld,
     if (!p.landed) {
       p.speed = approach(p.speed, goal, p.speed <= goal ? r.accel : 1e-4, 1e-4 * 60, ticks);
       if (p.type === 10 || p.type === 13) p.speed = 0.2445 * MPH; // FUN_001916b8
-      p.vy -= 0.02 * 3600 * dt;
+      if (p.hover) p.vy = Math.max(0, p.vy - 0.02 * 3600 * dt); // segurando: sobe e para, sem cair
+      else p.vy -= 0.02 * 3600 * dt;
       const flat = dirOf(p.yaw, 0);
       p.pos = add(p.pos, add(scale(flat, p.speed * dt), v3(0, p.vy * dt, 0)));
       // FUN_00191be8: chegou a 0,1 pé do chão (Napalm: 2) → pousa e fica (z = chão + folga).
@@ -465,7 +497,7 @@ export function stepProjectile(p: Projectile, dt: number, world: CollisionWorld,
       const hit = L > 1e-6 ? world.raycast(p.prev, scale(seg, 1 / L), L) : null;
       if (hit && hit.normal.y <= 0.3) {
         p.alive = false;
-        return { projectile: p, pos: add(p.prev, scale(seg, hit.distance / L)), victim: null, tag: hit.tag };
+        return { projectile: p, pos: add(p.prev, scale(seg, hit.distance / L)), victim: null, tag: hit.tag, normal: hit.normal };
       }
     }
     return null;
@@ -525,7 +557,7 @@ export function stepProjectile(p: Projectile, dt: number, world: CollisionWorld,
       return null;
     }
     p.alive = false;
-    return { projectile: p, pos: at, victim: null, tag: hit.tag };
+    return { projectile: p, pos: at, victim: null, tag: hit.tag, normal: hit.normal };
   }
   return null;
 }

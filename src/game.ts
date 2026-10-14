@@ -5,16 +5,21 @@ import { AudioEngine } from './audio';
 import { LevelCollision } from './collision';
 import { PS2_TO_THREE, VEHICLE_TO_THREE } from './coords';
 import { Input } from './input';
-import { INVENTORY_INDEX, Match, MATCH_RULES, type CarActions, type MatchEvent } from './game/match';
+import { INVENTORY_INDEX, Match, MATCH_RULES, type CarActions, type MatchEvent, type SpawnPoint } from './game/match';
 import { Hud, SHORT_NAMES, type HudBlip } from './hud';
-import { isBullet, pickupEffect, PROJECTILES, type Projectile, type WeaponId } from './game/weapons';
+import { envRuleFor } from './game/environment';
+import { pickupEffect, PROJECTILES, type Projectile, type WeaponId } from './game/weapons';
+import { applyClipOps, SPECIAL_CLIPS, stepClips, type ClipPlayback } from './game/specialclips';
 import { basisOf, forwardOf, rightOf, speedOf, type DriveParams, type VehicleShape, type VehicleState } from './physics/vehicle';
 import { v3, type V3 } from './physics/vec';
-import { buildBatched, isAdditive, solidBox } from './render';
-import { buildLevelLights, buildSky } from './levelfx';
+import { buildBatched, dynLights, isAdditive, MAX_DYN_LIGHTS, solidBox } from './render';
+import { buildLevelLights, buildSky, installPs2Fog, LEVEL_FOG } from './levelfx';
+import { LevelObjectRigs, ObjectClips } from './objanim';
+import { MaterialAnimator } from './texanim';
 import { CarRig, type RigDoc } from './rig';
 import { DebrisSystem } from './debris';
-import { LevelDestructibles, RAM_DAMAGE } from './destructibles';
+import { LevelDestructibles, ramDamage } from './destructibles';
+import { ParticleSystem, type Emitter, type ParticleDoc } from './particles';
 
 const params = new URLSearchParams(location.search);
 const levelName = params.get('lvl') ?? 'arena';
@@ -38,6 +43,15 @@ renderer.outputColorSpace = THREE.SRGBColorSpace;
 document.getElementById('game')!.appendChild(renderer.domElement);
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x1a1d24);
+// Névoa da fase (FUN_001a8b68, fórmula do GS em installPs2Fog). ⚠️ host: o fundo onde nada é desenhado (Arena,
+// Tóquio DM, sem cúpula) usa a cor da névoa — a limpeza da tela do jogo não foi achada.
+const levelFog = LEVEL_FOG[levelName];
+if (levelFog) {
+  installPs2Fog();
+  const c = new THREE.Color().setRGB(levelFog.color[0] / 255, levelFog.color[1] / 255, levelFog.color[2] / 255, THREE.SRGBColorSpace);
+  scene.fog = new THREE.Fog(c, levelFog.near, levelFog.far);
+  scene.background = c.clone();
+}
 const camera = new THREE.PerspectiveCamera(60, 1, 0.5, 20000);
 const hudEl = document.getElementById('hud')!;
 /** Mensagens 17..34 da tabela 0x2ba4c0 ("Destroyed <carro>", índice 17 + id do veículo). */
@@ -62,13 +76,30 @@ const ps2 = (p: number[]): V3 => {
 
 // ---------------------------------------------------------------- carga
 let skyUpdate: ((camera: THREE.Camera) => void) | null = null; // céu segue a câmera
+// Materiais animados pelos canais dos objetos (fogo, telões, água; src/texanim.ts), relógio em tiques de 1/60 s.
+let matAnim: MaterialAnimator | null = null;
+let matAnimStart = 0;
+// Clipes dos objetos do nível (auto-play, abertura) e peças móveis (src/objanim.ts).
+const objClips = new ObjectClips();
+let objRigs: LevelObjectRigs | null = null;
+/** Tique (1/60 s) do relógio das animações desde a carga (DAT_002f4308). */
+const animTick = () => ((performance.now() - matAnimStart) / 1000) * 60;
 
 async function loadLevel() {
   loading.textContent = `carregando arena ${levelName}…`;
   const { doc, bin } = await loadModel(`lvl/${levelName}`);
   // Objetos destrutíveis (nós 0x13) ficam fora do lote estático: LevelDestructibles troca a geometria pelo estado.
-  const { group, drawCalls } = await buildBatched(doc, bin, doc.scene.filter((i) => !i.dmg?.length));
-  group.add(await buildLevelLights(doc, doc.scene)); // sprites e fachos de luz
+  matAnim = doc.matAnim ? new MaterialAnimator(doc, objClips) : null;
+  // Fora do lote estático: destrutíveis (LevelDestructibles) e peças móveis (ossos dos objetos, LevelObjectRigs).
+  const still = doc.scene.filter((i) => !i.dmg?.length && !LevelObjectRigs.owns(doc, i));
+  const { group, drawCalls } = await buildBatched(doc, bin, still, { animator: matAnim ?? undefined });
+  // sprites e fachos de luz; os dos destrutíveis somem com eles e os das peças móveis andam com elas
+  group.add(await buildLevelLights(doc, still));
+  objRigs = await LevelObjectRigs.build(doc, bin, objClips, matAnim ?? undefined);
+  group.add(objRigs.group);
+  // FUN_002111f8: cada objeto, ao ser montado, toca os clipes com o bit "auto"
+  matAnimStart = performance.now();
+  objClips.autoStart(0);
   group.matrixAutoUpdate = false;
   group.matrix.copy(PS2_TO_THREE);
   scene.add(group);
@@ -107,6 +138,16 @@ function loadCarModel(name: string, rules: Record<string, { wheels: number[][]; 
         template.add(group);
       }
       // Clarão do tiro (efeito ligado pelo código do jogo; conversor: effects['code:muzzle']).
+      // Gelo do congelamento (texturas 88a28/b5a20 → effects['code:freeze']), aceso enquanto o carro está congelado.
+      const freezeDefs = doc.effects?.['code:freeze'] ?? [];
+      if (freezeDefs.length) {
+        const { group: ice } = await buildBatched(doc, bin, freezeDefs);
+        ice.name = 'freeze';
+        ice.matrixAutoUpdate = false;
+        ice.matrix.copy(VEHICLE_TO_THREE);
+        ice.visible = false;
+        template.add(ice);
+      }
       const muzzleDefs = doc.effects?.['code:muzzle'] ?? [];
       if (muzzleDefs.length) {
         const { group: muzzle } = await buildBatched(doc, bin, muzzleDefs);
@@ -149,7 +190,11 @@ function loadCarModel(name: string, rules: Record<string, { wheels: number[][]; 
 /** Caixa do carro (espaço Three, origem do modelo) sem malhas aditivas (fachos de luz etc.). */
 function shapeOf(doc: ModelDoc, bin: ArrayBuffer): VehicleShape {
   const box = solidBox(doc, bin, VEHICLE_TO_THREE);
-  return { halfWidth: Math.max(-box.min.x, box.max.x), halfLength: Math.max(-box.min.z, box.max.z), bottom: box.min.y, top: box.max.y };
+  const mounts = (doc as ModelDoc & { mounts?: Record<string, [number, number, number]> }).mounts;
+  return {
+    halfWidth: Math.max(-box.min.x, box.max.x), halfLength: Math.max(-box.min.z, box.max.z), bottom: box.min.y, top: box.max.y,
+    ...(mounts ? { mounts: Object.fromEntries(Object.entries(mounts).map(([k, p]) => [Number(k), p])) } : {}),
+  };
 }
 
 /**
@@ -165,11 +210,11 @@ const GLOBAL_OBJECTS = { fireball: 36, burst: 29 } as const;
  * os ícones da metralhadora (5000) — por isso o tipo 0 cai nele. A Mega Gun (14) não tem ícone no GLOBALS.
  */
 const pickupCategory = (id: number) => (id === 0 ? 5000 : 0x13ba + id);
-/** Cor da aura por pickup. ⚠️ ESCOLHA DO HOST: o brilho do ícone no jogo não foi achado. */
-const PICKUP_AURA: Record<number, number> = {
-  0: 0xffd040, 1: 0xff7a1a, 2: 0xc040ff, 3: 0xffc020, 4: 0xff5010, 5: 0x60e0ff, 6: 0xff2020,
-  7: 0x40a0ff, 8: 0x40ff60, 9: 0xffd040, 10: 0x40ff40, 11: 0xff8040, 12: 0x40ff60,
-};
+/**
+ * Pickups com ícone. O brilho faz parte do próprio nó (malha aditiva (Cs − 0)·As + Cd sem escrita de profundidade
+ * nos ícones de arma; vida e Upgrade não têm) — o jogo não desenha aura à parte.
+ */
+const PICKUP_IDS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
 /**
  * Tipo de projétil → categoria do modelo no GLOBALS (FUN_00204778 grava o nó em 0x37cbf0 + 0xda24 + 4·tipo; no
@@ -190,37 +235,30 @@ const PROJECTILE_CATEGORY_HC: Record<number, number> = {
   0x35: 0x1018, 0x36: 0x1019, 0x37: 0x101a, 0x2e: 0x101f, 0x34: 0x1020, 0x2c: 0x1026,
 };
 
-/** Brilho radial para a aura dos pickups (textura gerada; o PS2 usa um sprite aditivo). */
-let auraTexture: THREE.Texture | null = null;
-function auraSprite(color: number, size = 3.2): THREE.Sprite {
-  if (!auraTexture) {
-    const c = document.createElement('canvas');
-    c.width = c.height = 64;
-    const g = c.getContext('2d')!;
-    const grd = g.createRadialGradient(32, 32, 0, 32, 32, 32);
-    grd.addColorStop(0, 'rgba(255,255,255,0.9)');
-    grd.addColorStop(0.35, 'rgba(255,255,255,0.45)');
-    grd.addColorStop(1, 'rgba(255,255,255,0)');
-    g.fillStyle = grd;
-    g.fillRect(0, 0, 64, 64);
-    auraTexture = new THREE.CanvasTexture(c);
-  }
-  const sp = new THREE.Sprite(
-    new THREE.SpriteMaterial({ map: auraTexture, color, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true }),
-  );
-  sp.scale.setScalar(size); // no espaço normalizado do ícone (raio 1)
-  return sp;
-}
+/** Malha com pacote do GS em mistura aditiva ((Cs − 0)·As + Cd): auras e brilhos. */
+const isGsGlow = (def: ModelDoc['meshes'][string]) => def.gs?.alpha?.[1] === 2;
 
-async function loadGlobalObject(doc: ModelDoc, bin: ArrayBuffer, instances: ModelDoc['scene']): Promise<THREE.Group> {
-  const { group } = await buildBatched(doc, bin, instances);
-  // Ícones são anéis de painéis semitransparentes: o PS2 desenha só a face de fora. Com os dois lados,
-  // o painel de trás aparecia através do da frente (ícone "duplicado").
+/**
+ * Objeto do GLOBALS. Com `solid` (pickups): o corpo (atlas 5574c, sem pacote do GS ou com mistura normal gravando
+ * z) é sólido — o bit 15 das flags e o alfa "blend" do atlas o deixavam aditivo/translúcido; o atlas é opaco fora do
+ * recorte (alfa 0). Só as malhas com GS aditivo (aura, com os sprites) ficam translúcidas.
+ */
+async function loadGlobalObject(doc: ModelDoc, bin: ArrayBuffer, instances: ModelDoc['scene'], solid = false): Promise<THREE.Group> {
+  const { group } = await buildBatched(doc, bin, instances, solid ? { filter: (_k, def) => !isGsGlow(def) } : {});
+  const glow = solid ? (await buildBatched(doc, bin, instances, { filter: (_k, def) => isGsGlow(def), sprites: true })).group : null;
+  // Ícones são anéis de painéis: o PS2 desenha só a face de fora. Com os dois lados, o painel de trás aparecia
+  // através do da frente (ícone "duplicado").
   group.traverse((o) => {
     const mesh = o as THREE.Mesh;
     if (!mesh.isMesh) return;
     const mat = (mesh.material as THREE.Material).clone();
     mat.side = THREE.FrontSide;
+    if (solid) {
+      mat.blending = THREE.NormalBlending;
+      mat.transparent = true; // mistura normal pelo alfa (o atlas é 255 no corpo)
+      mat.depthWrite = true;
+      mat.alphaTest = 0.01;
+    }
     mesh.material = mat;
   });
   group.matrixAutoUpdate = false;
@@ -231,6 +269,7 @@ async function loadGlobalObject(doc: ModelDoc, bin: ArrayBuffer, instances: Mode
   const sphere = new THREE.Box3().setFromObject(holder).getBoundingSphere(new THREE.Sphere());
   group.matrix.premultiply(new THREE.Matrix4().makeTranslation(-sphere.center.x, -sphere.center.y, -sphere.center.z));
   holder.scale.setScalar(1 / Math.max(sphere.radius, 1e-3));
+  if (glow) group.add(glow); // depois da medida: a aura não entra no tamanho do corpo
   return holder;
 }
 
@@ -239,18 +278,36 @@ const DRIVER_VARIANT: Record<string, 'a' | 'b'> = { mrgrim: 'a', hc_axel: 'a', e
 
 /** Arma -> tipo de arma do jogo (FUN_00120ba0; índice dos marcadores 0x00F0 e dos seletores de projétil). */
 const WEAPON_TYPE: Record<WeaponId, number> = {
-  machinegun: 0, special: 1, fire: 2, homing: 3, napalm: 4, power: 6, ricochet: 7, env: 8, swarmer: 9, remote: 10,
+  machinegun: 0, special: 1, fire: 2, homing: 3, napalm: 4, power: 6, ricochet: 7, env: 8, swarmer: 9, remote: 10, energy: -1,
 };
 
 /**
  * Modelo de um projétil em escala nativa e coordenadas do PS2 (frente = +Y). É o mesmo nó usado no voo
  * (FUN_00203c68 → FUN_0022ff38) e pendurado no marcador 0x00F0 do lançador (FUN_00147568), pela tabela por tipo.
+ *
+ * Opaco: estas malhas não têm pacote de estado do GS (sem ALPHA_1/ZBUF_1 próprios), mas usam o atlas 5574c
+ * (alfa "blend" por causa dos brilhos dos pickups) e várias têm o bit 15 nas flags (Homing, Power, Ricochet…),
+ * o que as deixava aditivas/semitransparentes e sem gravar profundidade. Os mesmos mísseis embutidos no modelo
+ * do Mr. Grimm (seletor 0x1b1, sem estado do GS) são desenhados opacos. Recorte no alfa 0 do atlas.
+ *
+ * Malhas COM pacote de estado do GS ficam com a mistura dele: a bala 0xfa0/0xfb3 (traçante de 23 pés, cor por
+ * vértice, (Cs − 0)·As + Cd sem gravar z) e os brilhos (sprites) do Ricochet, Remote, Spectre…
  */
 async function loadProjectileModel(doc: ModelDoc, bin: ArrayBuffer, instances: ModelDoc['scene']): Promise<THREE.Group> {
-  const { group } = await buildBatched(doc, bin, instances);
+  const { group } = await buildBatched(doc, bin, instances, { filter: (_k, def) => !def.gs });
+  const { group: glow } = await buildBatched(doc, bin, instances, { filter: (_k, def) => !!def.gs, sprites: true });
+  group.add(glow);
   group.traverse((o) => {
+    if (o.parent === glow || o === glow) return;
     const mesh = o as THREE.Mesh;
-    if (mesh.isMesh) (mesh.material = (mesh.material as THREE.Material).clone()).side = THREE.FrontSide;
+    if (!mesh.isMesh) return;
+    const mat = (mesh.material as THREE.Material).clone();
+    mat.side = THREE.FrontSide;
+    mat.transparent = false;
+    mat.blending = THREE.NormalBlending;
+    mat.depthWrite = true;
+    mat.alphaTest = 0.5;
+    mesh.material = mat;
   });
   return group;
 }
@@ -263,30 +320,49 @@ async function loadGlobals() {
   }
   const cat = (c: number) => doc.categories?.[c.toString(16)];
   const pickups = new Map<number, THREE.Group>();
-  for (const [id, aura] of Object.entries(PICKUP_AURA)) {
-    const insts = cat(pickupCategory(Number(id)));
+  for (const id of PICKUP_IDS) {
+    const insts = cat(pickupCategory(id));
     if (!insts) continue;
     const holder = new THREE.Group();
-    holder.add(await loadGlobalObject(doc, bin, insts), auraSprite(aura));
-    pickups.set(Number(id), holder);
+    holder.add(await loadGlobalObject(doc, bin, insts, true));
+    pickups.set(id, holder);
   }
   const projectiles = new Map<number, THREE.Group>();
   for (let t = 0; t < PROJECTILES.length; t++) {
     const insts = cat(t in PROJECTILE_CATEGORY_HO ? PROJECTILE_CATEGORY_HO[t] : PROJECTILE_CATEGORY_HC[t] ?? -1);
     if (insts) projectiles.set(t, await loadProjectileModel(doc, bin, insts));
   }
-  return { ...out, pickups, projectiles, doc, bin };
+  // Modelos próprios do lançador (FUN_00148978 no Head-On): Napalm = tabela+0xdc04 (categoria 0x1002), Remote =
+  // +0xdc08 (0x1001), gravados por FUN_00204778; os demais tipos usam o modelo do projétil (FUN_001fd4c8).
+  const launchers = new Map<number, THREE.Group>();
+  for (const [t, c] of [[4, 0x1002], [10, 0x1001]] as const) {
+    const insts = cat(c);
+    if (insts) launchers.set(t, await loadProjectileModel(doc, bin, insts));
+  }
+  return { ...out, pickups, projectiles, launchers, doc, bin };
 }
 
-function spawnPoints(doc: ModelDoc, collision: LevelCollision): V3[] {
-  // Nós do caminho da IA (PTS — superfície dirigível). ⚠️ Spawns reais do DM moram no ELF.
-  const pts = doc.points ?? {};
-  const raw = (pts.pts?.length ? pts.pts : pts.pkp ?? []).map((p) => ps2(p.pos));
-  if (!raw.length) {
+/**
+ * Spawns: nós do grafo dos caminhos (PTS, registros de 32 bytes = nó em memória do grafo 0x2f5c80) com o bit 0x08 de
+ * +0x11; o carro nasce virado para o 1º vizinho (u16 +0x14, FUN_0011cd38). Sem nenhum marcado, todos os nós.
+ */
+function spawnPoints(doc: ModelDoc, collision: LevelCollision): SpawnPoint[] {
+  const nodes = doc.points?.pts ?? [];
+  const word = (p: { raw: string[] }, i: number) => parseInt(p.raw[i] ?? '0', 16) >>> 0;
+  const flags = (p: { raw: string[] }) => (word(p, 1) >>> 8) & 0xff;
+  const firstLink = (p: { raw: string[] }) => ((word(p, 1) >>> 24) & 0xff ? word(p, 2) & 0xffff : -1);
+  const marked = nodes.filter((p) => flags(p) & 0x08);
+  const list = (marked.length ? marked : nodes).map((p) => {
+    const l = firstLink(p);
+    return { pos: ps2(p.pos), face: l >= 0 && nodes[l] ? ps2(nodes[l].pos) : undefined };
+  });
+  if (!list.length) {
+    const pkp = (doc.points?.pkp ?? []).map((p) => ({ pos: ps2(p.pos) }));
+    if (pkp.length) return pkp;
     const c = collision.bounds.getCenter(new THREE.Vector3());
-    raw.push(v3(c.x, collision.bounds.max.y, c.z));
+    list.push({ pos: v3(c.x, collision.bounds.max.y, c.z), face: undefined });
   }
-  return raw;
+  return list;
 }
 
 function placeOnGround(p: V3, shape: VehicleShape, collision: LevelCollision): V3 {
@@ -301,6 +377,10 @@ interface Fx {
   age: number;
   life: number;
   grow: number;
+  /** escala inicial (padrão 1), deslocamento por segundo e esmaecimento (sprites) */
+  size?: number;
+  vel?: THREE.Vector3;
+  fade?: boolean;
 }
 
 // ---------------------------------------------------------------- jogo
@@ -321,6 +401,10 @@ async function main() {
   addEventListener('resize', hudResize, { signal: abort.signal });
   hudResize();
   const match = new Match(collision, spawns, (p, s) => placeOnGround(p, s, collision));
+  // Projéteis atravessam malhas que não escrevem profundidade (ex.: instância 2145 da Arena).
+  match.projectileWorld = collision.passThrough((k) => lvl.meshes[collision.instances[k]?.mesh]?.gs?.zwrite === false);
+  match.setLevel(levelName);
+  const envRule = envRuleFor(levelName);
   // Índice do veículo nas tabelas indexadas por carro+0x14 (nomes 0x2b39f0, cores do radar, perfis da IA): os
   // Head-On seguem o id da tabela de física (0..17); os Harbor City vêm depois (id 21.. → 18..).
   const vehicleId = (model: string) => {
@@ -356,6 +440,18 @@ async function main() {
   const wheelPhase = match.cars.map(() => 0);
   const wasDead = match.cars.map(() => false);
   const lastYaw = match.cars.map((c) => c.state.yaw);
+  /**
+   * Instâncias de clipe do carro tocadas pelo código: 0x18 = congelado (FUN_00127fc0 toca a 1×; FUN_00128078 volta
+   * a −1× nos últimos 30 tiques; FUN_00128108 zera ao descongelar), 0x19 = casca de fogo em laço (FUN_001281e8; no
+   * fim FUN_00128298 liga 0x40 = termina a volta e para).
+   */
+  // Clipes da arma especial (src/game/specialclips.ts): estado por carro e se a especial estava selecionada.
+  // `cues`: deixas do disparo pendentes; `act`: ação vista no último passo (início/fase/fim viram deixas);
+  // `waitReady`: depois de disparar, espera a classe voltar ao estado 0.
+  const specialClips = match.cars.map(() => ({
+    on: false, play: new Map<number, ClipPlayback>(), cues: [] as string[], act: null as { kind: string; phase: number } | null, waitReady: false,
+  }));
+  const fxClips = match.cars.map(() => ({ freeze: { t: 0, speed: 0 }, shell: { t: 0, on: false, stopping: false }, wasFrozen: false, wasShell: false }));
   // Suportes de arma (FUN_00148978): clipe que abre quando a arma é selecionada e fecha (ao contrário) quando
   // outra é escolhida; só um suporte se move por vez. Estado: 0 fechado, 1 aberto/abrindo, 2 fechando.
   const mountsOf = rigs.map((r) =>
@@ -366,7 +462,7 @@ async function main() {
   const projModels = match.cars.map(() => new Map<number, THREE.Object3D>());
   const projectileFor = (i: number, type: number) => {
     let o = projModels[i].get(type);
-    const src = globals.projectiles.get(type);
+    const src = globals.launchers.get(type) ?? globals.projectiles.get(type);
     if (!o && src) projModels[i].set(type, (o = src.clone()));
     return o ?? null;
   };
@@ -399,11 +495,37 @@ async function main() {
   );
   // Destroços e ações soltas pelos nós 0x13 ao piorar de estado (actionDispatch.cpp).
   const debris = new DebrisSystem(scene, collision);
+  // Partículas (FUN_002470c0 / FUN_00247580; rules/particles.json + texturas do RESIDENT.BDD).
+  const particles = await ParticleSystem.load((await fetch(assetURL('rules/particles.json')).then((r) => r.json())) as ParticleDoc);
+  scene.add(particles.group);
+  const T = (p: V3) => new THREE.Vector3(p.x, p.y, p.z);
+  /** Explosão do projétil (FUN_002024a8): até 4 efeitos de +0x74 com escala +0x84; normal do contato ou para cima. */
+  const particleExplosion = (type: number, pos: V3, vel?: V3, normal?: V3, hitCar = false) => {
+    const r = PROJECTILES[type];
+    if (!r) return;
+    for (let k = 0; k < 4; k++) {
+      const id = r.explosion[k];
+      if (id === undefined || id < 0) break;
+      particles.spawn(id, T(pos), { scale: r.explosionScale[k] ?? 1, dir: normal ? T(normal) : undefined, vel: vel ? T(vel) : undefined }, hitCar);
+    }
+  };
+  /** RGB 0xRRGGBB → cor do jogo 0x80BBGGRR (alfa 0x80 = 1,0). */
+  const gsColor = (rgb: number) => (0x80000000 | ((rgb & 0xff) << 16) | (rgb & 0xff00) | ((rgb >> 16) & 0xff)) >>> 0;
+  /** Fogo no carro (FUN_0017f1e8: emissor 0x42 preso ao carro, duração 300). */
+  const burnFx = new Map<number, Emitter>();
+  const specialFx: ({ kind: string; em: Emitter } | null)[] = [];
   const carFrame = new THREE.Matrix4();
-  const destructibles = await LevelDestructibles.build(lvl, lvlBin, collision, debris, PS2_TO_THREE);
+  const destructibles = await LevelDestructibles.build(lvl, lvlBin, collision, debris, PS2_TO_THREE, matAnim ?? undefined);
+  destructibles.fx = {
+    spawn: (id, pos, opts) => particles.spawn(id, pos, opts),
+    // queda (FUN_001a7630) no banco da arena; fogo (FUN_001d2b10) no global
+    play: (name, pos, min, max, volume) => audio.play(levelName, name, { pos: v3(pos.x, pos.y, pos.z), min, max, volume }),
+    loop: (key, name, volume, pos, min, max) => audio.loop(key, 'global', name, volume, { pos: v3(pos.x, pos.y, pos.z), min, max }),
+  };
   destructibles.group.matrixAutoUpdate = false;
   destructibles.group.matrix.copy(PS2_TO_THREE);
   scene.add(destructibles.group);
+  match.sceneTargets = () => destructibles.targets().map((t) => v3(t.pos.x, t.pos.y, t.pos.z));
   const V = (p: V3) => new THREE.Vector3(p.x, p.y, p.z);
   const muzzleUntil = match.cars.map(() => 0);
   // Pickups: ícone girando por cima do ponto do PKP.
@@ -430,26 +552,33 @@ async function main() {
       m.matrixAutoUpdate = false;
       // FUN_00203c68: escala da instância 0,25 no tipo 0x18 e 0,65 no 0x1d; os demais em 1.
       const k = p.type === 0x18 ? 0.25 : p.type === 0x1d ? 0.65 : 1;
-      m.matrix.copy(PS2_TO_THREE).multiply(new THREE.Matrix4().makeScale(k, k, k));
+      // Frente do projétil = +Y do PS2 (nariz dos mísseis, ponta da bala) → +Z do voo: o mesmo giro dos carros.
+      m.matrix.copy(VEHICLE_TO_THREE).multiply(new THREE.Matrix4().makeScale(k, k, k));
       o.add(m);
-    } else if (!isBullet(p.type)) {
-      const f = globals.fireball.clone();
-      f.scale.multiplyScalar(2);
-      o.add(f);
     }
-    if (r?.light) o.add(auraSprite((Math.round(r.lightR) << 16) | (Math.round(r.lightG) << 8) | Math.round(r.lightB), 6));
     scene.add(o);
     projObjs.set(p, o);
+    // FUN_00203c68: emissor +0x6c e rastro +0x70 presos à posição e à matriz do projétil (frente = Y do PS2);
+    // 0x17/0x2d em meia escala, rastro do Power tingido 0x804b96ff, 0x18 em branco.
+    const follow = () => {
+      const c = Math.cos(p.pitch);
+      return { pos: T(p.pos), forward: new THREE.Vector3(Math.sin(p.yaw) * c, Math.sin(p.pitch), Math.cos(p.yaw) * c) };
+    };
+    const scale = p.type === 0x17 || p.type === 0x2d ? 0.5 : 1;
+    const list: Emitter[] = [];
+    if (r && r.emitter >= 0) {
+      const e = particles.attach(r.emitter, follow, { scale, color: p.type === 0x18 ? 0x80ffffff : undefined });
+      if (e) list.push(e);
+    }
+    if (r && r.trail >= 0) {
+      const e = particles.attach(r.trail, follow, { color: p.type === 6 ? 0x804b96ff : undefined });
+      if (e) list.push(e);
+    }
+    projEmitters.set(p, list);
     return o;
   };
+  const projEmitters = new Map<Projectile, Emitter[]>();
   // Traçantes da metralhadora.
-  const tracerGeo = new THREE.BufferGeometry();
-  const tracerPos = new Float32Array(64 * 6);
-  tracerGeo.setAttribute('position', new THREE.BufferAttribute(tracerPos, 3));
-  const tracers = new THREE.LineSegments(tracerGeo, new THREE.LineBasicMaterial({ color: 0xffdd66 }));
-  tracers.frustumCulled = false;
-  scene.add(tracers);
-  let tracerList: { from: V3; to: V3; age: number }[] = [];
   const fx: Fx[] = [];
   /** Explosão do tipo: tamanho pelo raio (+0x04) e escala do 1º efeito (+0x84). ⚠️ host: prefabs no lugar das partículas. */
   const explode = (pos: V3, type: number) => {
@@ -508,6 +637,10 @@ async function main() {
   // Nome curto de cada carro (0x2b39f0) e cor no radar (0x2ba6c8), pelo índice do veículo.
   const shortName = (model: string) => SHORT_NAMES[vehicleId(model)] ?? model;
   const handle = (e: MatchEvent) => {
+    if (e.kind === 'specialCue') {
+      specialClips[e.car].cues.push(e.cue);
+      return;
+    }
     if (e.kind === 'shot') {
       muzzleUntil[e.car] = performance.now() + 60;
       // Metralhadora: um som a cada ~3 tiros por carro para não saturar. ⚠️ host: faixa 15–650 (a das armas).
@@ -516,17 +649,78 @@ async function main() {
         lastGunSound = performance.now();
       }
     } else if (e.kind === 'bulletHit') {
+      particleExplosion(e.type, e.pos, e.vel, e.normal, e.car);
       // Impacto da bala (FUN_00153ff0): metal no carro, terra no cenário (⚠️ superfície do chão não lida).
       if (performance.now() - lastBulletSound > 60) {
         audio.play('global', e.car ? 'W_BUL_METAL' : 'W_BUL_DIRT', { pos: e.pos, volume: 0.6 });
         lastBulletSound = performance.now();
       }
     } else if (e.kind === 'launch') {
+      // FUN_00147ec8 → FUN_001474f0: o projétil sai do marcador 0x00F0 no disparo. Com munição sobrando a classe pede
+      // o suporte de novo (suporte+4 = 1) e FUN_00148978 refaz o clipe do início (FUN_00127778, com S_DEPLOY) e
+      // pendura outro modelo (FUN_00147568): a "recarga" sobe com o suporte.
+      const r = rigs[e.car];
+      const mt = mountsOf[e.car].find((m) => m.weapon === e.weapon && m.state === 1);
+      if (r && mt) {
+        const c = match.cars[e.car];
+        const t = WEAPON_TYPE[mt.weapon];
+        r.setProjectile(t, null);
+        if ((c.ammo[mt.weapon] ?? 0) > 0) {
+          mt.t = 0;
+          r.setProjectile(t, projectileFor(e.car, t));
+          const wb = audio.weaponBank(c.model);
+          if (wb) audio.play(wb, 'S_DEPLOY', { pos: match.center(c), min: 20, max: 600 });
+        }
+      }
       if (e.weapon === 'special') playSpecial(match.cars[e.car].model, e.pos);
       else if (LAUNCH[e.weapon]) audio.play('global', LAUNCH[e.weapon]!, { pos: e.pos, ...WEAPON_RANGE });
     } else if (e.kind === 'special') {
       playSpecial(e.model, e.pos);
-      explode(e.pos, 1);
+      if (!e.noFx) explode(e.pos, 1); // ⚠️ host: clarão-prefab dos especiais sem partícula própria
+    } else if (e.kind === 'energy') {
+      // Onda: E_FLAK_COMBO (FUN_00151170, chamada pela onda FUN_0014c818); gelo: E_FRZ_IMPACT (FUN_001545a8 área).
+      // ⚠️ host: E_FRZ_LAUNCH / W_MINE / W_FIRE_BURN_L / W_HOMMISS_LNCH para congelar, mina, casca e míssil de
+      // energia (chamadas por tabela não achadas).
+      const name = { freeze: 'E_FRZ_LAUNCH', mine: 'W_MINE', blast: 'E_FLAK_COMBO', shell: 'W_FIRE_BURN_L', frozen: 'E_FRZ_IMPACT', boost: 'W_HOMMISS_LNCH' }[e.what];
+      audio.play('global', name, { pos: e.pos, ...WEAPON_RANGE });
+      if (e.what === 'blast') explode(e.pos, 3);
+    } else if (e.kind === 'env') {
+      // FUN_001d7b48: jatos 0x3e (escala 2, para cima) + 0x3b na cor do bocal; clarão 0x3c (1) + 0x3b (2) brancos;
+      // faíscas 0x3c (1) + 0x3b (2) na cor sorteada.
+      const col = gsColor(e.color);
+      if (e.fx === 'start' && envRule) audio.play(levelName, envRule.sound.name, { pos: e.pos, min: envRule.sound.min, max: envRule.sound.max });
+      else if (e.fx === 'jet') {
+        particles.spawn(0x3e, T(e.pos), { scale: 2, dir: new THREE.Vector3(0, 1, 0), color: col });
+        particles.spawn(0x3b, T(e.pos), { scale: 2, color: col });
+      } else if (e.fx === 'flash') {
+        particles.spawn(0x3c, T(e.pos), { scale: 1, color: col });
+        particles.spawn(0x3b, T(e.pos), { scale: 2, color: col });
+      } else if (e.fx === 'spark') {
+        particles.spawn(0x3c, T(e.pos), { scale: 1, color: col });
+        particles.spawn(0x3b, T(e.pos), { scale: 2, color: col });
+        if (envRule) audio.play(levelName, envRule.sparkSound.name, { pos: e.pos, min: envRule.sparkSound.min, max: envRule.sparkSound.max });
+      }
+    } else if (e.kind === 'hitFx') {
+      // FUN_0011f280: 0x3c (3), 0x3e (2) duas vezes para cima sorteado e 0x3b (2), cor 0x80f040a0
+      const c = 0x80f040a0;
+      particles.spawn(0x3c, T(e.pos), { scale: 3, color: c });
+      for (let k = 0; k < 2; k++) {
+        const d = new THREE.Vector3(Math.random() * 2 - 1, 0.25 + Math.random() * 0.75, Math.random() * 2 - 1).normalize();
+        particles.spawn(0x3e, T(e.pos), { scale: 2, dir: d, color: c });
+      }
+      particles.spawn(0x3b, T(e.pos), { scale: 2, color: c });
+    } else if (e.kind === 'burn') {
+      // FUN_0017f1e8: emissor 0x42 preso à posição e à matriz do carro, duração 300; apagar = FUN_00249828.
+      burnFx.get(e.car)?.stop();
+      burnFx.delete(e.car);
+      if (e.on) {
+        const c = match.cars[e.car];
+        const em = particles.attach(0x42, () => ({ pos: T(c.state.pos), forward: T(forwardOf(c.state.yaw)), right: T(rightOf(c.state.yaw)) }));
+        if (em) {
+          em.duration = 300;
+          burnFx.set(e.car, em);
+        }
+      }
     } else if (e.kind === 'message') {
       if (e.car === player.id) hud.message(e.text);
     } else if (e.kind === 'bounce') {
@@ -534,7 +728,7 @@ async function main() {
     } else if (e.kind === 'impact') collisionSound(e.speed, e.pos);
     else if (e.kind === 'ram') {
       // Batida no cenário: o mesmo som das colisões (FUN_00142290 → FUN_00141ca0), no máximo 4 por segundo por carro.
-      destructibles.hitTag(e.tag, e.speed * RAM_DAMAGE, { kind: 'ram', pos: V(e.pos) }, performance.now() / 1000);
+      destructibles.hitTag(e.tag, ramDamage(e.speed, e.maxMph), { kind: 'ram', pos: V(e.pos), vel: V(e.vel) }, performance.now() / 1000);
       if (clock() - (lastRam[e.car] ?? 0) > 0.25) {
         lastRam[e.car] = clock();
         collisionSound(e.speed, e.pos);
@@ -548,10 +742,10 @@ async function main() {
       const r = rigs[e.car];
       if (r) r.hitPart(r.group.worldToLocal(new THREE.Vector3(e.pos.x, e.pos.y, e.pos.z)), e.amount, performance.now() / 1000, 4);
     } else if (e.kind === 'explosion') {
-      explode(e.pos, e.type);
-      // Área nos destrutíveis: metade do raio (FUN_00202d08 → FUN_0022c5a8(raio·0,5)).
+      particleExplosion(e.type, e.pos, e.vel, e.normal, e.hitCar);
+      // Área nos destrutíveis (FUN_00202d08: consulta a raio·0,5, queda pelo raio inteiro).
       const w = PROJECTILES[e.type];
-      if (w) destructibles.blast(V(e.pos), w.blastRadius * 0.5, w.damage, e.weapon, performance.now() / 1000);
+      if (w) destructibles.blast(V(e.pos), w.blastRadius, w.damage, e.weapon, performance.now() / 1000);
       // FUN_00152b48: W_EXPLO_MED 60–650; FUN_00150c98: W_EXPLO_LRG 15–650. ⚠️ host: qual arma usa qual.
       const name = EXPLO[e.weapon] ?? (w && w.blastRadius > 0 ? 'W_EXPLO_LRG' : 'W_EXPLO_MED');
       const big = name === 'W_EXPLO_LRG';
@@ -622,6 +816,19 @@ async function main() {
   let lastSelected: WeaponId | null = null;
   let pendingNext = false;
 
+  // Abertura do nível (FUN_001b5ab8): sem a cena (pedido do usuário, 2026-10-14) — a partida começa no estado de
+  // "pulado" (FUN_001b5d88): os objetos do roteiro 0 vão ao fim do clipe e, na ARENA, o 0xC23 toca o clipe 2.
+  const introDef = lvl.intros?.find((i) => i.index === 0);
+  if (introDef) {
+    const t0 = animTick();
+    for (const [cat, , clipCat] of introDef.script) {
+      const o = objClips.objectOf(cat);
+      if (o && objClips.play(o, clipCat, t0)) objClips.finish(o);
+    }
+    const c23 = levelName === 'arena' ? objClips.objectOf(0xc23) : undefined;
+    if (c23) objClips.play(c23, 2, t0);
+  }
+
   renderer.setAnimationLoop((now) => {
     const dt = Math.min((now - last) / 1000, 0.08); // evita espiral da morte
     last = now;
@@ -645,6 +852,15 @@ async function main() {
       match.step(STEP, new Map([[player.id, act]]));
       for (const c of match.cars) if (c.deadFor === 0 && c.state.pos.y < killY) match.respawn(c);
       for (const e of match.drain()) handle(e);
+      // Ações que duram (choque, pisão, garra, canhão…): início = 'fire', troca de fase = 'phaseN', fim = 'end'/'abort'.
+      match.cars.forEach((c, i) => {
+        const sc = specialClips[i];
+        const now = c.action ? { kind: c.action.kind, phase: c.action.phase } : null;
+        if (now && !sc.act) sc.cues.push('fire', `start:${now.kind}`);
+        else if (now && sc.act && now.phase !== sc.act.phase) sc.cues.push(`phase${now.phase}`);
+        else if (!now && sc.act) sc.cues.push(sc.act.kind === 'cannon' && sc.act.phase === 1 ? 'abort' : 'end');
+        sc.act = now;
+      });
       hud.tick();
       acc -= STEP;
     }
@@ -656,6 +872,8 @@ async function main() {
       const r = rigs[i];
       const dead = c.deadFor > 0;
       if (wasDead[i] && !dead) r?.resetDamage(); // renasceu (FUN_0012ea48)
+      const ice = m.getObjectByName('freeze');
+      if (ice) ice.visible = c.frozen > 0 && !dead;
       wasDead[i] = dead;
       // Estado de dano dos nós 0x13 pela vida; morto (vida 0) = carcaça até renascer. Sem nós 0x13, some.
       r?.setHealth(c.health / MATCH_RULES.maxHealth, now / 1000);
@@ -667,7 +885,12 @@ async function main() {
       basisM.makeBasis(new THREE.Vector3(b.x.x, b.x.y, b.x.z), new THREE.Vector3(b.y.x, b.y.y, b.y.z), new THREE.Vector3(b.z.x, b.z.y, b.z.z));
       m.position.set(pos.x, pos.y, pos.z);
       m.quaternion.setFromRotationMatrix(basisM);
-      if (c.spin) m.rotateY(c.spin); // especial do Twister (giro visual)
+      // Pose dos especiais: Twister sobe, inclina e gira (FUN_001e4670 +0xa0/+0xa8, +0x8c); preso na garra do Mr. Slam
+      // de cabeça para baixo (FUN_001b1fc0 +0xa4 + π).
+      if (c.pose?.lift) m.position.y += c.pose.lift;
+      if (c.spin) m.rotateY(c.spin);
+      if (c.pose?.tilt) m.rotateX(c.pose.tilt);
+      if (c.pose?.roll) m.rotateZ(c.pose.roll);
       const shadow = shadows[i];
       if (shadow) placeShadow(shadow, c.state, dead);
       if (r) {
@@ -684,6 +907,29 @@ async function main() {
         // Seletores (FUN_00230138): chama do turbo (0x44, FUN_001238c8) e lanternas (0x41: 2 com freio,
         // FUN_0011f1e8; o filho 1 depende de um flag que o código nunca liga, como o brilho dos faróis 0x40).
         r.setSelector(0x44, c.boosting ? 1 : 0);
+        r.setSelector(0x43, c.shell > 0 ? 1 : 0); // casca de fogo (FUN_00123010)
+        const fc = fxClips[i];
+        const frozen = c.frozen > 0 && !dead;
+        if (frozen && !fc.wasFrozen) fc.freeze = { t: 0, speed: 1 };
+        else if (!frozen && fc.wasFrozen) fc.freeze = { t: 0, speed: 0 };
+        else if (frozen && c.frozen < 30) fc.freeze.speed = -1;
+        fc.wasFrozen = frozen;
+        const fClip = r.rig.clips.find((cl) => cl.category === 0x18);
+        if (fClip) {
+          fc.freeze.t = Math.max(0, Math.min(1, fc.freeze.t + (fc.freeze.speed * dt * 60) / Math.max(fClip.duration - (fClip.start ?? 0), 1)));
+          r.time.set(0x18, fc.freeze.t);
+        }
+        const shellOn = c.shell > 0 && !dead;
+        if (shellOn && !fc.wasShell) fc.shell = { t: 0, on: true, stopping: false };
+        else if (!shellOn && fc.wasShell && fc.shell.on) fc.shell.stopping = true;
+        fc.wasShell = shellOn;
+        const sClip = r.rig.clips.find((cl) => cl.category === 0x19);
+        if (sClip && fc.shell.on) {
+          const t = fc.shell.t + (dt * 60) / Math.max(sClip.duration - (sClip.start ?? 0), 1);
+          if (t >= 1 && fc.shell.stopping) fc.shell = { t: 0, on: false, stopping: false };
+          else fc.shell.t = t - Math.floor(t);
+          r.time.set(0x19, fc.shell.t);
+        }
         r.setSelector(0x41, c.braking ? 2 : 0);
         // Rodas: giro pela distância percorrida (raio ~2 pés ⚠️), esterço pela taxa de giro, suspensão no meio.
         const spd = Math.hypot(c.state.vel.x, c.state.vel.z) * Math.sign(c.state.vel.x * Math.sin(c.state.yaw) + c.state.vel.z * Math.cos(c.state.yaw) || 1);
@@ -739,6 +985,44 @@ async function main() {
           clipT.set(mt.clip.category, Math.max(clipT.get(mt.clip.category) ?? 0, mt.t));
         }
         for (const [cat, t] of clipT) r.time.set(cat, t);
+        // Especial (FUN_0014a4e0): ao selecionar, vtable +0x14 (estado 0); ao trocar, +0x1c. Morte zera.
+        const spRule = SPECIAL_CLIPS[c.model];
+        if (spRule) {
+          const sc = specialClips[i];
+          const isSp = c.selected === 'special' && !dead;
+          const k = r.rig.mountSpeed ?? 1;
+          const has = (cat: number) => r.rig.clips.some((cl) => cl.category === cat);
+          let sound: 'deploy' | 'retract' | null = null;
+          const ammoOk = !spRule.ammo || (c.ammo.special ?? 0) > 0;
+          if (dead) {
+            for (const p of sc.play.values()) p.t = p.speed = 0;
+            sc.cues.length = 0;
+            sc.waitReady = false;
+          } else if (isSp && !sc.on) {
+            if (ammoOk) sound = applyClipOps(sc.play, spRule.select, k, has);
+          } else if (!isSp && sc.on) sound = applyClipOps(sc.play, spRule.deselect, k, has);
+          sc.on = isSp;
+          // Disparo: deixas do Match e das ações; depois, pronta de novo quando a espera passa e o botão é solto.
+          for (const cue of sc.cues.splice(0)) {
+            const ops = spRule.cues?.[cue];
+            if (ops) sound = applyClipOps(sc.play, ops, k, has) ?? sound;
+            if (cue === 'fire' || cue === 'alt' || cue === 'end' || cue === 'abort') sc.waitReady = true;
+          }
+          if (sc.waitReady && isSp && !c.action && match.tick > c.nextFire && !c.fireWasHeld && ammoOk) {
+            sc.waitReady = false;
+            if (spRule.ready) sound = applyClipOps(sc.play, spRule.ready, k, has) ?? sound;
+          }
+          if (sound) {
+            const wb = audio.weaponBank(c.model);
+            if (wb) audio.play(wb, sound === 'deploy' ? 'S_DEPLOY' : 'S_RETRACT', { pos: match.center(c), min: 20, max: 600 });
+          }
+          const clipOf = (cat: number) => r.rig.clips.find((x) => x.category === cat);
+          stepClips(sc.play, dt, (cat) => {
+            const cl = clipOf(cat);
+            return cl ? cl.duration - (cl.start ?? 0) : 1;
+          }, (cat) => !!clipOf(cat)?.loop);
+          for (const [cat, p] of sc.play) r.time.set(cat, p.t);
+        }
         r.update();
       }
     });
@@ -756,33 +1040,87 @@ async function main() {
       if (live.has(p)) continue;
       scene.remove(o);
       projObjs.delete(p);
+      for (const em of projEmitters.get(p) ?? []) em.stop(); // FUN_00249828: para de emitir; as vivas terminam
+      projEmitters.delete(p);
+    }
+    // Luzes dos projéteis (instância+0x5c, FUN_0024c350): as 8 mais perto do carro do jogador (FUN_0024c740).
+    const eye = match.center(player);
+    // + luzes das partículas (FUN_002464e8 → FUN_002347d8), no mesmo pool das 8 mais perto
+    const lit = [
+      ...match.projectiles
+        .filter((p) => PROJECTILES[p.type]?.light)
+        .map((p) => {
+          const r = PROJECTILES[p.type];
+          return { pos: lerp(p.prev, p.pos, alpha), r: r.lightR / 255, g: r.lightG / 255, b: r.lightB / 255, radius: 250 };
+        }),
+      ...particles.lights().map((l) => ({ pos: v3(l.pos.x, l.pos.y, l.pos.z), r: l.color.r, g: l.color.g, b: l.color.b, radius: l.radius })),
+      // Hammerhead com alvo ao alcance do pisão (FUN_001977b8): luz do pool (FUN_0024c448, raio 250) em
+      // (25,5; 51; 204) — ⚠️ a mesma escala/queda do host das outras luzes
+      ...match.cars
+        .filter((c) => c.model === 'hamr' && c.deadFor === 0 && c.selected === 'special' && (c.ammo.special ?? 0) > 0 && match.stompTarget(c, 175) !== null)
+        .map((c) => ({ pos: match.center(c), r: 25.5 / 255, g: 51 / 255, b: 204 / 255, radius: 250 })),
+    ]
+      .map((l) => ({ l, d: (l.pos.x - eye.x) ** 2 + (l.pos.y - eye.y) ** 2 + (l.pos.z - eye.z) ** 2 }))
+      .sort((a, b) => a.d - b.d);
+    for (let k = 0; k < MAX_DYN_LIGHTS; k++) {
+      const e = lit[k]?.l;
+      const c = dynLights.uDynColor.value[k];
+      if (!e) {
+        c.setRGB(0, 0, 0);
+        continue;
+      }
+      dynLights.uDynPos.value[k].set(e.pos.x, e.pos.y, e.pos.z);
+      c.setRGB(e.r, e.g, e.b);
+      dynLights.uDynRadius.value[k] = e.radius;
     }
     for (const p of match.projectiles) {
       const o = projectileObj(p);
       const at = lerp(p.prev, p.pos, alpha);
       o.position.set(at.x, at.y, at.z);
       o.rotation.set(-p.pitch, p.yaw, 0, 'YXZ');
-      // Balas: traçante do trecho percorrido no tique (o modelo 0xfa0 é minúsculo).
-      if (isBullet(p.type)) tracerList.push({ from: p.prev, to: p.pos, age: 0.035 });
     }
-    // Traçantes (70 ms).
-    tracerList = tracerList.filter((tr) => (tr.age += dt) < 0.07).slice(-64);
-    tracerPos.fill(0);
-    tracerList.forEach((tr, i) => tracerPos.set([tr.from.x, tr.from.y, tr.from.z, tr.to.x, tr.to.y, tr.to.z], i * 6));
-    tracerGeo.attributes.position.needsUpdate = true;
-    tracerGeo.setDrawRange(0, tracerList.length * 2);
     debris.update(dt, t);
     destructibles.update(t);
+    // Especiais com partículas presas: objeto do Derby (⚠️ host: rastro 0x16 no lugar do modelo do objeto
+    // 0x356108) e raio do Spectre HC (FUN_001e11a8: emissor 0x1e vermelho 0x800020ff na saída).
+    match.cars.forEach((c, i) => {
+      const act = c.action;
+      const want = act?.kind === 'derby' ? 'derby' : act?.kind === 'beam' ? 'beam' : act?.kind === 'arc' ? 'arc' : null;
+      const cur = specialFx[i];
+      if (cur && cur.kind !== want) {
+        cur.em.stop();
+        specialFx[i] = null;
+      }
+      if (!want || specialFx[i]) return;
+      const em = want === 'derby'
+        ? particles.attach(0x16, () => ({ pos: T(c.action?.obj?.pos ?? c.state.pos), forward: T(c.action?.obj?.dir ?? forwardOf(c.state.yaw)) }))
+        : want === 'arc'
+          // Dark Tooth: ⚠️ host — o relâmpago do jogo (FUN_0021e1e8, emissor 0x28) não está portado; feixe 0x1e
+          // azulado do teto rumo ao alvo travado
+          ? particles.attach(0x1e, () => {
+              const from = { ...match.center(c), y: match.center(c).y + c.shape.top };
+              const tgt = c.action?.target != null ? match.center(match.cars[c.action.target]) : null;
+              const d = tgt ? { x: tgt.x - from.x, y: tgt.y - from.y, z: tgt.z - from.z } : forwardOf(c.state.yaw);
+              const L = Math.hypot(d.x, d.y, d.z) || 1;
+              return { pos: T(from), forward: T({ x: d.x / L, y: d.y / L, z: d.z / L }) };
+            }, { color: 0x80ffa060 })
+          : particles.attach(0x1e, () => ({ pos: T(match.muzzle(c)), forward: T(forwardOf(c.state.yaw)) }), { color: 0x800020ff });
+      if (em) specialFx[i] = { kind: want, em };
+    });
+    particles.update(dt);
     // Explosões: crescem e somem.
     for (let i = fx.length - 1; i >= 0; i--) {
       const f = fx[i];
       f.age += dt;
       if (f.age >= f.life) {
         scene.remove(f.obj);
+        if (f.obj instanceof THREE.Sprite) f.obj.material.dispose();
         fx.splice(i, 1);
         continue;
       }
-      f.obj.scale.setScalar(1 + f.grow * (f.age / f.life));
+      f.obj.scale.setScalar((f.size ?? 1) * (1 + f.grow * (f.age / f.life)));
+      if (f.vel) f.obj.position.addScaledVector(f.vel, dt);
+      if (f.fade && f.obj instanceof THREE.Sprite) f.obj.material.opacity = 1 - f.age / f.life;
     }
 
     const nowMs = performance.now();
@@ -863,6 +1201,11 @@ async function main() {
     lastSelected = player.selected;
 
     skyUpdate?.(camera);
+    const tick = animTick();
+    objRigs?.update(tick);
+    matAnim?.update(tick);
+    camera.updateMatrixWorld();
+    particles.render(camera);
     renderer.render(scene, camera);
     hud.render(renderer, hudState(), dt);
     renderHud(fps, drawCalls, collision.triangleCount);
@@ -899,7 +1242,7 @@ async function main() {
     return {
       health: player.health / MATCH_RULES.maxHealth,
       turbo: player.turbo / MATCH_RULES.turboMax,
-      energy: 1, // ⚠️ host: ataques de energia não implementados (carro+0x6898 começa em 1,0 — FUN_00123cd0)
+      energy: player.energy, // carro+0x6898 (FUN_00139cd8: clipe 1 do painel)
       dead: player.deadFor > 0,
       respawnIn: MATCH_RULES.respawnDelay - player.deadFor,
       ammo,
@@ -940,8 +1283,12 @@ async function main() {
     selectors: () => rigs.map((r) => r?.selectorStates() ?? null),
     debris: () => debris.count,
     debrisSys: debris,
+    particles,
     destructibles,
+    objClips,
+    objRigs: () => objRigs,
     rigs,
+    camera,
     spawns,
     collision,
     THREE,

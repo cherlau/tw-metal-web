@@ -1,0 +1,21 @@
+# Estado das especiais restantes (estado 0 = selecionada)
+at:1fd278 wart_state
+at:116358 edatv_state
+at:117df8 edplayer_state
+at:16c708 dark1_state
+at:170360 darkpla1_state
+at:17b1a0 edboss_state
+at:19a670 darkpla2_state
+at:1b0e90 hc_axel_state
+at:1c2f70 hc_derby_state
+at:1c93c8 hc_hears_state
+at:1c9918 hc_taxi_state
+at:1d0910 hc_grim_state
+at:1d6770 hc_sweet_state
+at:1d85c8 hc_tow_state
+at:1db498 hc_preac_state
+at:1dd3c0 hc_rock_state
+at:1dd7e8 hc_semi_state
+at:1e11a8 hc_vette_state
+at:1e39b0 hc_suv_state
+at:16dfa0 dark2_state

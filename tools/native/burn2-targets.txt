@@ -1,0 +1,2 @@
+# Atualização de cada fogo (gerente 0x349150, 10 slots de 0x40)
+at:17f400 burn_update

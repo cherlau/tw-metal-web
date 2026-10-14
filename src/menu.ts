@@ -18,8 +18,11 @@ const audio = new AudioEngine('menu', abort.signal); // nível sem faixas -> tri
 const SHELL_CAR: Record<string, string> = {
   axel: 'AXEL', cop: 'COP', crim: 'CRIMSON', sweet: 'SWEETT', twist: 'TWISTER', spectre: 'SPECTRE', thump: 'THUMPER',
   grass: 'GRASS', hamr: 'HAMMER', rkill: 'ROADKILL', wart: 'WARTHOG', mrslam: 'MRSLAM', mrgrim: 'GRIMM', hearse: 'SHADOW',
-  edatv: 'ATV', edboss: 'EDDY', dark1: 'DARKT1', dark2: 'DARKT2',
+  edatv: 'ATV', edboss: 'EDDY', dark1: 'DARKT1', dark2: 'DARKT2', edplayer: 'EDDY', darkpla1: 'DARKT1',
 };
+/** Versões jogáveis usam ícone, cartão e biografia do chefe (o UI.BDD só os tem com o id do chefe). ⚠️ host */
+const UI_ID: Record<string, string> = { edplayer: 'edboss', darkpla1: 'dark1' };
+const uiId = (id: string) => UI_ID[id] ?? id;
 let idleKey = '';
 /** Som da seleção: S_SCROLL, ronco do carro e marcha lenta em laço; ambiente FE_AMB por baixo. */
 function selectSound(car: string | null) {
@@ -138,7 +141,7 @@ async function main() {
     fetch(assetURL('ui/menu.json')).then((r) => r.json()),
     HudFont.load(0),
   ]);
-  const carName = (id: string) => menu.bios[id]?.car ?? displayName(rules[id]?.name, id);
+  const carName = (id: string) => menu.bios[uiId(id)]?.car ?? displayName(rules[id]?.name, id);
   const levelName = (id: string) => menu.levelNames[id] ?? id;
 
   root.innerHTML = `
@@ -148,7 +151,7 @@ async function main() {
     <div class="cols">
       <section class="cars">
         ${CAR_GROUPS.map((g) => `<div class="title" data-label="${esc(g.title)}"></div><div class="grid">${g.cars
-          .map((c) => `<button data-car="${c}" title="${esc(carName(c))}"><img src="${assetURL(`ui/${menu.icons[c] ?? ''}`)}" alt="${esc(carName(c))}"></button>`)
+          .map((c) => `<button data-car="${c}" title="${esc(carName(c))}"><img src="${assetURL(`ui/${menu.icons[uiId(c)] ?? ''}`)}" alt="${esc(carName(c))}"></button>`)
           .join('')}</div>`).join('')}
       </section>
       <section class="preview">
@@ -223,10 +226,10 @@ async function main() {
     shown = id;
     const nameEl = document.getElementById('carname')!;
     nameEl.replaceChildren(label(font, carName(id), 22, [0xdd, 0xdb, 0x0a, 0x80]));
-    const bio = menu.bios[id];
+    const bio = menu.bios[uiId(id)];
     const card = document.getElementById('card') as HTMLImageElement;
-    card.hidden = !menu.cards[id];
-    if (menu.cards[id]) card.src = assetURL(`ui/${menu.cards[id]}`);
+    card.hidden = !menu.cards[uiId(id)];
+    if (menu.cards[uiId(id)]) card.src = assetURL(`ui/${menu.cards[uiId(id)]}`);
     card.alt = bio ? `${bio.car} — ${bio.driver}` : '';
     document.getElementById('bio')!.textContent = bio ? `${bio.driver}: ${bio.bio}` : '';
     try {

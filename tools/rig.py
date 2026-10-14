@@ -80,6 +80,9 @@ class Clip:
     tracks: list[Track] = field(default_factory=list)
     # bit 1 do u16 em +0x0E: a instância toca em laço (FUN_00211348 copia para o bit 0x10000 da instância)
     loop: bool = False
+    # bit 0 do u16 em +0x0E: o objeto toca o clipe ao ser montado (FUN_002111f8 testa 0x10000 do word +0x0C e
+    # chama FUN_002107e8: instância começando no relógio da carga)
+    auto: bool = False
 
 
 def bone_of(data: bytes, node: int, parent: int) -> Bone:
@@ -163,7 +166,8 @@ def tangent(raw: int) -> float:
     if raw > 0x4000:
         return 16384.0 / (32768.0 - raw)
     if raw < -0x3FFF:
-        return 16384.0 / (-32768.0 - raw)
+        # −32768: divisão por zero; a FPU do EE não tem infinito e satura em +MAX
+        return 16384.0 / (-32768.0 - raw) if raw != -32768 else 3.4028234e38
     return raw / 16384.0
 
 
@@ -198,7 +202,7 @@ def _track(data: bytes, p: int) -> Track:
 
 def _clip(data: bytes, n: int) -> Clip:
     clip = Clip(_u32(data, n) >> 18, round(_f32(data, n + 8), 4), round(_f32(data, n + 4), 4),
-                loop=bool((_u32(data, n + 0x0C) >> 17) & 1))
+                loop=bool((_u32(data, n + 0x0C) >> 17) & 1), auto=bool((_u32(data, n + 0x0C) >> 16) & 1))
     p = n
     for i in range(struct.unpack_from("<H", data, n + 0x0C)[0]):
         p -= 4 * struct.unpack_from("<H", data, n + 0x12 + 2 * i)[0]
@@ -206,18 +210,33 @@ def _clip(data: bytes, n: int) -> Clip:
     return clip
 
 
+def object_clip_table(data: bytes, obj: int) -> list[int] | None:
+    """Tabela de clipes de um objeto 0x11: objeto+0x20 → u16 n, n ponteiros em +0x10. É a lista que FUN_002110d8
+    percorre (o 1º clipe de cada categoria vence)."""
+    t = _u32(data, obj + 0x20) if obj + 0x24 <= len(data) else 0
+    if not t or t + 0x10 > len(data):
+        return None
+    n = struct.unpack_from("<H", data, t)[0]
+    return [_u32(data, t + 0x10 + 4 * i) for i in range(n)]
+
+
+def object_clips(data: bytes, obj: int) -> list[Clip]:
+    """Clipes de um objeto 0x11 na ordem da tabela, só o 1º de cada categoria (FUN_002110d8)."""
+    out, seen = [], set()
+    for n in object_clip_table(data, obj) or []:
+        if not n or n + 0x14 > len(data) or _u32(data, n) & 0x3F != 0x0B or _u32(data, n) >> 18 in seen:
+            continue
+        seen.add(_u32(data, n) >> 18)
+        out.append(_clip(data, n))
+    return out
+
+
 def clip_table(data: bytes) -> list[int] | None:
-    """Tabela de clipes do objeto do carro (1º objeto da lista 0x06): objeto+0x20 → u16 n, n ponteiros em +0x10.
-    É a lista que FUN_002110d8 percorre (o 1º clipe de cada categoria vence)."""
+    """Tabela de clipes do objeto do carro (1º objeto da lista 0x06; ver object_clip_table)."""
     for r in ngp.roots(data):
         if _u32(data, r) & 0xFF != 0x06 or not _u32(data, r + 4):
             continue
-        obj = _u32(data, r + 8)
-        t = _u32(data, obj + 0x20) if obj + 0x24 <= len(data) else 0
-        if not t or t + 0x10 > len(data):
-            return None
-        n = struct.unpack_from("<H", data, t)[0]
-        return [_u32(data, t + 0x10 + 4 * i) for i in range(n)]
+        return object_clip_table(data, _u32(data, r + 8))
     return None
 
 

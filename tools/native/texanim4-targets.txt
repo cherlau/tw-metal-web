@@ -1,0 +1,3 @@
+# Animação de textura: desenho de malha (geometria em +0x60+16n)
+at:218034 mesh_draw
+at:272cb0 mesh_x

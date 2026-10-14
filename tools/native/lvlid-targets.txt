@@ -1,0 +1,3 @@
+# Quem lê a tabela de nomes de fase (0x2c37d0) e grava DAT_002f4900
+2c37d0 lvlnames
+2c3838 lvlbanks

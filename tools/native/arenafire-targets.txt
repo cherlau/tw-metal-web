@@ -1,0 +1,12 @@
+# Destrutíveis: fogo (continuação agendada), slot de efeitos, som/efeito do tombamento, gerentes de categoria
+at:1730b8 fire_tick
+at:2a3460 fire_thunk
+at:1d2b08 fire_sound
+at:2302f0 slot_alloc
+at:230428 slot_set
+at:2303d0 slot_color
+at:1e2348 topple_fx
+at:1e21b8 topple_ram
+at:1e2000 topple
+at:1717c8 e10_cb
+at:171690 cat119e

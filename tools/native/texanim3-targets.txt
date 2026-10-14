@@ -1,0 +1,7 @@
+# Animação de textura: leitura do cabeçalho de malha
+at:2225a4 mh_a
+at:2228e4 mh_b
+at:222ad0 mh_c
+at:225e6c mh_d
+at:24b880 mh_e
+at:1c4e38 mh_f

@@ -1,6 +1,11 @@
-# Atualização do jogador (FUN_001025f0) e suas 4 etapas
-at:12aa60 le_controle
-at:1026e0 etapa1
-at:102f50 etapa2
-at:102a88 etapa3
-at:1032b8 etapa4
+# Eddy e Dark Tooth jogáveis
+at:1176b8 edplayer_wave
+at:1173a8 edplayer_init
+at:117df8 edplayer_state
+at:16fc40 darkpla1_init
+at:16fe00 darkpla1_fire
+at:170360 darkpla1_state
+at:1704a0 darkpla1_a
+at:170e28 darkpla1_b
+at:170dc8 darkpla1_c
+at:170d30 darkpla1_d

@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import type { ObjRigDoc } from './objanim';
+import type { RigClip } from './rig';
 
 /** Span [byteOffset, count] dentro do .bin (SPEC §7.1). */
 export type Span = [number, number];
@@ -29,6 +31,8 @@ export interface MeshDef {
   sprites?: SpriteDef[];
   /** Estado do GS herdado do grupo (pacote A+D): ALPHA_1 [A, B, C, D, FIX] e gravação de z. */
   gs?: { alpha?: [number, number, number, number, number]; zwrite?: boolean };
+  /** Canais de material do objeto 0x11 dono (FUN_0024baa8): [U, V, R, G, B, alfa], -1 = nenhum (src/texanim.ts). */
+  mat?: number[];
 }
 
 export interface TextureDef {
@@ -52,6 +56,10 @@ export interface InstanceDef {
   sel?: [string, number][];
   /** Carros com esqueleto: índice do osso (tools/rig.py), -1 = raiz. */
   b?: number;
+  /** Objeto 0x11 dono dos canais de material da malha (chave de ModelDoc.matAnim). */
+  obj?: string;
+  /** Níveis: objeto com esqueleto (chave de objRigs) — a malha vai crua no osso `b`. */
+  ob?: string;
 }
 
 /** Nó 0x13 (estado de dano): limiares u16 (fração da vida × 65535) por entrada — tools/ngp.py: DamageNode. */
@@ -134,6 +142,12 @@ export interface ModelDoc {
   sceneUnknown: Record<string, string[]>;
   meshes: Record<string, MeshDef>;
   textures: Record<string, TextureDef>;
+  /** Objetos 0x11 cujos canais animam materiais (UV, cor, alfa): clipes só com as trilhas desses canais. */
+  matAnim?: Record<string, { clips: RigClip[] }>;
+  /** Níveis: esqueleto e clipes dos objetos com peças móveis (instâncias com `ob`/`b`). */
+  objRigs?: Record<string, ObjRigDoc>;
+  /** Níveis: roteiros de abertura (nós 0x1B 0xC1C + 0x14·i); só o estado final é usado (sem a cena). */
+  intros?: { index: number; script: number[][] }[];
 }
 
 export const assetURL = (path: string) => `${import.meta.env.BASE_URL}assets/${path}`;

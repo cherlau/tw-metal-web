@@ -1,0 +1,2 @@
+# Animação de textura: callbacks de desenho por categoria
+38fd18 draw_cb_table

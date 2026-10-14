@@ -2,7 +2,10 @@
 // ⚠️ ESCOLHA DO HOST: nomes de exibição das arenas, agrupamento e quais entram no menu.
 // Só as arenas de deathmatch (pedido do usuário, 2026-10-11): as fases da história e de Harbor City
 // foram removidas do menu e dos assets publicados (recriáveis com tools/convert_model.py --dir lvl).
-// Fora do menu: chefes (dark1/dark2/edboss).
+// Fora do menu: chefes (dark1/dark2/edboss) e a forma gigante do Dark Tooth (darkpla2). Entram as versões jogáveis
+// (pedido do usuário, 2026-10-14): Cousin Eddy (edplayer, "Cousin Eddy P") e Dark Tooth (darkpla1, "Dark1 P").
+// Carros do Harbor City removidos do menu e dos assets publicados (pedido do usuário, 2026-10-14); recriáveis com
+// tools/convert_model.py hc_<nome> (--dir cars / aicars) e tools/convert_sfx.py.
 
 export interface LevelEntry {
   id: string;
@@ -25,8 +28,7 @@ export const LEVEL_GROUPS: { title: string; levels: LevelEntry[] }[] = [
 ];
 
 export const CAR_GROUPS: { title: string; cars: string[] }[] = [
-  { title: 'Head-On', cars: ['axel', 'sweet', 'cop', 'crim', 'grass', 'hamr', 'hearse', 'mrgrim', 'mrslam', 'rkill', 'spectre', 'thump', 'twist', 'wart', 'edatv'] },
-  { title: 'Harbor City', cars: ['hc_axel', 'hc_sweet', 'hc_derby', 'hc_grim', 'hc_hears', 'hc_preac', 'hc_rkill', 'hc_rock', 'hc_semi', 'hc_stock', 'hc_suv', 'hc_taxi', 'hc_tank', 'hc_tow', 'hc_vette'] },
+  { title: 'Head-On', cars: ['axel', 'sweet', 'cop', 'crim', 'grass', 'hamr', 'hearse', 'mrgrim', 'mrslam', 'rkill', 'spectre', 'thump', 'twist', 'wart', 'edatv', 'edplayer', 'darkpla1'] },
 ];
 
 /** Nome legível a partir do nome nativo (HO_Axel -> Axel). */

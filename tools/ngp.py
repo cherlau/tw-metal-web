@@ -217,6 +217,8 @@ def decode_packets(
             if iu.vn == 2 and iu.vl == 16 and base + 3 in by_addr and by_addr[base + 3][0].vl == 32:
                 c = by_addr[base + 3][0].floats()[0]
                 col = _color(by_addr[base + 2][0])[0] if base + 2 in by_addr else np.ones(4)
+                # bruto = texel em ponto fixo 12.4; /4096 só normaliza texturas de 256 — o runtime (src/render.ts,
+                # spriteFor) multiplica por 256/dimensão da textura
                 uvr = iu.values().astype(np.float64).reshape(-1) / 4096.0
                 sprites.append(Sprite(tuple(map(float, c[:3])), float(c[3]), tuple(map(float, col)), tuple(map(float, uvr[:4]))))
                 continue
@@ -288,7 +290,7 @@ def _is_header(ngp: bytes, p: int, relocs: set[int], targets: set[int]) -> bool:
     if z0 and p not in targets:
         return False  # +0x00 ≠ 0 (🟡 visto em níveis HC) só quando um ponteiro aponta para cá
     if not flags or (anim and not flags & 0x04):
-        return False  # +0x08 só é não-zero (f32 velocidade de textura animada) quando flags & 0x04
+        return False  # +0x08 só é não-zero (f32 da projeção de textura, FUN_0024b170) no modo 2 (flags & 0x0E == 4)
     ids = _texture_ids(ngp, p)
     if any(struct.unpack_from("<I", ngp, p + 0x10 + 4 * k)[0] for k in range(len(ids) + 1, 4)):
         return False  # buraco na lista de texturas
@@ -296,6 +298,20 @@ def _is_header(ngp: bytes, p: int, relocs: set[int], targets: set[int]) -> bool:
         return False  # ids de textura observados ficam abaixo de 0x200000
     exp = (scale_bits >> 23) & 0xFF
     return (scale_bits & 0x807FFFFF) == 0 and 0x60 <= exp <= 0x7F  # potência de 2 entre 2^-31 e 1
+
+
+def material_channels(ngp: bytes, p: int) -> list[int] | None:
+    """Canais de material da malha (FUN_0024baa8): com o bit 31 das flags, a extensão do cabeçalho (logo após os TEX0)
+    traz u16 índices de canal do objeto 0x11 dono (−1 = nenhum): [0] desloca U e [1] desloca V (só com a flag 0x800),
+    [2..4] escalam R, G, B e [5] escala o alfa (base em +0x5C, sempre 1,0). None = sem canal ligado."""
+    flags = struct.unpack_from("<I", ngp, p + 4)[0]
+    if not flags & 0x80000000:
+        return None
+    ch = list(struct.unpack_from("<6h", ngp, p + 0x60 + 0x10 * len(_texture_ids(ngp, p))))
+    if not flags & 0x800:
+        ch[0] = ch[1] = -1
+    ch = [c if c >= 0 else -1 for c in ch]
+    return ch if any(c >= 0 for c in ch) else None
 
 
 def find_meshes(ngp: bytes, ptr: bytes) -> list[Mesh]:
@@ -424,6 +440,10 @@ class SceneReport:
     selectors: dict[int, Selector] = field(default_factory=dict)
     selected: list[Instance] = field(default_factory=list)
     unknown: dict[int, list[int]] = field(default_factory=dict)  # word de tipo -> nós não interpretados
+    # Registros de localizador 0x00F0/0x00F8 alcançados: (registro, caminho de nós até ele)
+    markers: list[tuple[int, list[int]]] = field(default_factory=list)
+    # Todos os nós visitados, na ordem do percurso (para achar nós por categoria = word >> 18)
+    visited: list[int] = field(default_factory=list)
 
 
 def _u32(b: bytes, p: int) -> int:
@@ -531,6 +551,7 @@ def scene(data: bytes, ptr: bytes, meshes: list[Mesh], root: int | None = None, 
         if depth > 64 or p in path:
             return
         path = path + [p]
+        rep.visited.append(p)
         if p in mesh_at:
             xf = xforms[-1]
             off = tuple(float(v) for v in xf[3, :3])
@@ -549,6 +570,7 @@ def scene(data: bytes, ptr: bytes, meshes: list[Mesh], root: int | None = None, 
             return
         word = _u32(data, p)
         if word >> 24 == 0 and (word >> 16) & 0xFF in (0xF0, 0xF8):
+            rep.markers.append((p, path))
             return  # registro de localizador 0x00F0xxxx/0x00F8xxxx (pontos de montagem), não é nó
         t = word & 0x3F  # bits 6..7 do byte baixo = flags (ex.: 0x41 = grupo animado)
         if t == 0x06:  # raiz: +0x08 -> objeto
@@ -638,8 +660,18 @@ def scene(data: bytes, ptr: bytes, meshes: list[Mesh], root: int | None = None, 
                 xforms.pop()
             else:
                 children(p, p + 0x1C, n, bone, path, depth)
-        elif t == 0x12:  # escala: +0x04 *animação?, +0x08 n, +0x20..+0x28 escala (x, y, z), n filhos em +0x2C
+        elif t == 0x12:
+            # Escala (FUN_0021b3c0 caso 0x12): matriz identidade com a diagonal = escala +0x20..+0x28, translação
+            # acumulada (t + (+0x10..+0x18))/escala, n filhos (+0x08) em +0x2C. Como no 0x18: ⚠️ a translação entra
+            # como p·S + t. Só a Arena tem (0,918 nas arquibancadas, 0,655 no aparelho do ataque de ambiente).
+            if place_objects:
+                sx, sy, sz = struct.unpack_from("<3f", data, p + 0x20)
+                m = np.diag([sx, sy, sz, 1.0])
+                m[3, :3] = struct.unpack_from("<3f", data, p + 0x10)
+                xforms.append(m @ xforms[-1])
             children(p, p + 0x2C, _u32(data, p + 8), bone, path, depth)
+            if place_objects:
+                xforms.pop()
         elif t == 0x03:  # N filhos a partir de +0x1C (parâmetros em +0x10..+0x1B: 🟡)
             children(p, p + 0x1C, _u32(data, p + 8), bone, path, depth)
         elif t == 0x1F and (word >> 24) == 0x06:
@@ -700,7 +732,7 @@ def scene(data: bytes, ptr: bytes, meshes: list[Mesh], root: int | None = None, 
                 if place_objects:
                     xforms.pop()
         elif t in (0x08, 0x0E, 0x17, 0x19, 0x1A, 0x1B, 0x1E):
-            pass  # localizador, vazio (0x0E), marcador (0x17), partículas, gatilho (0x19), animação, colisão (0x1B, 0x1E)
+            pass  # localizador, vazio (0x0E), marcador (0x17), partículas, gatilho (0x19), colisão (0x1A, 0x1B, 0x1E)
         else:
             rep.unknown.setdefault(word, []).append(p)
 

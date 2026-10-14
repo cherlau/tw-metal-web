@@ -1,0 +1,7 @@
+# Carro pegando fogo (FUN_00120778 → FUN_0017f1e8, gerente 0x349150; FUN_0017f370 apaga) e impulsos do golpe
+at:17f1e8 burn_start
+at:17f370 burn_stop
+349150 burn_mgr
+at:136048 impulse_center
+at:1360b8 impulse_at
+at:2b3b90 burn_fx_table

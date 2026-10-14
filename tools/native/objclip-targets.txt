@@ -1,0 +1,5 @@
+# Quem toca clipes de objeto nos níveis
+210590 play_clip_callers
+at:1151e0 script_init
+at:115348 script_play
+refsrange:2d5ea8:2d5f20 script_vtable

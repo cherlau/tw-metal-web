@@ -1,0 +1,6 @@
+# Ataque de ambiente da ARENA (fase 0x10): objeto 0x37bee0 (gerente 0x37be20)
+37bee0 arena_env
+37be20 arena_mgr
+at:1d7a80 env_start
+at:1d7f50 env_state
+at:1a4548 env_snd

@@ -1,0 +1,8 @@
+# Abertura dos níveis: quem chama FUN_001b5ab8/FUN_001b5d88 e quem preenche modo+0x1d0
+1b5ab8 intro_start_callers
+1b5d88 intro_tick_callers
+at:1b5a20 intro_done
+at:1d0ab8 node1b_12
+at:1dad60 intro_end_other
+at:1dad28 intro_cam
+at:1da9a0 intro_cam_start

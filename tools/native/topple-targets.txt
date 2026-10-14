@@ -1,0 +1,6 @@
+# Pool de tombamento (0x328260, 15 × 0x150) e luzes do nó destruído
+refsrange:328260:328270 topple_pool_users
+at:1e3048 topple_release
+at:171690 cat119e
+at:171410 dmg_reset
+at:172908 dmg_apply

@@ -1,0 +1,4 @@
+at:1a45c0 env_spark_snd
+at:147488 env_end
+at:1d32d8 snd_pos
+at:2470c0 fx_spawn

@@ -50,7 +50,7 @@ export interface RigDoc {
   direct?: { spin: number[]; steer: number[] };
   /** Velocidade dos clipes de suporte de arma (FUN_00127778: 2 nos carros Head-On, 1 nos HC). */
   mountSpeed?: number;
-  /** Marcadores 0x00F0 (cat. 0x3C, id = tipo de arma): FUN_00147568 pendura ali o modelo do projétil. */
+  /** Marcadores 0x00F0 (cat. 0x3C; id → tipo de arma por MARK_SLOT): FUN_00147568 pendura ali o modelo do projétil. */
   launchMarks?: { type: number; bone: number; pos: number[] }[];
 }
 
@@ -113,7 +113,7 @@ export function clipFrame(c: RigClip, t01: number): number {
 }
 
 /** Rotação exatamente como FUN_00236e50 (linha-major, uso p · M). */
-function euler(rx: number, ry: number, rz: number, out: number[]): void {
+export function euler(rx: number, ry: number, rz: number, out: number[]): void {
   const sx = Math.sin(rx), sy = Math.sin(ry), sz = Math.sin(rz);
   const cx = Math.cos(rx), cy = Math.cos(ry), cz = Math.cos(rz);
   out[0] = cy * cz; out[1] = -cy * sz; out[2] = sy; out[3] = 0;
@@ -123,7 +123,7 @@ function euler(rx: number, ry: number, rz: number, out: number[]): void {
 }
 
 /** a · b (linha-major 4x4). */
-function mul(a: number[], b: number[], out: number[]): void {
+export function mul(a: number[], b: number[], out: number[]): void {
   const r = new Array<number>(16);
   for (let i = 0; i < 4; i++)
     for (let j = 0; j < 4; j++) r[i * 4 + j] = a[i * 4] * b[j] + a[i * 4 + 1] * b[4 + j] + a[i * 4 + 2] * b[8 + j] + a[i * 4 + 3] * b[12 + j];
@@ -172,6 +172,13 @@ export interface ReleasedAction {
   entry: number;
   action: string;
 }
+
+/**
+ * Marcador 0x00F0 de id n → slot carro+0x61d8 + 4·tipo lido por FUN_00147568/FUN_001474f0 com o tipo da classe
+ * (FUN_00124288): ids 1..7 vão para o próprio tipo, 15 → 10 (Remote), 10 → 11, 11 → 12. O slot 9 (Swarmer) nunca é
+ * preenchido: o jogo não mostra modelo no lançador do Swarmer.
+ */
+const MARK_SLOT: Record<number, number> = { 15: 10, 10: 11, 11: 12 };
 
 export class CarRig {
   readonly group = new THREE.Group();
@@ -313,11 +320,12 @@ export class CarRig {
       if (dmg.length || sel.length) r.tagged.push({ dmg, sel, obj: group });
     }
     for (const m of doc.rig.launchMarks ?? []) {
-      if (r.marks.has(m.type)) continue;
+      const slot = MARK_SLOT[m.type] ?? m.type;
+      if (r.marks.has(slot)) continue;
       const g = new THREE.Group();
       g.position.set(m.pos[0], m.pos[1], m.pos[2]);
       (m.bone >= 0 ? r.boneGroups[m.bone] : root).add(g);
-      r.marks.set(m.type, g);
+      r.marks.set(slot, g);
     }
     r.showTagged();
     r.update();

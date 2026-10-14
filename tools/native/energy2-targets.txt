@@ -1,0 +1,4 @@
+# Recarga da energia (FUN_0011bde0 soma em carro+0x6898) e combos que ligam os bits de controle+0x1c
+11bde0 energy_add
+14ca00 e10_effect
+at:14ca00 e10_effect_fn

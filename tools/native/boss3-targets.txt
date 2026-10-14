@@ -1,0 +1,7 @@
+# Dark Tooth 2: tempestade e origem do raio
+at:16d768 dark2_storm1
+at:16dc20 dark2_storm2
+at:16cdf8 dark2_src
+at:16cf50 dark2_aim
+at:16d210 dark2_c
+at:16d4b8 dark2_d

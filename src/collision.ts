@@ -128,6 +128,26 @@ export class LevelCollision implements CollisionWorld {
     }
   }
 
+  /**
+   * Mundo para projéteis: atravessa as instâncias cujo predicado diz que não seguram tiro (ex.: malhas que não
+   * escrevem profundidade). ⚠️ host até a geometria de colisão 9/0x1A ser convertida.
+   */
+  passThrough(skip: (k: number) => boolean): CollisionWorld {
+    return {
+      closestPoint: (p, max) => this.closestPoint(p, max),
+      raycast: (o, d, max) => {
+        let done = 0;
+        for (let n = 0; n < 16; n++) {
+          const from = { x: o.x + d.x * done, y: o.y + d.y * done, z: o.z + d.z * done };
+          const hit = this.raycast(from, d, max - done);
+          if (!hit || hit.tag === undefined || !skip(hit.tag)) return hit && { ...hit, distance: hit.distance + done };
+          done += hit.distance + 0.01;
+        }
+        return null;
+      },
+    };
+  }
+
   raycast(origin: V3, dir: V3, maxDist: number): Hit | null {
     this.ray.origin.set(origin.x, origin.y, origin.z);
     this.ray.direction.set(dir.x, dir.y, dir.z);

@@ -1,0 +1,5 @@
+# Modelos globais do lancador (Napalm 0x38a7f4, Remote 0x38a7f8, especial 0x38a7f0): quem grava
+38a7f0 lm_special
+38a7f4 lm_napalm
+38a7f8 lm_remote
+refsrange:38a7e0:38a800 lm_range

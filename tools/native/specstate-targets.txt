@@ -1,0 +1,15 @@
+# Funções de estado das especiais (estado 0 = selecionada)
+at:1c8610 roadkill_state
+at:16a018 crimson_state
+at:1d6270 spectre_state
+at:199878 hearse_state
+at:1172e8 axel_state
+at:1e1c48 thumper_state
+at:1b07f0 grimm_state
+at:1e5fb8 twister_state
+at:1b8318 cop_state
+at:193880 grass_state
+at:197da0 hammer_state
+at:1b3278 slam_state
+at:1fcd00 wart_fire
+at:1fcc10 wart_init

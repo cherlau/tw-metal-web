@@ -1,0 +1,3 @@
+# Chefes: auxiliares (2ª rodada)
+at:16c1a8 dark1_seek
+at:16bea8 dark1_hit

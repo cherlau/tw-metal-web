@@ -1,0 +1,6 @@
+# Sistema de partículas: módulo 0x243800..0x24a000 (FUN_002470c0 cria, FUN_00246878 copia as tabelas
+# 0x2cd8e0/0x2cbd60/0x2cab00/0x2cf320 por id para o emissor de 0x1780 bytes no pool 0x527580)
+range:243800:24a000 part_mod
+at:273950 part_273950
+527580 part_pool
+585580 part_alloc

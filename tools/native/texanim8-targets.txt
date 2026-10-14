@@ -1,0 +1,3 @@
+# Animação de textura: quem chama o roteiro de clipes FUN_00115348
+115348 anim_script
+231f80 script_open

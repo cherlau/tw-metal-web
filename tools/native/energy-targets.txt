@@ -1,0 +1,15 @@
+# Ataques de energia (inventário carro+0x51b4): mina 0xd (vtable 0x2d6888), 0x10 (0x2d6828), congelar 0xe (0x2d6768)
+at:14c208 mine_fire
+at:14c430 mine_v48
+at:14c460 mine_v28
+at:14ca00 e10_effect
+at:14cf28 e10_state
+at:14cf00 e10_v48
+at:14c598 e10_v38
+at:14d588 freeze_fire
+at:14d740 freeze_v48
+at:14d770 freeze_v28
+at:11bd48 energy_cost
+at:1026e0 player_ctl
+at:12aa60 ctl_reset
+at:1fd278 ctl_bits

@@ -16,6 +16,7 @@ import struct
 import json
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 import numpy as np
 from PIL import Image
@@ -117,6 +118,27 @@ def save_texture(t: tex.Texture) -> dict:
     }
 
 
+def token_stream(data: bytes, p: int, limit: int = 4096) -> list:
+    """Fluxo de fichas dos roteiros (FUN_00231f80/FUN_00231fc0/FUN_00232170): blocos [tipo u8, n u8]; tipo 1 = n
+    floats (alinhados a 4 depois do cabeçalho), 2 = n strings com tamanho no 1º byte, 0 = fim."""
+    out: list = []
+    while len(out) < limit and p + 2 <= len(data):
+        kind, n = data[p], data[p + 1]
+        if kind == 1:
+            p = (p + 5) & ~3
+            out.extend(struct.unpack_from(f"<{n}f", data, p))
+            p += 4 * n
+        elif kind == 2:
+            p += 2
+            for _ in range(n):
+                size = data[p]
+                out.append(data[p + 1:p + size].split(b"\0")[0].decode("latin-1"))
+                p += size
+        else:
+            break
+    return out
+
+
 def convert(name: str, folder: str) -> dict:
     base = SOURCE / folder / name
 
@@ -199,6 +221,8 @@ def convert(name: str, folder: str) -> dict:
         }
         if m.offset in mesh_state:
             entry["gs"] = mesh_state[m.offset]
+        if (mat := ngp.material_channels(ngp_bytes, m.offset)) is not None:
+            entry["mat"] = mat  # canais do objeto dono: [U, V, R, G, B, alfa] (FUN_0024baa8)
         if m.strips:
             # Uma parte por slot de textura (o cabeçalho de cada strip escolhe a textura).
             entry["parts"] = []
@@ -349,7 +373,10 @@ def convert(name: str, folder: str) -> dict:
     rig_json = None
     if use_rig:
         all_insts = scene_rep.instances + scene_rep.damaged + scene_rep.selected +             [i for v in scene_rep.effects.values() for i in v] + [i for v in scene_rep.code_effects.values() for i in v]
-        rig_bones, rig_index = rig.build(ngp_bytes, all_insts)
+        # Ossos sem malha que carregam marcadores 0x00F0 (ex.: ponta da garra do Ricochet no Roadkill) também
+        # entram, depois dos das malhas — senão o projétil fica na origem do carro.
+        marker_paths = [SimpleNamespace(path=path) for _, path in scene_rep.markers]
+        rig_bones, rig_index = rig.build(ngp_bytes, all_insts + marker_paths)
         clip_list = rig.clips(ngp_bytes, ptr_bytes)
         wheel_like = set()
         for i in all_insts:
@@ -394,7 +421,78 @@ def convert(name: str, folder: str) -> dict:
             out["dmg"] = [[f"n{n:06x}", e] for n, e in i.damage]
         if i.select:  # filhos de seletores 0x05 no caminho: visível só quando todos estão no filho atual
             out["sel"] = [[f"n{n:06x}", c] for n, c in i.select]
+        if (obj := material_owner(i)) is not None:
+            out["obj"] = f"n{obj:06x}"  # objeto 0x11 cujos canais animam o material (matAnim)
+        if (ob := obj_rig_of.get((i.mesh, tuple(i.path)))) is not None:
+            out["ob"], out["b"] = ob  # osso do esqueleto do objeto (objRigs): o runtime ignora offset/matrix
         return out
+
+    # Animação de material (FUN_0024baa8): malhas com canais leem o vetor de canais do objeto 0x11 dono (obj+4),
+    # alimentado pelos clipes do objeto. Carros com esqueleto ficam de fora (os canais deles são os do rig).
+    mat_objects: dict[int, set[int]] = {}  # objeto -> canais lidos pelos materiais
+
+    def material_owner(i: ngp.Instance) -> int | None:
+        mat = mesh_json.get(f"m{i.mesh:06x}", {}).get("mat")
+        if use_rig or mat is None:
+            return None
+        owners = [n for n in i.path if struct.unpack_from("<I", ngp_bytes, n)[0] & 0x3F == 0x11]
+        if not owners:
+            return None
+        mat_objects.setdefault(owners[-1], set()).update(c for c in mat if c >= 0)
+        return owners[-1]
+
+    # Peças móveis dos níveis: objetos 0x11 cujos clipes escrevem canais de ossos 0x0D sob eles. O jogo monta o
+    # objeto com FUN_002111f8 (toca na carga os clipes com o bit 0 do u16 +0x0E, "auto") e desenha os ossos pelos
+    # canais (FUN_0021b3c0); os demais clipes são tocados por roteiros (0xDCA, abertura) ou pelo código.
+    obj_rig_of: dict[tuple[int, tuple[int, ...]], tuple[str, int]] = {}
+    obj_rigs: dict[str, dict] = {}
+    if folder == "lvl":
+        by_obj: dict[int, list[ngp.Instance]] = {}
+        effect_insts = [i for insts in scene_rep.effects.values() for i in insts]
+        for i in scene_rep.instances + scene_rep.damaged + effect_insts:
+            owners = [n for n in i.path if struct.unpack_from("<I", ngp_bytes, n)[0] & 0x3F == 0x11]
+            if owners:
+                by_obj.setdefault(owners[-1], []).append(i)
+        for obj, insts in sorted(by_obj.items()):
+            clip_list = rig.object_clips(ngp_bytes, obj)
+            if not clip_list:
+                continue
+            ob_bones, ob_index = rig.build(ngp_bytes, insts)
+            driven = {c for b in ob_bones for c in b.chan + [b.vis] if c >= 0}
+            if not driven & {t.channel for c in clip_list for t in c.tracks}:
+                continue
+            key = f"n{obj:06x}"
+            obj_rigs[key] = {
+                "category": struct.unpack_from("<I", ngp_bytes, obj)[0] >> 18,
+                "bones": [{"parent": b.parent, "const": b.const, "chan": b.chan, "vis": b.vis,
+                           "pre": b.pre, "post": b.post} for b in ob_bones],
+                "clips": [{"category": c.category, "start": c.start, "duration": c.duration, "role": "other",
+                           "loop": c.loop, "auto": c.auto,
+                           "tracks": [{"ch": t.channel, "kind": t.kind, "step": t.step, "base": t.base,
+                                       "scale": t.scale, "t0": t.t0, "keys": t.keys}
+                                      for t in c.tracks if t.channel in driven]}
+                          for c in clip_list],
+            }
+            for i in insts:
+                obj_rig_of[(i.mesh, tuple(i.path))] = (key, rig.leaf_bone(ngp_bytes, i, ob_index))
+
+    # Roteiros de abertura (FUN_002062b8 → FUN_0018fdb8): nós 0x1B com u16 +0x08 = 0xC1C + 0x14·i (i < 6); o
+    # fluxo em +0x0C (FUN_00231f80) = n e n trios (categoria, índice, categoria do clipe) que FUN_001b5ab8 toca.
+    # O port não mostra a cena: só aplica o estado final (objetos no fim do clipe; 0xC23 no clipe 2).
+    intros: list[dict] = []
+    if folder == "lvl":
+        relocs = ngp.relocations(ngp_bytes, ptr_bytes)
+        targets = sorted({ngp._u32(ngp_bytes, r) for r in relocs if ngp._u32(ngp_bytes, r) + 0x10 <= len(ngp_bytes)})
+        for t in targets:
+            w = ngp._u32(ngp_bytes, t)
+            sid = struct.unpack_from("<H", ngp_bytes, t + 8)[0]
+            if w & 0x3F != 0x1B or not (0xC1C <= sid < 0xC1C + 0x65) or (sid - 0xC1C) % 0x14:
+                continue
+            values = token_stream(ngp_bytes, t + 0x0C)
+            n = int(values[0]) if values else 0
+            entry = {"index": (sid - 0xC1C) // 0x14,
+                     "script": [[int(v) for v in values[1 + 3 * k:4 + 3 * k]] for k in range(n)]}
+            intros.append(entry)
 
     # Ações soltas pelos nós 0x13 (actionDispatch.cpp) e os modelos das peças de destroço (tools/actions.py).
     piece_info: dict[int, dict] = {}
@@ -462,6 +560,10 @@ def convert(name: str, folder: str) -> dict:
         **({"mounts": weapon_mounts()} if folder in ("cars", "aicars") else {}),
         # Esqueleto (ossos 0x0D como FUN_0022c678) e clipes de animação (nós 0x0B com categoria).
         **({"rig": rig_json} if rig_json else {}),
+        # Níveis: esqueleto e clipes de cada objeto com peças móveis (instâncias com "ob"/"b").
+        **({"objRigs": obj_rigs} if obj_rigs else {}),
+        # Roteiro da abertura (FUN_001b5ab8): o runtime aplica só o estado final.
+        **({"intros": intros} if intros else {}),
         # Lançadores por slot: base fixa + portas (dobradiça: pivô, eixo, ângulo de abertura) — tools/launchers.py.
         **({"launchers": [
             {"slots": la.slots, "offset": la.offset,
@@ -501,6 +603,17 @@ def convert(name: str, folder: str) -> dict:
         "meshes": mesh_json,
         "textures": textures,
     }
+    # Depois de todas as instâncias (inst_json registra os objetos donos): clipes de cada objeto com material animado,
+    # só com as trilhas dos canais que os materiais leem (o clipe da abertura da Arena tem 211 trilhas, quase todas de
+    # ossos).
+    if mat_objects:
+        doc["matAnim"] = {
+            f"n{obj:06x}": {"clips": [
+                {"category": c.category, "start": c.start, "duration": c.duration, "role": "other", "loop": c.loop,
+                 "auto": c.auto, "tracks": [{"ch": t.channel, "kind": t.kind, "step": t.step, "base": t.base, "scale": t.scale,
+                             "t0": t.t0, "keys": t.keys} for t in c.tracks if t.channel in chans]}
+                for c in rig.object_clips(ngp_bytes, obj)]}
+            for obj, chans in sorted(mat_objects.items())}
     dest = ASSETS / folder
     dest.mkdir(parents=True, exist_ok=True)
     (dest / f"{name}.bin").write_bytes(bytes(out.buf))

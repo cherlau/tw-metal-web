@@ -41,6 +41,10 @@ export class DebrisBody {
   /** Quanto um canto pode ficar abaixo do chão sem contato (objetos que já nascem enterrados, como árvores). */
   slop = 0;
   resting = false;
+  /** Ponto local do topo (FUN_001e2770): ao chegar a ≤ 3 pés do chão chama `onLand(|v|², ponto no mundo)` uma vez. */
+  landTip: THREE.Vector3 | null = null;
+  onLand: ((v2: number, at: THREE.Vector3) => void) | null = null;
+  private landed = false;
   private readonly invInertia: THREE.Vector3; // diagonal, no espaço local
   private readonly corners: THREE.Vector3[];
 
@@ -84,6 +88,14 @@ export class DebrisBody {
     const w = this.omega.length();
     if (w > 1e-6) this.rot.premultiply(new THREE.Quaternion().setFromAxisAngle(this.omega.clone().divideScalar(w), w * dt)).normalize();
     if (!ground) return;
+    if (this.landTip && !this.landed) {
+      const tip = this.landTip.clone().applyQuaternion(this.rot).add(this.pos);
+      const hit = ground.raycast({ x: tip.x, y: tip.y + 10, z: tip.z }, { x: 0, y: -1, z: 0 }, 110);
+      if (hit && hit.distance - 10 <= 3) {
+        this.landed = true;
+        this.onLand?.(this.vel.lengthSq(), tip.setY(tip.y + 10 - hit.distance));
+      }
+    }
     // Canto mais fundo: raio curto por canto (sobe 3 pés e desce 6) — funciona em encosta e sob outras copas.
     let deepest = -1;
     let depth = 0;

@@ -1,0 +1,8 @@
+# Ataque de ambiente por fase (FUN_0014d040, switch DAT_002f4900)
+at:1cab28 env_0
+at:17c5e8 env_1
+at:18cf60 env_2
+at:1b9d50 env_3
+at:1cfc78 env_4
+at:194618 env_5
+at:1d7a80 env_10

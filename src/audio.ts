@@ -88,6 +88,7 @@ export class AudioEngine {
   private buffers = new Map<string, Promise<AudioBuffer | null>>();
   private musicEl: HTMLAudioElement | null = null;
   private playlist: string[] = [];
+  private playIndex = 0;
   private muted = false;
   private engines = new Map<number, EngineVoice>();
   private enginesLoading = new Set<number>();
@@ -147,16 +148,21 @@ export class AudioEngine {
     const el = new Audio();
     el.crossOrigin = 'anonymous';
     this.ctx.createMediaElementSource(el).connect(this.musicBus);
-    let i = 0;
-    const next = () => {
-      el.src = assetURL(this.music!.tracks[this.playlist[i % this.playlist.length]].url);
-      i++;
-      // O progresso do jogo nunca depende da mídia tocar (SPEC §12).
-      el.play().catch(() => undefined);
-    };
-    el.addEventListener('ended', next);
+    el.addEventListener('ended', () => this.nextTrack());
     this.musicEl = el;
-    next();
+    this.nextTrack();
+  }
+
+  private playUrl(url: string) {
+    if (!this.musicEl) return;
+    this.musicEl.src = assetURL(url);
+    // O progresso do jogo nunca depende da mídia tocar (SPEC §12).
+    this.musicEl.play().catch(() => undefined);
+  }
+
+  private nextTrack() {
+    if (!this.music || !this.playlist.length) return;
+    this.playUrl(this.music.tracks[this.playlist[this.playIndex++ % this.playlist.length]].url);
   }
 
   private buffer(url: string): Promise<AudioBuffer | null> {

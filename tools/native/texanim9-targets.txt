@@ -1,0 +1,3 @@
+# Animação de textura: modo 4 (rolagem de UV pela velocidade em +0x08)
+at:24b170 uv_scroll
+at:24b0f0 uv_scroll_end

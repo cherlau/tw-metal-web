@@ -1,0 +1,9 @@
+# Combos do controle (bits de controle+0x1c)
+at:12ad70 ctl_a
+at:12caa8 ctl_b
+at:12cf88 ctl_c
+at:12d194 ctl_d
+at:12d418 ctl_e
+at:12d7a4 ctl_f
+at:12d8ec ctl_g
+at:12da70 ctl_h

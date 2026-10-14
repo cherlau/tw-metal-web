@@ -77,6 +77,8 @@ export interface VehicleShape {
   wheels?: V3[];
   /** Registro de direção nativo (sem ele: modelo arcade do host, VEHICLE_RULES). */
   drive?: DriveParams;
+  /** Pontos de disparo 0x00F8 por id (coords do PS2: x direita, y frente, z cima; modelo `mounts`). */
+  mounts?: Record<number, readonly [number, number, number]>;
 }
 
 export interface VehicleState {
